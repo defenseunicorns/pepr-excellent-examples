@@ -1,0 +1,34 @@
+{
+  "name": "pepr-excellent-examples",
+  "version": "0.0.1",
+  "description": "This repository is a comprehensive collection of practical examples, code snippets, and usage scenarios for Pepr.",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "pepr-module",
+    "security"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "name": "Pepr Excellent Examples",
+    "uuid": "eee15d8c-c9b4-53bc-ba89-8537c2054bbc",
+    "onError": "ignore",
+    "alwaysIgnore": {
+      "namespaces": [],
+      "labels": []
+    },
+    "includedFiles": []
+  },
+  "scripts": {
+    "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system"
+  },
+  "dependencies": {
+    "pepr": "0.15.0"
+  },
+  "devDependencies": {
+    "typescript": "5.2.2"
+  }
+}

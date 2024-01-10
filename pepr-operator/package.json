@@ -1,0 +1,35 @@
+{
+  "name": "pepr-operator",
+  "version": "0.0.1",
+  "description": "Build an operator with Pepr",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "pepr-module",
+    "security"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "name": "pepr-operator",
+    "uuid": "e3789d0b-497b-5019-bcb4-8cd5c959b4ff",
+    "onError": "reject",
+    "alwaysIgnore": {
+      "namespaces": [],
+      "labels": []
+    },
+    "includedFiles": [],
+    "env": {}
+  },
+  "scripts": {
+    "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system"
+  },
+  "dependencies": {
+    "pepr": "0.21.1"
+  },
+  "devDependencies": {
+    "typescript": "5.3.3"
+  }
+}

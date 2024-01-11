@@ -1,0 +1,15 @@
+{
+   "compilerOptions": {
+      "lib": [
+         "es2022"
+      ],
+      "target": "es2022",
+      "module": "es2022",
+      "moduleResolution": "node",
+      "allowSyntheticDefaultImports": true,
+      "outDir": "./build",
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "sourceMap": true
+   }
+}

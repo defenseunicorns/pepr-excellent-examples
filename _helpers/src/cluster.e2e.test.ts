@@ -61,16 +61,13 @@ describe("clean()", () => {
   }, mins(2))
 
   beforeEach(() => {
-    // configure test-driven KFC to use test-defined config
+    // configure test-driven KFC to use test-defined kube config
     process.env.KUBECONFIG = trc.kubeConfig
   })
 
-  afterEach(() => { console.log(process.env) ; process.env = { ...originalEnv } ; console.log(process.env) })
+  afterEach(() => { process.env = { ...originalEnv } })
 
-  afterAll(async () => {
-    await down(cluster)
-    console.log(process.env)
-  }, mins(1))
+  afterAll(async () => { await down(cluster) }, mins(1))
 
   it("removes resources with TestRunCfg-defined label", async () => {
     const configMap = {

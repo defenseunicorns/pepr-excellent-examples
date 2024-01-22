@@ -1,14 +1,20 @@
 import * as path from 'path';
-import * as fs from 'fs';
+// import * as fs from 'fs';
 import { nearestAncestor } from './general'
 
 export class TestRunCfg {
   me: string;
   unique: string;
+  kubeConfig: string;
 
-  constructor(me: string, unique: string = new Date().valueOf().toString()) {
+  constructor(
+    me: string,
+    unique: string = new Date().valueOf().toString(),
+    kubeConfig: string = "~/.kube/config",
+  ) {
     this.me = me
     this.unique = unique
+    this.kubeConfig = kubeConfig
   }
 
   name(): string {
@@ -27,13 +33,13 @@ export class TestRunCfg {
     return `${this.root()}/cluster.lock`
   }
 
-  module(): string {
-    return `${this.here()}/${this.name()}.pepr.ts`
-  }
-
   labelKey(): string {
     return `test-transient/${this.name()}`
   }
+  
+  // module(): string {
+  //   return `${this.here()}/${this.name()}.pepr.ts`
+  // }
 
   // manifests(): [string, string][] {
   //   return fs.readdirSync(this.here())

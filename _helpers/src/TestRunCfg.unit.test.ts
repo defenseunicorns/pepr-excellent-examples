@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import * as path from 'path';
+import { describe, expect, it, jest } from '@jest/globals';
+// import * as path from 'path';
 import { TestRunCfg } from "./TestRunCfg";
 
 import * as general from './general'
@@ -34,6 +34,19 @@ describe("TestRunCfg", () => {
     })
   })
 
+  describe("exposes kube config used for cluster operations", () => {
+    it("defaults to widely-known default location", () => {
+      const trc = new TestRunCfg(me)
+      expect(trc.kubeConfig).toBe("~/.kube/config")
+    })
+
+    it("can be given directly", () => {
+      const kubeConfig = "~/.config/k3d/cluster.yaml"
+      const trc = new TestRunCfg(me, undefined, kubeConfig)
+      expect(trc.kubeConfig).toBe(kubeConfig)
+    })
+  })
+
   it("derives capability name", () => {
     const trc = new TestRunCfg(me)
     expect(trc.name()).toBe(name)
@@ -60,17 +73,17 @@ describe("TestRunCfg", () => {
     expect(trc.lockfile()).toBe(lock)
   })
 
-  it ("derives cluster module file path", () => {
-    const mod = me.replace('.e2e.test', '.pepr')
-    const trc = new TestRunCfg(me)
-    expect(trc.module()).toBe(mod)
-  })
-
   it("exposes a capability-specific label key", () => {
     const lk = `test-transient/${name}`
     const trc = new TestRunCfg(me)
     expect(trc.labelKey()).toBe(lk)
   })
+
+  // it ("derives cluster module file path", () => {
+  //   const mod = me.replace('.e2e.test', '.pepr')
+  //   const trc = new TestRunCfg(me)
+  //   expect(trc.module()).toBe(mod)
+  // })
 
   // describe("discovers to-be-applied, index-ordered capability test manifests", () => {
   //   const files = [

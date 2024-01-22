@@ -36,14 +36,14 @@ const opts = program.opts();
 
 function testUnit(passthru) {
   spawnSync(
-    "jest", [ "--testMatch", "**/?(*.)+(spec|test).unit.[tj]s?(x)", ...passthru ],
+    "jest", [ "--testRegex", ".*\.unit\.test\.ts", ...passthru ],
     { stdio: 'inherit' }
   )
 }
 
 function testE2e(passthru) {
   spawnSync(
-    "jest", [ "--testMatch", "**/?(*.)+(spec|test).e2e.[tj]s?(x)", ...passthru ],
+    "jest", [ "--testRegex", ".*\.e2e\.test\.ts", ...passthru ],
     { stdio: 'inherit' }
   )
 }

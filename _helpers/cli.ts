@@ -56,28 +56,30 @@ async function testE2e(passthru) {
     { stdio: 'inherit' }
   )
   if (result.status !== 0) { throw result }
-
-  // create long-lived test cluster
+  
+  // long-lived test cluster
   const cluster = "pexex-helpers-e2e"
-  await down(cluster)
-  const kubeConfig = await up(cluster)
+  try {
+    await down(cluster)
+    const kubeConfig = await up(cluster)
 
-  // run tests that require a pre-existing cluster (and/or don't care)
-  result = spawnSync(
-    "jest", [
-      "--testPathIgnorePatterns", "src/cluster\.e2e\.test\.ts",
-      "--testPathPattern", ".*\.e2e\.test\.ts",
-      ...passthru
-    ],
-    {
-      stdio: 'inherit',
-      env: { ...process.env, KUBECONFIG: kubeConfig }
-    }
-  )
-  if (result.status !== 0) { throw result }
+    // run tests that require a pre-existing cluster (and/or don't care)
+    let result = spawnSync(
+      "jest", [
+        "--testPathIgnorePatterns", "src/cluster\.e2e\.test\.ts",
+        "--testPathPattern", ".*\.e2e\.test\.ts",
+        ...passthru
+      ],
+      {
+        stdio: 'inherit',
+        env: { ...process.env, KUBECONFIG: kubeConfig }
+      }
+    )
+    if (result.status !== 0) { throw result }
 
-  // in the case that all tests pass, clean up test cluster
-  await down(cluster)
+  } finally {
+    await down(cluster)
+  }
 }
 
 async function testAll(passthru) {

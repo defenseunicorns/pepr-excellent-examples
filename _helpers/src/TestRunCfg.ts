@@ -33,6 +33,10 @@ export class TestRunCfg {
     return `${this.root()}/cluster.lock`
   }
 
+  locktext(): string {
+    return `${this.me}:${this.unique}`
+  }
+
   labelKey(): string {
     return `test-transient/${this.name()}`
   }

@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import * as pfs from 'fs/promises';
+import * as fsP from 'fs/promises';
 import {
   GenericClass,
   K8s,
@@ -19,13 +19,16 @@ export function ms(num: number): number { return num }
 export function secs(num: number): number { return num * 1000 }
 export function mins(num: number): number { return num * secs(60)}
 
+// Jest runs test files in parallel but we can't guarantee that capabilities
+// will only touch non-global cluster resources, so... we're serializing
+// e2e test cluster access/ownership with a file-based lock
 export async function waitLock(file: string, unique: string) {
   const lock = async () => {
-    let fileHandle: pfs.FileHandle;
+    let fileHandle: fsP.FileHandle;
 
     // 'wx' --> open for write; create if it does not exist & fail if does
-    // https://nodejs.org/api/pfs.html#file-system-flags
-    try { fileHandle = await pfs.open(file, 'wx') }
+    // https://nodejs.org/api/fs.html#file-system-flags
+    try { fileHandle = await fsP.open(file, 'wx') }
     catch (e) {
       if (e.code === 'EEXIST') { return false } else { throw e }
     }

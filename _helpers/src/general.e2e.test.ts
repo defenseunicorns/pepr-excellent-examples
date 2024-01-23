@@ -1,6 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
-// SPDX-FileCopyrightText: 2023-Present The Pepr Authors
-
+import * as fsP from 'fs/promises';
 import {
   beforeAll,
   afterAll,
@@ -10,35 +8,20 @@ import {
   expect,
   it
 } from '@jest/globals';
+import { TestRunCfg } from './TestRunCfg';
 import {
+  mins,
+  waitLock,
   resourceGone,
   untilGone
 } from "./general";
 
-// const cluster = "peprexex-helpers-cluster-clean"
-// let trc: TestRunCfg
-// const originalEnv = { ...process.env }
+const trc = new TestRunCfg(__filename)
 
-// beforeAll(async () => {
-//   const kubeConfig = await up(cluster)
-//   trc = {
-//     kubeConfig,
-//     labelKey: jest.fn(() => "test-transient/capability-name")
-//   } as unknown as TestRunCfg
-// }, mins(2))
-
-// beforeEach(() => {
-//   // configure test-driven KFC to use test-defined kube config
-//   process.env.KUBECONFIG = trc.kubeConfig
-// })
-
-// afterEach(() => { process.env = { ...originalEnv } })
-
-// afterAll(async () => { await down(cluster) }, mins(1))
-
-
-// TODO: need to pull in cluster lock stuff to serialize cluster access to peprexex cluster... right?
-
+beforeAll(async () => {
+  await waitLock(trc.lockfile(), trc.locktext())
+}, mins(10))
+afterAll(async () => await fsP.rm(trc.lockfile()))
 
 describe("resourceGone()", () => {
   it("is tested", () => {

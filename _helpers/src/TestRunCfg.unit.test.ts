@@ -73,6 +73,12 @@ describe("TestRunCfg", () => {
     expect(trc.lockfile()).toBe(lock)
   })
 
+  it ("derives cluster lock file text", () => {
+    const lock = `${root}/cluster.lock`
+    const trc = new TestRunCfg(me)
+    expect(trc.locktext()).toBe(`${trc.me}:${trc.unique}`)
+  })
+
   it("exposes a capability-specific label key", () => {
     const lk = `test-transient/${name}`
     const trc = new TestRunCfg(me)

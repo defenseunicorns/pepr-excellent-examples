@@ -17,7 +17,7 @@ import { Cmd } from './Cmd';
 
 describe("up()", () => {
   it("creates a test k3d cluster", async () => {
-    const cluster = "peprexex-helpers-cluster-e2e-up"
+    const cluster = "pexex-helpers-cluster-e2e-up"
 
     const kubeconfig =  await up(cluster)
 
@@ -36,7 +36,7 @@ describe("up()", () => {
 
 describe("down()", () => {
   it("delete a test k3d cluster", async () => {
-    const cluster = "peprexex-helpers-cluster-e2e-down"
+    const cluster = "pexex-helpers-cluster-e2e-down"
     const kubeconfig = await up(cluster)
 
     await down(cluster)
@@ -48,7 +48,7 @@ describe("down()", () => {
 })
 
 describe("clean()", () => {
-  const cluster = "peprexex-helpers-cluster-clean"
+  const cluster = "pexex-helpers-cluster-clean"
   let trc: TestRunCfg
   const originalEnv = { ...process.env }
 

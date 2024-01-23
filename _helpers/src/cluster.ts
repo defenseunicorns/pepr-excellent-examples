@@ -10,19 +10,23 @@ import { TestRunCfg } from './TestRunCfg';
 import { untilTrue, resourceGone } from "./general";
 import { Cmd } from './Cmd'
 
-export async function up(name: string = 'peprexex-helpers-cluster'): Promise<string> {
+export async function up(name: string = 'pexex-helpers-cluster'): Promise<string> {
   const create = await new Cmd({
     cmd: `k3d cluster create ${name} --kubeconfig-update-default=false`
   }).run()
+  if (create.exitcode > 0) { throw create }
+
   const config = await new Cmd({
     cmd: `k3d kubeconfig write ${name}`
   }).run()
+  if (config.exitcode > 0) { throw config }
 
   return config.stdout[0]
 }
 
-export async function down(name: string = 'peprexex-cluster'): Promise<void> {
-  await new Cmd({ cmd: `k3d cluster delete ${name}` }).run()
+export async function down(name: string = 'pexex-helpers-cluster'): Promise<void> {
+  const remove = await new Cmd({ cmd: `k3d cluster delete ${name}` }).run()
+  if (remove.exitcode > 0) { throw remove }
 }
 
 export async function clean(trc: TestRunCfg): Promise<void> {

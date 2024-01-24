@@ -35,7 +35,7 @@ describe("up()", () => {
 })
 
 describe("down()", () => {
-  it("delete a test k3d cluster", async () => {
+  it("deletes a test k3d cluster", async () => {
     const cluster = "pexex-helpers-cluster-e2e-down"
     const kubeconfig = await up(cluster)
 

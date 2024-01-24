@@ -1,9 +1,6 @@
-import * as fsP from 'fs/promises';
 import {
   beforeAll,
   afterAll,
-  beforeEach,
-  afterEach,
   describe,
   expect,
   it
@@ -11,17 +8,16 @@ import {
 import { TestRunCfg } from './TestRunCfg';
 import {
   mins,
-  waitLock,
+  lock,
+  unlock,
   resourceGone,
   untilGone
 } from "./general";
 
 const trc = new TestRunCfg(__filename)
 
-beforeAll(async () => {
-  await waitLock(trc.lockfile(), trc.locktext())
-}, mins(10))
-afterAll(async () => await fsP.rm(trc.lockfile()))
+beforeAll(async () => { await lock(trc) }, mins(10))
+ afterAll(async () => { await unlock(trc) })
 
 describe("resourceGone()", () => {
   it("is tested", () => {

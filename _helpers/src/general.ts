@@ -6,6 +6,7 @@ import {
   K8s,
   KubernetesObject
 } from "kubernetes-fluent-client";
+import { TestRunCfg } from './TestRunCfg';
 
 export function sleep(seconds: number): Promise<void> {
   return new Promise(res => setTimeout(res, secs(seconds)));
@@ -19,9 +20,9 @@ export function ms(num: number): number { return num }
 export function secs(num: number): number { return num * 1000 }
 export function mins(num: number): number { return num * secs(60)}
 
-// Jest runs test files in parallel but we can't guarantee that capabilities
-// will only touch non-global cluster resources, so... we're serializing
-// e2e test cluster access/ownership with a file-based lock
+// Jest runs test files in parallel so we can't guarantee that test capabilities
+// will only touch non-conflicting cluster resources... which means we have to
+// synchronize e2e test cluster access & ownership with a (file-based) lock
 export async function waitLock(file: string, unique: string) {
   const lock = async () => {
     let fileHandle: fsP.FileHandle;
@@ -38,8 +39,16 @@ export async function waitLock(file: string, unique: string) {
 
     return true
   }
-  
+
   await untilTrue(lock)
+}
+
+export async function lock(trc: TestRunCfg) {
+  return waitLock(trc.lockfile(), trc.locktext())
+}
+
+export async function unlock(trc: TestRunCfg) {
+  return fsP.rm(trc.lockfile())
 }
 
 export function nearestAncestor(filename: string, fromPath: string): string {

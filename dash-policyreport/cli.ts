@@ -43,22 +43,7 @@ function testUnit(passthru) {
 }
 
 async function testE2e(passthru) {
-  /*
-    Because this suite contains tests that create & destroy clusters as part of
-    execution AS WELL AS those that expect a stable test cluster to pre-exist
-    their execution, this block stages test invocations such that only a single
-    test-owned cluster exists at a given time.
-  */
-
-  // run tests that create & destroy their own clusters
-  let result = spawnSync(
-    "jest", [ "--testPathPattern", "src/cluster\.e2e\.test\.ts", ...passthru ],
-    { stdio: 'inherit' }
-  )
-  if (result.status !== 0) { throw result }
-  
-  // long-lived test cluster
-  const cluster = "pexex-helpers-e2e"
+  const cluster = "pexex-dash-policyreport-e2e"
   try {
     await down(cluster)
     const kubeConfig = await up(cluster)

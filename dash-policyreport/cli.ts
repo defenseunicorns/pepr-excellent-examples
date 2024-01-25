@@ -51,7 +51,6 @@ async function testE2e(passthru) {
     // run tests that require a pre-existing cluster (and/or don't care)
     let result = spawnSync(
       "jest", [
-        "--testPathIgnorePatterns", "src/cluster\.e2e\.test\.ts",
         "--testPathPattern", ".*\.e2e\.test\.ts",
         ...passthru
       ],

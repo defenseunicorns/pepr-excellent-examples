@@ -1,0 +1,52 @@
+{
+  "name": "dash-policyreport",
+  "version": "0.0.1",
+  "description": "Dash Days 2024 Jan - Pepr meets ClusterPolicyReport/PolicyReport",
+  "type": "module",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "pepr-module",
+    "security"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "name": "dash-policyreport",
+    "uuid": "5f4e99be-321f-5a32-85bd-eb2c9bfcc291",
+    "onError": "reject",
+    "alwaysIgnore": {
+      "namespaces": [],
+      "labels": []
+    },
+    "includedFiles": [],
+    "env": {}
+  },
+  "ugh": "scripts --> k3d-setup --> k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "dotenv-cli": "^7.3.0",
+    "pepr": "0.23.1"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/node": "^20.11.0",
+    "commander": "^11.1.0",
+    "jest": "^29.7.0",
+    "kubernetes-fluent-client": "^2.1.0",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.2",
+    "typescript": "5.3.3"
+  },
+
+  "scripts": {
+    "_node": "node --no-warnings=ExperimentalWarning --experimental-specifier-resolution=node --loader ts-node/esm",
+    "cli": "npx dotenv -e .env.dev -- npm run _node -- cli.ts",
+    "test":"npm run test:all",
+    "test:all": "npm run cli -- test --suite all",
+    "test:e2e": "npm run cli -- test --suite e2e",
+    "test:unit": "npm run cli -- test --suite unit"
+  }
+}

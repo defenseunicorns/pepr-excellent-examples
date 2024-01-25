@@ -1,7 +1,10 @@
 import 'dotenv/config';
+import { writeFile, mkdir } from 'node:fs/promises';
+import * as path from 'node:path';
 import { program, Option } from 'commander';
 import { spawnSync } from 'node:child_process';
 import { up, down } from 'helpers/src/cluster';
+import { Cmd } from 'helpers/src/Cmd';
 
 program.name('cli')
   .version('0.0.0', '-v, --version')
@@ -23,13 +26,18 @@ const test = program.command('test')
       'args to pass to test runner (e.g. --passthru="--testPathPattern=general.test.unit.ts")'
     )
   )
-  .action(async ({suite, passthru}) => {
+  .action(async ({ suite, passthru }) => {
     passthru = passthru || []
     switch (suite) {
-      case 'unit':  testUnit(passthru)      ; break
-      case 'e2e':   await testE2e(passthru) ; break
-      case 'all':   await testAll(passthru) ; break
+      case 'unit': testUnit(passthru); break
+      case 'e2e': await testE2e(passthru); break
+      case 'all': await testAll(passthru); break
     }
+  })
+
+const generate = program.command('regen').description('generate policyReport types from github crd')
+  .action(async () => {
+    await generateType()
   })
 
 await program.parseAsync(process.argv);
@@ -37,9 +45,22 @@ const opts = program.opts();
 
 function testUnit(passthru) {
   spawnSync(
-    "jest", [ "--testRegex", ".*\.unit\.test\.ts", ...passthru ],
+    "jest", ["--testRegex", ".*\.unit\.test\.ts", ...passthru],
     { stdio: 'inherit' }
   )
+}
+
+async function generateType() {
+  const crdFileUrl = "https://github.com/kubernetes-sigs/wg-policy-prototypes/raw/master/policy-report/crd/v1alpha2/wgpolicyk8s.io_policyreports.yaml"
+  const crdFilePath = path.resolve("./types", "policyreport-crd.yaml")
+  const dir = path.dirname(crdFilePath)
+
+  mkdir(dir, { recursive: true })
+  const response = await fetch(crdFileUrl);
+  const body = await response.text();
+  writeFile(crdFilePath, body)
+  const getTypesCmd = await new Cmd({ cmd: `npm run _kfc -- crd ${crdFileUrl} ${dir}` }).run()
+  if (getTypesCmd.exitcode > 0) { throw getTypesCmd }
 }
 
 async function testE2e(passthru) {
@@ -51,9 +72,9 @@ async function testE2e(passthru) {
     // run tests that require a pre-existing cluster (and/or don't care)
     let result = spawnSync(
       "jest", [
-        "--testPathPattern", ".*\.e2e\.test\.ts",
-        ...passthru
-      ],
+      "--testPathPattern", ".*\.e2e\.test\.ts",
+      ...passthru
+    ],
       {
         stdio: 'inherit',
         env: { ...process.env, KUBECONFIG: kubeConfig }

@@ -37,7 +37,7 @@ describe("sleep", () => {
   })
 })
 
-describe("untilTrue", () => {
+describe("untilTrue()", () => {
   it("resolves when given predicate returns true", async () => {
     let predicate = () => new Promise<boolean>(resolve => {
       setTimeout(() => resolve(true), 250)
@@ -46,7 +46,7 @@ describe("untilTrue", () => {
   })
 })
 
-describe("ms", () => {
+describe("ms()", () => {
   it("returns appropriate number of milliseconds", () => {
     const testTable = [
       [100, 100],
@@ -59,7 +59,7 @@ describe("ms", () => {
   })
 })
 
-describe("secs", () => {
+describe("secs()", () => {
   it("returns appropriate number of milliseconds", () => {
     const testTable = [
       [1, 1000],
@@ -72,7 +72,7 @@ describe("secs", () => {
   })
 })
 
-describe("mins", () => {
+describe("mins()", () => {
   it("returns appropriate number of milliseconds", () => {
     const testTable = [
       [1, 60000],
@@ -85,7 +85,7 @@ describe("mins", () => {
   })
 })
 
-describe("waitLock", () => {
+describe("waitLock()", () => {
   let workdir: string;
 
   beforeEach(async () => {
@@ -119,7 +119,7 @@ describe("waitLock", () => {
   })
 })
 
-describe("nearestAncestor", () => {
+describe("nearestAncestor()", () => {
   let rootdir: string
   let filename: string
   let ancestor: string

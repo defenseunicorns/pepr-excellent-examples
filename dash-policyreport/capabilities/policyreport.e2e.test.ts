@@ -2,22 +2,22 @@ import {
   beforeAll,
   afterAll,
   describe,
-  expect,
+  // expect,
   it
 } from '@jest/globals';
 import { TestRunCfg } from 'helpers/src/TestRunCfg';
-import { readFile } from 'node:fs/promises';
+// import { readFile } from 'node:fs/promises';
 import {
   mins,
   lock,
   unlock,
-  resourceGone,
-  untilGone,
+  // resourceGone,
+  // untilGone,
   sleep
 } from "helpers/src/general";
-import { K8s, kind } from 'kubernetes-fluent-client';
-import { parse} from 'yaml';
-import { PolicyReport } from '../types/policyreport-v1alpha1';  
+// import { K8s, kind } from 'kubernetes-fluent-client';
+// import { parse} from 'yaml';
+// import { PolicyReport } from '../types/policyreport-v1alpha1';  
 
 const trc = new TestRunCfg(__filename)
 
@@ -26,19 +26,12 @@ beforeAll(async () => { await lock(trc) }, mins(10))
 
 describe("applyCRDs()", () => {
   it("applys our custom crd", async() => {
-    const crd = await readFile("./types/policyreport-crd.yaml", "utf8")
-    const crd_output = await K8s(kind.CustomResourceDefinition).Apply(parse(crd))
+    // const crd = await readFile("./types/policyreport-crd.yaml", "utf8")
+    // const crd_output = await K8s(kind.CustomResourceDefinition).Apply(parse(crd))
 
-    console.log(crd_output)
 
-    export const PolicyReport = new Capability({
-      name: "policyreport",
-      description: "Generate PolicyReport resources",
-    });
-    
 
-    sleep(1000) // wait for crd to be ready
-
+    await sleep(1000) // wait for crd to be ready
   }, mins(10))  
   // it("removes CRD & CRs with TestRunCfg-defined label", async () => {
   //   const crd = {

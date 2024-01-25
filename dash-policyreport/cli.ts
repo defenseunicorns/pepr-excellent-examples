@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import 'dotenv/config';
-import { writeFile, mkdir } from 'node:fs/promises';
-import * as path from 'node:path';
+import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
+import { join, resolve, dirname } from 'node:path';
 import { program, Option } from 'commander';
 import { spawnSync } from 'node:child_process';
 import { up, down } from 'helpers/src/cluster';
@@ -13,29 +15,29 @@ const env = program.command('env')
   .description('dump env')
   .action(() => { console.log(process.env) })
 
-const test = program.command('test')
+  const test = program.command('test')
   .description('run tests')
   .addOption(
     new Option('-s, --suite <suite>', 'suite type')
-      .choices(['unit', 'e2e', 'all'])
-      .default('all')
-  )
-  .addOption(
-    new Option(
-      '-p, --passthru [passthru...]',
-      'args to pass to test runner (e.g. --passthru="--testPathPattern=general.test.unit.ts")'
+    .choices(['unit', 'e2e', 'all'])
+    .default('all')
     )
-  )
-  .action(async ({ suite, passthru }) => {
-    passthru = passthru || []
+    .addOption(
+      new Option(
+        '-p, --passthru [passthru...]',
+        'args to pass to test runner (e.g. --passthru="--testPathPattern=general.test.unit.ts")'
+        )
+        )
+        .action(async ({ suite, passthru }) => {
+          passthru = passthru || []
     switch (suite) {
       case 'unit': testUnit(passthru); break
       case 'e2e': await testE2e(passthru); break
       case 'all': await testAll(passthru); break
     }
   })
-
-const generate = program.command('regen').description('generate policyReport types from github crd')
+  
+  const generate = program.command('regen').description('generate policyReport types from github crd')
   .action(async () => {
     await generateType()
   })
@@ -43,25 +45,41 @@ const generate = program.command('regen').description('generate policyReport typ
 await program.parseAsync(process.argv);
 const opts = program.opts();
 
+async function generateType() {
+  const crdFileUrl = "https://github.com/kubernetes-sigs/wg-policy-prototypes/raw/master/policy-report/crd/v1alpha2/wgpolicyk8s.io_policyreports.yaml"
+  const crdFilePath = resolve("./types", "policyreport-crd.yaml")
+
+  // save remote manifest
+  const dir = dirname(crdFilePath)
+  await mkdir(dir, { recursive: true })
+  const response = await fetch(crdFileUrl)
+  const body = await response.text()
+  await writeFile(crdFilePath, body)
+
+  // generate CRD types from manifest
+  const getCRDsCmd = await new Cmd({ cmd: `npm run _kfc -- crd ${crdFileUrl} ${dir}` }).run()
+  if (getCRDsCmd.exitcode > 0) { throw getCRDsCmd }
+
+  // exclude eslint check of CRD types
+  const crds = ( await readdir(dir) ).filter(m => m.endsWith('.ts'))
+  for (const crd of crds ) {
+    const path = join(dir, crd)
+    const content = [
+      `/* eslint-disable @typescript-eslint/no-explicit-any */`,
+      ( await readFile( path ) ).toString()
+    ].join("\n")
+    await writeFile(path, content)
+  }
+}
+
 function testUnit(passthru) {
   spawnSync(
-    "jest", ["--testRegex", ".*\.unit\.test\.ts", ...passthru],
+    // eslint-disable-next-line no-useless-escape
+    "jest", ["--testPathPattern", ".*\.unit\.test\.ts", ...passthru],
     { stdio: 'inherit' }
   )
 }
 
-async function generateType() {
-  const crdFileUrl = "https://github.com/kubernetes-sigs/wg-policy-prototypes/raw/master/policy-report/crd/v1alpha2/wgpolicyk8s.io_policyreports.yaml"
-  const crdFilePath = path.resolve("./types", "policyreport-crd.yaml")
-  const dir = path.dirname(crdFilePath)
-
-  mkdir(dir, { recursive: true })
-  const response = await fetch(crdFileUrl);
-  const body = await response.text();
-  writeFile(crdFilePath, body)
-  const getTypesCmd = await new Cmd({ cmd: `npm run _kfc -- crd ${crdFileUrl} ${dir}` }).run()
-  if (getTypesCmd.exitcode > 0) { throw getTypesCmd }
-}
 
 async function testE2e(passthru) {
   const cluster = "pexex-dash-policyreport-e2e"
@@ -70,11 +88,12 @@ async function testE2e(passthru) {
     const kubeConfig = await up(cluster)
 
     // run tests that require a pre-existing cluster (and/or don't care)
-    let result = spawnSync(
+    const result = spawnSync(
       "jest", [
-      "--testPathPattern", ".*\.e2e\.test\.ts",
-      ...passthru
-    ],
+        // eslint-disable-next-line no-useless-escape
+        "--testPathPattern", ".*\.e2e\.test\.ts",
+        ...passthru
+      ],
       {
         stdio: 'inherit',
         env: { ...process.env, KUBECONFIG: kubeConfig }

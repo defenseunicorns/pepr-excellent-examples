@@ -1,6 +1,6 @@
 import { PeprModule } from "pepr";
 // cfg loads your pepr configuration from package.json
-import cfg from "./package.json";
+import cfg from "./package.json"; 
 
 // HelloPepr is a demo capability that is included with Pepr. Comment or delete the line below to remove it.
 // import { HelloPepr } from "./capabilities/_hello-pepr";

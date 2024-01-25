@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pepr-demo
+  labels:
+    keep-me: please
+    remove-me: please
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-1
+  namespace: pepr-demo
+data:
+  key: ex-1-val

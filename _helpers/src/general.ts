@@ -48,7 +48,13 @@ export async function lock(trc: TestRunCfg) {
 }
 
 export async function unlock(trc: TestRunCfg) {
-  return fsP.rm(trc.lockfile())
+  try {
+    await fsP.rm(trc.lockfile())
+  }
+  catch (e) {
+    if (e.code === 'ENOENT') { return }
+    else { throw e }
+  }
 }
 
 export function nearestAncestor(filename: string, fromPath: string): string {

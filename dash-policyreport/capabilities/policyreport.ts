@@ -15,7 +15,7 @@ const { When } = PolicyCapability;
 When(ConfigMap)
   .IsCreated()
   .Validate(request => {
-    return request.Raw.metadata.name
+    return request.Raw.metadata.name !== "fail"
       ? request.Approve()
-      : request.Deny("Name is required");
+      : request.Deny("Name must not be 'fail'");
   });

@@ -7,7 +7,7 @@ import {
 } from "@jest/globals";
 import { Cmd } from "helpers/src/Cmd";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-// import { readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import {
   mins,
   lock,
@@ -17,8 +17,8 @@ import {
   sleep,
 } from "helpers/src/general";
 import { spawnSync } from "node:child_process";
-// import { K8s, kind } from 'kubernetes-fluent-client';
-// import { parse} from 'yaml';
+import { K8s, kind } from 'kubernetes-fluent-client';
+import { parse} from 'yaml';
 // import { PolicyReport } from '../types/policyreport-v1alpha1';
 
 const trc = new TestRunCfg(__filename);
@@ -30,28 +30,34 @@ afterAll(async () => {
   await unlock(trc);
 });
 
+const loadManifest = async (filePath)  => {
+  return parse(await readFile(filePath, "utf8"))
+}
 describe("applyCRDs()", () => {
-  it(
-    "applys our custom crd",
-    async () => {
-      // const crd = await readFile("./types/policyreport-crd.yaml", "utf8")
-      // const crd_output = await K8s(kind.CustomResourceDefinition).Apply(parse(crd))
+  it("applys our custom crd", async () => {
+    const build = await new Cmd({ cmd: `npx pepr build` }).run()
+    const deploy = await new Cmd({ cmd: `npx pepr deploy --confirm` }).run()
 
-      console.log("starting pepr build")
-      const startPepr = await new Cmd({ cmd: `npx pepr build` }).run()
-      console.log("build command done")
-      console.log(startPepr)
-      
-      const DeployPepr = await new Cmd({ cmd: `npx pepr deploy --confirm` }).run()
-      console.log(DeployPepr) 
-      await sleep(mins(5))
+    const crd = await loadManifest(`${trc.root()}/types/policyreport-crd.yaml`)
+    const crd_applied = await K8s(kind.CustomResourceDefinition).Apply(crd)
+    console.log(crd_applied)
 
+    const ns = await loadManifest(`${trc.here()}/namespace.yaml`)
+    const ns_applied = await K8s(kind.Namespace).Apply(ns)
+    console.log(ns_applied)
 
-      // const applyConfigmap = await new Cmd({ cmd: `kubectl apply -f configmap.pass.yaml` }).run()
-      // console.log(applyConfigmap)
+    const goodCm = await loadManifest(`${trc.here()}/configmap.pass.yaml`)
+    const goodCm_applied = await K8s(kind.ConfigMap).Apply(goodCm)
+    console.log(goodCm_applied)
 
-    },
-    mins(5));
+    const badCm = await loadManifest(`${trc.here()}/configmap.fail.yaml`)
+    const badCm_applied = await K8s(kind.ConfigMap).Apply(badCm)
+    console.log(badCm_applied)
+
+    await sleep(mins(5))
+
+    }, mins(5)
+  )
   
   // it("removes CRD & CRs with TestRunCfg-defined label", async () => {
   //   const crd = {

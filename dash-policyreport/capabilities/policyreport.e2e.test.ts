@@ -2,8 +2,8 @@ import {
   beforeAll,
   afterAll,
   describe,
-  // expect,
   it,
+  expect,
 } from "@jest/globals";
 import { Cmd } from "helpers/src/Cmd";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
@@ -19,7 +19,8 @@ import {
 import { spawnSync } from "node:child_process";
 import { K8s, kind } from 'kubernetes-fluent-client';
 import { parse} from 'yaml';
-// import { PolicyReport } from '../types/policyreport-v1alpha1';
+import { PolicyReport } from '../types/policyreport-v1alpha2';
+import { assert } from "node:console";
 
 const trc = new TestRunCfg(__filename);
 
@@ -35,12 +36,14 @@ const loadManifest = async (filePath)  => {
 }
 describe("applyCRDs()", () => {
   it("applys our custom crd", async () => {
-    const build = await new Cmd({ cmd: `npx pepr build` }).run()
-    const deploy = await new Cmd({ cmd: `npx pepr deploy --confirm` }).run()
-
     const crd = await loadManifest(`${trc.root()}/types/policyreport-crd.yaml`)
     const crd_applied = await K8s(kind.CustomResourceDefinition).Apply(crd)
     console.log(crd_applied)
+
+    const build = await new Cmd({ cmd: `npx pepr build` }).run()
+    if (build.exitcode !== 0) { throw build}
+    const deploy = await new Cmd({ cmd: `npx pepr deploy --confirm` }).run()
+    if (deploy.exitcode !== 0) { throw deploy}
 
     const ns = await loadManifest(`${trc.here()}/namespace.yaml`)
     const ns_applied = await K8s(kind.Namespace).Apply(ns)
@@ -53,6 +56,10 @@ describe("applyCRDs()", () => {
     const badCm = await loadManifest(`${trc.here()}/configmap.fail.yaml`)
     const badCm_applied = await K8s(kind.ConfigMap).Apply(badCm)
     console.log(badCm_applied)
+
+    // const policyReport = await K8s(PolicyReport).InNamespace("pepr-system").Get("pepr-policy-report")
+    // expect(policyReport.summary.error).toBe(1)
+    // console.log(policyReport)
 
     await sleep(mins(5))
 

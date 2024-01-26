@@ -23,12 +23,12 @@ import { spawnSync } from "node:child_process";
 
 const trc = new TestRunCfg(__filename);
 
-// beforeAll(async () => {
-//   await lock(trc);
-// }, mins(10));
-// afterAll(async () => {
-//   await unlock(trc);
-// });
+beforeAll(async () => {
+  await lock(trc);
+}, mins(10));
+afterAll(async () => {
+  await unlock(trc);
+});
 
 describe("applyCRDs()", () => {
   it(
@@ -42,11 +42,16 @@ describe("applyCRDs()", () => {
       console.log("build command done")
       console.log(startPepr)
       
+      const DeployPepr = await new Cmd({ cmd: `npx pepr deploy --confirm` }).run()
+      console.log(DeployPepr) 
+      await sleep(mins(5))
+
+
       // const applyConfigmap = await new Cmd({ cmd: `kubectl apply -f configmap.pass.yaml` }).run()
       // console.log(applyConfigmap)
 
     },
-  ), mins(5);
+    mins(5));
   
   // it("removes CRD & CRs with TestRunCfg-defined label", async () => {
   //   const crd = {

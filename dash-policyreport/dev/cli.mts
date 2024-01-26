@@ -7,6 +7,13 @@ import { program, Option } from 'commander';
 import { spawnSync } from 'node:child_process';
 import { up, down } from 'helpers/src/cluster';
 import { Cmd } from 'helpers/src/Cmd';
+import { unlock } from 'helpers/src/general';
+import { TestRunCfg } from 'helpers/src/TestRunCfg';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 program.name('cli')
   .version('0.0.0', '-v, --version')
@@ -85,6 +92,8 @@ async function testE2e(passthru) {
   const cluster = "pexex-dash-policyreport-e2e"
   try {
     await down(cluster)
+    await unlock(new TestRunCfg(__filename))
+
     const kubeConfig = await up(cluster)
 
     // run tests that require a pre-existing cluster (and/or don't care)
@@ -103,6 +112,7 @@ async function testE2e(passthru) {
 
   } finally {
     await down(cluster)
+    await unlock(new TestRunCfg(__filename))
   }
 }
 

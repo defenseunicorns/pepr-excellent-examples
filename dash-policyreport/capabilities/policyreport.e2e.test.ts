@@ -3,9 +3,9 @@ import {
   afterAll,
   describe,
   // expect,
-  it
-} from '@jest/globals';
-import { TestRunCfg } from 'helpers/src/TestRunCfg';
+  it,
+} from "@jest/globals";
+import { TestRunCfg } from "helpers/src/TestRunCfg";
 // import { readFile } from 'node:fs/promises';
 import {
   mins,
@@ -13,26 +13,32 @@ import {
   unlock,
   // resourceGone,
   // untilGone,
-  sleep
+  sleep,
 } from "helpers/src/general";
 // import { K8s, kind } from 'kubernetes-fluent-client';
 // import { parse} from 'yaml';
-// import { PolicyReport } from '../types/policyreport-v1alpha1';  
+// import { PolicyReport } from '../types/policyreport-v1alpha1';
 
-const trc = new TestRunCfg(__filename)
+const trc = new TestRunCfg(__filename);
 
-beforeAll(async () => { await lock(trc) }, mins(10))
- afterAll(async () => { await unlock(trc) })
+beforeAll(async () => {
+  await lock(trc);
+}, mins(10));
+afterAll(async () => {
+  await unlock(trc);
+});
 
 describe("applyCRDs()", () => {
-  it("applys our custom crd", async() => {
-    // const crd = await readFile("./types/policyreport-crd.yaml", "utf8")
-    // const crd_output = await K8s(kind.CustomResourceDefinition).Apply(parse(crd))
+  it(
+    "applys our custom crd",
+    async () => {
+      // const crd = await readFile("./types/policyreport-crd.yaml", "utf8")
+      // const crd_output = await K8s(kind.CustomResourceDefinition).Apply(parse(crd))
 
-
-
-    await sleep(1000) // wait for crd to be ready
-  }, mins(10))  
+      await sleep(1000); // wait for crd to be ready
+    },
+    mins(10),
+  );
   // it("removes CRD & CRs with TestRunCfg-defined label", async () => {
   //   const crd = {
   //     apiVersion: "apiextensions.k8s.io/v1",
@@ -96,4 +102,4 @@ describe("applyCRDs()", () => {
   //   expect(await resourceGone(cr_kind, applied_cr)).toBe(true)
   //   expect(await resourceGone(kind.CustomResourceDefinition, applied_crd)).toBe(true)
   // }, secs(10))
-})
+});

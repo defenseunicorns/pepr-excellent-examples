@@ -5,6 +5,7 @@ import {
   // expect,
   it,
 } from "@jest/globals";
+import { Cmd } from "helpers/src/Cmd";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 // import { readFile } from 'node:fs/promises';
 import {
@@ -15,18 +16,19 @@ import {
   // untilGone,
   sleep,
 } from "helpers/src/general";
+import { spawnSync } from "node:child_process";
 // import { K8s, kind } from 'kubernetes-fluent-client';
 // import { parse} from 'yaml';
 // import { PolicyReport } from '../types/policyreport-v1alpha1';
 
 const trc = new TestRunCfg(__filename);
 
-beforeAll(async () => {
-  await lock(trc);
-}, mins(10));
-afterAll(async () => {
-  await unlock(trc);
-});
+// beforeAll(async () => {
+//   await lock(trc);
+// }, mins(10));
+// afterAll(async () => {
+//   await unlock(trc);
+// });
 
 describe("applyCRDs()", () => {
   it(
@@ -35,10 +37,17 @@ describe("applyCRDs()", () => {
       // const crd = await readFile("./types/policyreport-crd.yaml", "utf8")
       // const crd_output = await K8s(kind.CustomResourceDefinition).Apply(parse(crd))
 
-      await sleep(1000); // wait for crd to be ready
+      console.log("starting pepr build")
+      const startPepr = await new Cmd({ cmd: `npx pepr build` }).run()
+      console.log("build command done")
+      console.log(startPepr)
+      
+      // const applyConfigmap = await new Cmd({ cmd: `kubectl apply -f configmap.pass.yaml` }).run()
+      // console.log(applyConfigmap)
+
     },
-    mins(10),
-  );
+  ), mins(5);
+  
   // it("removes CRD & CRs with TestRunCfg-defined label", async () => {
   //   const crd = {
   //     apiVersion: "apiextensions.k8s.io/v1",

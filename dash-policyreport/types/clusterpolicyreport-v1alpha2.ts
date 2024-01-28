@@ -5,9 +5,9 @@
 import { GenericKind, RegisterKind } from "kubernetes-fluent-client";
 
 /**
- * PolicyReport is the Schema for the policyreports API
+ * ClusterPolicyReport is the Schema for the clusterpolicyreports API
  */
-export class PolicyReport extends GenericKind {
+export class ClusterPolicyReport extends GenericKind {
     /**
      * APIVersion defines the versioned schema of this representation of an object. Servers
      * should convert recognized schemas to the latest internal value, and may reject
@@ -26,7 +26,7 @@ export class PolicyReport extends GenericKind {
     /**
      * PolicyReportResult provides result details
      */
-    results?: Result[];
+    results?: ResultElement[];
     /**
      * Scope is an optional reference to the report scope (e.g. a Deployment, Namespace, or Node)
      */
@@ -45,57 +45,65 @@ export class PolicyReport extends GenericKind {
 /**
  * PolicyReportResult provides the result for an individual policy
  */
-export interface Result {
+export interface ResultElement {
     /**
      * Category indicates policy category
      */
     category?: string;
     /**
-     * Data provides additional information for the policy rule
-     */
-    data?: { [key: string]: string };
-    /**
-     * Message is a short user friendly description of the policy rule
+     * Description is a short user friendly message for the policy rule
      */
     message?: string;
     /**
-     * Policy is the name of the policy
+     * Policy is the name or identifier of the policy
      */
     policy: string;
     /**
-     * Resources is an optional reference to the resource checked by the policy and rule
+     * Properties provides additional information for the policy rule
+     */
+    properties?: { [key: string]: string };
+    /**
+     * Subjects is an optional reference to the checked Kubernetes resources
      */
     resources?: Resource[];
     /**
-     * ResourceSelector is an optional selector for policy results that apply to multiple
-     * resources. For example, a policy result may apply to all pods that match a label. Either
-     * a Resource or a ResourceSelector can be specified. If neither are provided, the result is
-     * assumed to be for the policy report scope.
+     * SubjectSelector is an optional label selector for checked Kubernetes resources. For
+     * example, a policy result may apply to all pods that match a label. Either a Subject or a
+     * SubjectSelector can be specified. If neither are provided, the result is assumed to be
+     * for the policy report scope.
      */
     resourceSelector?: ResourceSelector;
     /**
-     * Rule is the name of the policy rule
+     * Result indicates the outcome of the policy rule execution
+     */
+    result?: ResultEnum;
+    /**
+     * Rule is the name or identifier of the rule within the policy
      */
     rule?: string;
     /**
-     * Scored indicates if this policy rule is scored
+     * Scored indicates if this result is scored
      */
     scored?: boolean;
     /**
-     * Severity indicates policy severity
+     * Severity indicates policy check result criticality
      */
     severity?: Severity;
     /**
-     * Status indicates the result of the policy rule check
+     * Source is an identifier for the policy engine that manages this report
      */
-    status?: Status;
+    source?: string;
+    /**
+     * Timestamp indicates the time the result was found
+     */
+    timestamp?: Timestamp;
 }
 
 /**
- * ResourceSelector is an optional selector for policy results that apply to multiple
- * resources. For example, a policy result may apply to all pods that match a label. Either
- * a Resource or a ResourceSelector can be specified. If neither are provided, the result is
- * assumed to be for the policy report scope.
+ * SubjectSelector is an optional label selector for checked Kubernetes resources. For
+ * example, a policy result may apply to all pods that match a label. Either a Subject or a
+ * SubjectSelector can be specified. If neither are provided, the result is assumed to be
+ * for the policy report scope.
  */
 export interface ResourceSelector {
     /**
@@ -197,23 +205,43 @@ export interface Resource {
 }
 
 /**
- * Severity indicates policy severity
+ * Result indicates the outcome of the policy rule execution
  */
-export enum Severity {
-    High = "high",
-    Low = "low",
-    Medium = "medium",
-}
-
-/**
- * Status indicates the result of the policy rule check
- */
-export enum Status {
+export enum ResultEnum {
     Error = "error",
     Fail = "fail",
     Pass = "pass",
     Skip = "skip",
     Warn = "warn",
+}
+
+/**
+ * Severity indicates policy check result criticality
+ */
+export enum Severity {
+    Critical = "critical",
+    High = "high",
+    Info = "info",
+    Low = "low",
+    Medium = "medium",
+}
+
+/**
+ * Timestamp indicates the time the result was found
+ */
+export interface Timestamp {
+    /**
+     * Non-negative fractions of a second at nanosecond resolution. Negative second values with
+     * fractions must still have non-negative nanos values that count forward in time. Must be
+     * from 0 to 999,999,999 inclusive. This field may be limited in precision depending on
+     * context.
+     */
+    nanos: number;
+    /**
+     * Represents seconds of UTC time since Unix epoch 1970-01-01T00:00:00Z. Must be from
+     * 0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z inclusive.
+     */
+    seconds: number;
 }
 
 /**
@@ -322,13 +350,13 @@ export interface Summary {
      */
     skip?: number;
     /**
-     * Warn provides the count of unscored policies whose requirements were not met
+     * Warn provides the count of non-scored policies whose requirements were not met
      */
     warn?: number;
 }
 
-RegisterKind(PolicyReport, {
+RegisterKind(ClusterPolicyReport, {
   group: "wgpolicyk8s.io",
-  version: "v1alpha1",
-  kind: "PolicyReport",
+  version: "v1alpha2",
+  kind: "ClusterPolicyReport",
 });

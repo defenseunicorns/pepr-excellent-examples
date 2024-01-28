@@ -5,9 +5,9 @@
 import { GenericKind, RegisterKind } from "kubernetes-fluent-client";
 
 /**
- * PolicyReport is the Schema for the policyreports API
+ * ClusterPolicyReport is the Schema for the clusterpolicyreports API
  */
-export class PolicyReport extends GenericKind {
+export class ClusterPolicyReport extends GenericKind {
     /**
      * APIVersion defines the versioned schema of this representation of an object. Servers
      * should convert recognized schemas to the latest internal value, and may reject
@@ -327,8 +327,8 @@ export interface Summary {
     warn?: number;
 }
 
-RegisterKind(PolicyReport, {
+RegisterKind(ClusterPolicyReport, {
   group: "wgpolicyk8s.io",
   version: "v1alpha1",
-  kind: "PolicyReport",
+  kind: "ClusterPolicyReport",
 });

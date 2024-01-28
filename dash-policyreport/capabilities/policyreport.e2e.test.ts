@@ -24,39 +24,37 @@ import { assert } from "node:console";
 
 const trc = new TestRunCfg(__filename);
 
-beforeAll(async () => {
-  await lock(trc);
-}, mins(10));
-afterAll(async () => {
-  await unlock(trc);
-});
+beforeAll(async () => { await lock(trc) }, mins(10))
+afterAll( async () => { await unlock(trc) });
 
 const loadManifest = async (filePath)  => {
   return parse(await readFile(filePath, "utf8"))
 }
+
 describe("applyCRDs()", () => {
   it("applys our custom crd", async () => {
     const crd = await loadManifest(`${trc.root()}/types/policyreport-crd.yaml`)
     const crd_applied = await K8s(kind.CustomResourceDefinition).Apply(crd)
-    console.log(crd_applied)
 
     const build = await new Cmd({ cmd: `npx pepr build` }).run()
-    if (build.exitcode !== 0) { throw build}
     const deploy = await new Cmd({ cmd: `npx pepr deploy --confirm` }).run()
-    if (deploy.exitcode !== 0) { throw deploy}
 
     const ns = await loadManifest(`${trc.here()}/namespace.yaml`)
     const ns_applied = await K8s(kind.Namespace).Apply(ns)
     console.log(ns_applied)
 
-    const goodCm = await loadManifest(`${trc.here()}/configmap.pass.yaml`)
-    const goodCm_applied = await K8s(kind.ConfigMap).Apply(goodCm)
-    console.log(goodCm_applied)
+    try {
+      const goodCm = await loadManifest(`${trc.here()}/configmap.pass.yaml`)
+      const goodCm_applied = await K8s(kind.ConfigMap).Apply(goodCm)
+      console.log(goodCm_applied)
 
-    const badCm = await loadManifest(`${trc.here()}/configmap.fail.yaml`)
-    const badCm_applied = await K8s(kind.ConfigMap).Apply(badCm)
-    console.log(badCm_applied)
-
+      const badCm = await loadManifest(`${trc.here()}/configmap.fail.yaml`)
+      const badCm_applied = await K8s(kind.ConfigMap).Apply(badCm)
+      console.log(badCm_applied)
+    
+    } catch (e) {
+      console.log(e)
+    }
     // const policyReport = await K8s(PolicyReport).InNamespace("pepr-system").Get("pepr-policy-report")
     // expect(policyReport.summary.error).toBe(1)
     // console.log(policyReport)

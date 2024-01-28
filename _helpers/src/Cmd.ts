@@ -54,4 +54,11 @@ export class Cmd {
       })
     })
   }
+
+  async runOrThrow(): Promise<Result> {
+    const result = await this.run()
+    if (result.exitcode > 0) { throw result }
+    return result
+  }
+
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { Cmd } from './Cmd'
 
-describe("Cmd", () => {
+describe("run()", () => {
   it("returns stdout", async () => {
     const expected = "pong"
     const {stdout} = await new Cmd({ cmd: `echo "${expected}"` }).run()
@@ -36,5 +36,21 @@ describe("Cmd", () => {
     const [key, val] = ["TESTVAR", "testcontent"]
     const {stdout} = await new Cmd({ env: { [key]: val}, cmd: `echo $${key}` }).run()
     expect(stdout.join("")).toBe(val)
+  })
+})
+
+describe("runOrThrow()", () => {
+  it("on success, returns result", async () => {
+    const expected = "pong"
+    const result = await new Cmd({ cmd: `echo "${expected}"` }).runOrThrow()
+    expect(result.stdout.join("")).toBe(expected)
+    expect(result.stderr.join("")).toBe("")
+    expect(result.exitcode).toBe(0)
+  })
+
+  it("on failure, throws result", async () => {
+    const expected = {"exitcode": 1, "stderr": [], "stdout": []}
+    const promise = new Cmd({ cmd: `exit ${expected.exitcode}` }).runOrThrow()
+    expect(promise).rejects.toEqual(expected)
   })
 })

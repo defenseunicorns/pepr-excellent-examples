@@ -28,7 +28,7 @@ export class Cmd {
     this.env = spec.env ? { ...process.env, ...spec.env } : process.env
   }
 
-  run(): Promise<Result> {
+  runRaw(): Promise<Result> {
     return new Promise((resolve) => {
       const proc = exec(this.cmd, {
         cwd: this.cwd,
@@ -55,10 +55,11 @@ export class Cmd {
     })
   }
 
-  async runOrThrow(): Promise<Result> {
-    const result = await this.run()
-    if (result.exitcode > 0) { throw result }
-    return result
+  run(): Promise<Result> {
+    return this.runRaw().then(result => {
+      if (result.exitcode > 0) { throw result }
+      return result
+    })
   }
 
 }

@@ -3,10 +3,10 @@ import { PeprModule } from "pepr";
 import cfg from "./package.json";
 
 // HelloPepr is a demo capability that is included with Pepr. Comment or delete the line below to remove it.
-import { PolicyCapability } from "./capabilities/policyreport";
+import { PeprReport } from "./capabilities/clusterpolicyreport";
 
 /**
  * This is the main entrypoint for this Pepr module. It is run when the module is started.
  * This is where you register your Pepr configurations and capabilities.
  */
-new PeprModule(cfg, [PolicyCapability]);
+new PeprModule(cfg, [PeprReport]);

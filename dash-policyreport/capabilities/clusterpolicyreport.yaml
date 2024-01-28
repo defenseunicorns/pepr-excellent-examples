@@ -1,0 +1,14 @@
+---
+apiVersion: "wgpolicyk8s.io/v1alpha2",
+kind: "ClusterPolicyReport",
+metadata: {
+  name: pepr-cpr,
+  namespace: pepr-system
+},
+results: [],
+summary:
+  pass: 0
+  fail: 0
+  warn: 0
+  error: 0
+  skip: 0

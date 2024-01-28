@@ -1,20 +1,20 @@
 import {
   Capability,
-  K8s, Log, a, kind
+  // K8s, Log, a, kind
 } from "pepr";
 import { ConfigMap } from "kubernetes-fluent-client/dist/upstream";
-import { PolicyReport } from '../types/policyreport-v1alpha2';
-import { sleep } from 'helpers/src/general'
+// import { PolicyReport } from '../types/policyreport-v1alpha2';
+// import { sleep } from 'helpers/src/general'
 
-export const PolicyCapability = new Capability({
+export const PeprReport = new Capability({
   name: "test-policy-report",
   description: "Generate a resource",
   namespaces: []
 });
 
-const { When } = PolicyCapability;
+const { When } = PeprReport;
 
-const peprPolicyReportName = "pepr-policy-report"
+// const peprPolicyReportName = "pepr-policy-report"
 
 // async function generateReport() {
 //   const policyReport = {

@@ -3,7 +3,7 @@ import {
   afterAll,
   describe,
   it,
-  expect,
+  // expect,
 } from "@jest/globals";
 import { Cmd } from "helpers/src/Cmd";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
@@ -16,45 +16,62 @@ import {
   // untilGone,
   sleep,
 } from "helpers/src/general";
-import { spawnSync } from "node:child_process";
 import { K8s, kind } from 'kubernetes-fluent-client';
-import { parse} from 'yaml';
-import { PolicyReport } from '../types/policyreport-v1alpha2';
-import { assert } from "node:console";
+import { parseAllDocuments } from 'yaml';
+// import { ClusterPolicyReport } from '../types/clusterpolicyreport-v1alpha2';
+
+
+const load = async (manifest)  => {
+  const resources = parseAllDocuments(await readFile(manifest, "utf8"))
+    .map(doc => JSON.parse(String(doc.contents)))
+
+  for (const resource of resources) {
+    resource.metadata.labels = resource.metadata.labels || {}
+    resource.metadata.labels = {
+      ...resource.metadata.labels,
+      [trc.labelKey()]: trc.unique
+    }
+  }
+
+  return resources
+}
+
+const apply = async (resources) => {
+  return Promise.all(resources.map(r => K8s(kind[r.kind]).Apply(r)))
+}
+
 
 const trc = new TestRunCfg(__filename);
 
 beforeAll(async () => { await lock(trc) }, mins(10))
 afterAll( async () => { await unlock(trc) });
 
-const loadManifest = async (filePath)  => {
-  return parse(await readFile(filePath, "utf8"))
-}
+describe("Pepr ClusterPolicyReport()", () => {
+  beforeAll(async () => {
+    const crds = await load(`${trc.root()}/types/wgpolicyk8s.io_clusterpolicyreports.yaml`)
+    const applied = await apply(crds)
 
-describe("applyCRDs()", () => {
+    await new Cmd({ cmd: `npx pepr build` }).run()
+    await new Cmd({ cmd: `npx pepr deploy --confirm` }).run()
+  }, mins(5))
+
   it("applys our custom crd", async () => {
-    const crd = await loadManifest(`${trc.root()}/types/policyreport-crd.yaml`)
-    const crd_applied = await K8s(kind.CustomResourceDefinition).Apply(crd)
 
-    const build = await new Cmd({ cmd: `npx pepr build` }).run()
-    const deploy = await new Cmd({ cmd: `npx pepr deploy --confirm` }).run()
+    // const ns = await load(`${trc.here()}/namespace.yaml`)
+    // const ns_applied = await K8s(kind.Namespace).Apply(ns)
 
-    const ns = await loadManifest(`${trc.here()}/namespace.yaml`)
-    const ns_applied = await K8s(kind.Namespace).Apply(ns)
-    console.log(ns_applied)
+    // try {
+    //   const goodCm = await load(`${trc.here()}/configmap.pass.yaml`)
+    //   const goodCm_applied = await K8s(kind.ConfigMap).Apply(goodCm)
+    //   console.log(goodCm_applied)
 
-    try {
-      const goodCm = await loadManifest(`${trc.here()}/configmap.pass.yaml`)
-      const goodCm_applied = await K8s(kind.ConfigMap).Apply(goodCm)
-      console.log(goodCm_applied)
-
-      const badCm = await loadManifest(`${trc.here()}/configmap.fail.yaml`)
-      const badCm_applied = await K8s(kind.ConfigMap).Apply(badCm)
-      console.log(badCm_applied)
+    //   const badCm = await load(`${trc.here()}/configmap.fail.yaml`)
+    //   const badCm_applied = await K8s(kind.ConfigMap).Apply(badCm)
+    //   console.log(badCm_applied)
     
-    } catch (e) {
-      console.log(e)
-    }
+    // } catch (e) {
+    //   console.log(e)
+    // }
     // const policyReport = await K8s(PolicyReport).InNamespace("pepr-system").Get("pepr-policy-report")
     // expect(policyReport.summary.error).toBe(1)
     // console.log(policyReport)

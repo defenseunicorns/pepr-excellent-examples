@@ -74,6 +74,17 @@ async function generateTypes() {
     ].join("\n")
     await writeFile(typePath, content)
   }
+
+  // prevent TS ts(2612) in gen'd files (by adding 'declare' modifier)
+  //  ( but maybe this should be a patch to the KFC gen function? )
+  for (const t of types ) {
+    const typePath = resolve(typesDir, t)
+    let ts = ( await readFile( typePath ) ).toString()
+    ts = ts.replace("apiVersion?:", "declare apiVersion?:")
+    ts = ts.replace("kind?:", "declare kind?:")
+    ts = ts.replace("metadata?:", "declare metadata?:")
+    await writeFile(typePath, ts)
+  }
 }
 
 function testUnit(passthru) {

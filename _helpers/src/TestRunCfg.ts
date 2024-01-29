@@ -1,5 +1,6 @@
-import * as path from 'path';
-// import * as fs from 'fs';
+import * as path from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { parseAllDocuments } from 'yaml';
 import { nearestAncestor } from './general'
 
 export class TestRunCfg {
@@ -39,6 +40,22 @@ export class TestRunCfg {
 
   labelKey(): string {
     return `test-transient/${this.name()}`
+  }
+
+  async load(manifest) {
+    // read yaml doc into list of js resources
+    const resources = parseAllDocuments(await readFile(manifest, "utf8"))
+      .map(doc => JSON.parse(String(doc.contents)))
+
+      // add test-specific label to resources
+    for (const resource of resources) {
+      resource.metadata.labels = resource.metadata.labels || {}
+      resource.metadata.labels = {
+        ...resource.metadata.labels,
+        [this.labelKey()]: this.unique
+      }
+    }
+    return resources
   }
   
   // module(): string {

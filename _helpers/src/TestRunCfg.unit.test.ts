@@ -39,9 +39,25 @@ describe("TestRunCfg", () => {
   })
 
   describe("exposes kube config used for cluster operations", () => {
-    it("defaults to widely-known default location", () => {
+    it("defaults to KUBECONFIG envvar if set", () => {
+      const env = { ...process.env }
+      const kubeConfig = "test/kubeconfig.yaml"
+      process.env.KUBECONFIG = kubeConfig
+
+      const trc = new TestRunCfg(me)
+      expect(trc.kubeConfig).toBe(kubeConfig)
+
+      process.env = env
+    })
+
+    it("otherwise, defaults to widely-known default location", () => {
+      const env = { ...process.env }
+      delete process.env.KUBECONFIG
+
       const trc = new TestRunCfg(me)
       expect(trc.kubeConfig).toBe("~/.kube/config")
+
+      process.env = env
     })
 
     it("can be given directly", () => {

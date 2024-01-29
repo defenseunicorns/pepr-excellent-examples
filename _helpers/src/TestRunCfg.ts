@@ -11,7 +11,7 @@ export class TestRunCfg {
   constructor(
     me: string,
     unique: string = new Date().valueOf().toString(),
-    kubeConfig: string = "~/.kube/config",
+    kubeConfig: string = process.env.KUBECONFIG || "~/.kube/config",
   ) {
     this.me = me
     this.unique = unique

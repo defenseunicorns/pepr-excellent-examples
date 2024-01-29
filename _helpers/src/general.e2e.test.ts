@@ -30,3 +30,15 @@ describe.skip("untilGone()", () => {
     console.log("TODO")
   })
 })
+
+describe.skip("resourceLive()", () => {
+  it("is tested", () => {
+    console.log("TODO")
+  })
+})
+
+describe.skip("untilLive()", () => {
+  it("is tested", () => {
+    console.log("TODO")
+  })
+})

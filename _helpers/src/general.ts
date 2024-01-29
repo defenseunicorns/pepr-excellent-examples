@@ -83,3 +83,19 @@ export async function resourceGone(k: GenericClass, o: KubernetesObject) {
 export async function untilGone(k: GenericClass, o: KubernetesObject) {
   return untilTrue(() => resourceGone(k, o))
 }
+
+export async function resourceLive(k: GenericClass, o: KubernetesObject) {
+  const ns = o.metadata.namespace ? o.metadata.namespace : ""
+  const name = (o as { name: string }).name
+
+  try { await K8s(k).InNamespace(ns).Get(name) }
+  catch (e) {
+    if (e.status === 404) { return false }
+    else { throw e }
+  }
+  return true
+}
+
+export async function untilLive(k: GenericClass, o: KubernetesObject) {
+  return untilTrue(() => resourceLive(k, o))
+}

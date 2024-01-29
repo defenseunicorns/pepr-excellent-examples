@@ -14,6 +14,7 @@ import {
   secs,
   lock,
   unlock,
+  untilLive,
   untilTrue,
   sleep,
 } from "helpers/src/general";
@@ -24,20 +25,14 @@ import { ClusterPolicyReport } from '../types/clusterpolicyreport-v1alpha2';
 const apply = async (resources) => {
   kind["ClusterPolicyReport"] = ClusterPolicyReport
 
+  // normalize single / lists of resourcse as iterable list
   resources = [ resources ].flat()
+
   return Promise.all(resources.map(async (r) => {
     const kynd = kind[r.kind]
     const applied = await K8s(kynd).Apply(r)
-    const ns = applied.metadata.namespace ? applied.metadata.namespace : ""
-
-    return untilTrue(async () => {
-      try { await K8s(kind[r.kind]).InNamespace(ns).Get(applied.name) }
-      catch (e) {
-        if (e.status === 404) { return false }
-        else { throw e }
-      }
-      return true
-    })
+    
+    return untilLive(kynd, applied)
   }))
 }
 

@@ -15,7 +15,6 @@ import {
   lock,
   unlock,
   untilLive,
-  untilTrue,
   sleep,
 } from "helpers/src/general";
 import { clean } from 'helpers/src/cluster';
@@ -31,7 +30,7 @@ const apply = async (resources) => {
   return Promise.all(resources.map(async (r) => {
     const kynd = kind[r.kind]
     const applied = await K8s(kynd).Apply(r)
-    
+
     return untilLive(kynd, applied)
   }))
 }
@@ -69,7 +68,7 @@ describe("Pepr ClusterPolicyReport()", () => {
     const crd = await K8s(kind.CustomResourceDefinition).Get("clusterpolicyreports.wgpolicyk8s.io")
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
-    Object.entries(cpr.summary).forEach( ([key, value]) => {
+    Object.values(cpr.summary).forEach(value => {
       expect(value).toBe(0)
     })
 

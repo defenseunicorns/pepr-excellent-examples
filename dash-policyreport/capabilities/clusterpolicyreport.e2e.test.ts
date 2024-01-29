@@ -64,15 +64,27 @@ describe("Pepr ClusterPolicyReport()", () => {
     // TODO: clean out "dirty" cpr
   })
 
-  it("can access to a zeroized ClusterPolicyReport", async () => {
+  it("can access a zeroized ClusterPolicyReport", async () => {
     const crd = await K8s(kind.CustomResourceDefinition).Get("clusterpolicyreports.wgpolicyk8s.io")
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
     Object.values(cpr.summary).forEach(value => {
       expect(value).toBe(0)
     })
+  }, secs(30))
 
-    // await sleep(mins(30)
+  it("can access Pepr controller logs", async () => {
+    const raw = await new Cmd({
+      env: { KUBECONFIG: process.env.KUBECONFIG },
+      cmd: `kubectl -n pepr-system logs -l 'pepr.dev/controller=admission'`
+    }).run()
 
-  }, mins(30))
-});
+    const logs = raw.stdout.filter(l => l !== '')
+      .map(l => JSON.parse(l))
+      .filter(l => l.url !== "/healthz" && l.msg !== "Pepr Store update")
+
+    const needle = '✅ Controller startup complete'
+    expect(logs.filter(u => u.msg === needle)).toHaveLength(2)
+
+  }, secs(30))
+})

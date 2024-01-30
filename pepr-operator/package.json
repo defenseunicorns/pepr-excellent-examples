@@ -1,7 +1,7 @@
 {
-  "name": "pepr-operator",
+  "name": "webappcontroller",
   "version": "0.0.1",
-  "description": "Build an operator with Pepr",
+  "description": "Kubernetes Controller for WebApp resources",
   "keywords": [
     "pepr",
     "k8s",
@@ -13,8 +13,8 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "name": "pepr-operator",
-    "uuid": "e3789d0b-497b-5019-bcb4-8cd5c959b4ff",
+    "name": "WebAppController",
+    "uuid": "774fab07-77fa-517c-b5f8-c682c96c20c0",
     "onError": "reject",
     "alwaysIgnore": {
       "namespaces": [],
@@ -27,7 +27,7 @@
     "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system"
   },
   "dependencies": {
-    "pepr": "0.21.1"
+    "pepr": "^0.23.2"
   },
   "devDependencies": {
     "typescript": "5.3.3"

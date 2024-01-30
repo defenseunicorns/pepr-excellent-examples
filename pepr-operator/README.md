@@ -1,21 +1,167 @@
-# Pepr Module
+# WebApp Operator
 
-This is a Pepr Module. [Pepr](https://github.com/defenseunicorns/pepr) is a type-safe Kubernetes middleware system.
+The WebApp Operator, written in Pepr, deploys the `CustomResourceDefinition` for WebApp, then watches and reconciles for instances of WebApps in the cluster to ensure the desired state meets the actual state.
 
-The `capabilities` directory contains all the capabilities for this module. By default,
-a capability is a single typescript file in the format of `capability-name.ts` that is
-imported in the root `pepr.ts` file as `import { HelloPepr } from "./capabilities/hello-pepr";`.
-Because this is typescript, you can organize this however you choose, e.g. creating a sub-folder
-per-capability or common logic in shared files or folders.
+The WebApp instance represents a `Deployment` object with confirgurable replicas, a `Service`, and a `ConfigMap` that has a `index.html` file that can be configured to a specific language, and theme. The resources the Operator deploys contain `ownerReferences`, causing a cascading delete effect when the WebApp instance is deleted.
 
-Example Structure:
+If a bad actor deletes an object deployed by the Operator, the object will abruptly redeploy the object. 
 
+## Demo
+
+_Create an ephemeral cluster. (Kind of k3d will work)_
+
+Make sure Pepr is update to date
+
+```bash
+npx pepr update
 ```
-Module Root
-├── package.json
-├── pepr.ts
-└── capabilities
-    ├── example-one.ts
-    ├── example-three.ts
-    └── example-two.ts
+
+Build the Pepr manifests
+
+```bash
+npx pepr build
 ```
+
+Deploy the Operator 
+
+```bash
+kubectl apply -f dist/pepr-module-774fab07-77fa-517c-b5f8-c682c96c20c0.yaml
+kubectl wait --for=condition=Ready pods -l app -n pepr-system --timeout=120s
+```
+
+Notice that the WebApp CRD has been deployed
+
+```bash
+kubectl get crd | grep webapp
+```
+
+Explain the `WebApp.spec`
+
+```bash
+kubectl explain wa.spec
+
+# output
+GROUP:      pepr.io
+KIND:       WebApp
+VERSION:    v1alpha1
+
+FIELD: spec <Object>
+
+DESCRIPTION:
+    <empty>
+FIELDS:
+  language      <string> -required-
+    Language defines the language of the web application, either English (en) or
+    Spanish (es).
+
+  replicas      <integer> -required-
+    Replicas is the number of desired replicas.
+
+  theme <string> -required-
+    Theme defines the theme of the web application, either dark or light.
+```
+
+Create an instance of a `WebApp` in English with the light theme and 1 replica
+
+```yaml
+kubectl create ns webapps;
+kubectl apply -f -<<EOF
+kind: WebApp
+apiVersion: pepr.io/v1alpha1
+metadata:
+  name: webapp-light-en
+  namespace: webapps
+spec:
+  theme: light 
+  language: en
+  replicas: 1 
+EOF
+```
+
+Check that the `ConfigMap`, `Service` and `Deployment` are deployed
+
+```bash
+kubectl get cm,svc,deploy -n webapps
+
+# output
+NAME                                    DATA   AGE
+configmap/kube-root-ca.crt              1      6s
+configmap/web-content-webapp-light-en   1      5s
+
+NAME                      TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/webapp-light-en   ClusterIP   10.43.85.1   <none>        80/TCP    5s
+
+NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/webapp-light-en   1/1     1            1           5s
+```
+
+Get the Status of the WebApp
+
+```json
+kubectl get wa webapp-light-en -n webapps -ojsonpath="{.status}" | jq  
+
+# output
+{
+  "observedGeneration": 1,
+  "phase": "Ready"
+}
+```
+
+Port-forward and look at the WebApp in the browser
+
+```bash
+kubectl port-forward svc/webapp-light-en -n webapps 3000:80
+```
+[WebApp](http://localhost:3000)
+![WebApp](light.png)
+
+Delete the `ConfigMap` on the WebApp to watch it the operator reconcile it back
+
+```bash
+kubectl delete cm -n webapps --all 
+# wait a second
+kubectl get cm -n webapps 
+
+# output
+configmap "kube-root-ca.crt" deleted
+configmap "web-content-webapp-light-en" deleted
+NAME                          DATA   AGE
+kube-root-ca.crt              1      0s
+web-content-webapp-light-en   1      0s
+```
+
+Update the `WebApp` and change the theme to dark and language to spanish
+
+```bash
+kubectl apply -f -<<EOF
+kind: WebApp
+apiVersion: pepr.io/v1alpha1
+metadata:
+  name: webapp-light-en
+  namespace: webapps
+spec:
+  theme: dark 
+  language: es
+  replicas: 1 
+EOF
+#output
+webapp.pepr.io/webapp-light-en configured
+```
+
+Port-forward and look at the WebApp in the browser
+
+```bash
+kubectl port-forward svc/webapp-light-en -n webapps 3000:80
+```
+[WebApp](http://localhost:3000)
+
+![WebApp](dark.png)
+
+Delete the WebApp and check the namespace
+
+```bash
+kubectl delete wa -n webapps --all
+kubectl get cm,deploy,svc -n webapps
+```
+
+When the WebApp is deleted, all of the resources that it created are also deleted.

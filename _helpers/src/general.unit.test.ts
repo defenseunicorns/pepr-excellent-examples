@@ -165,7 +165,7 @@ describe("resourceLive()", () => {
     K8s.mockImplementationOnce(() => (
       { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
     ))
-    const kobject = { name: "test-name", metadata: {} }
+    const kobject = { metadata: { name: "test-name" } }
 
     let result = await resourceLive(kind.GenericKind, kobject)
 
@@ -179,7 +179,7 @@ describe("resourceLive()", () => {
     K8s.mockImplementationOnce(() => (
       { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
     ))
-    const kobject = { name: "test-name", metadata: { namespace: "test-ns" } }
+    const kobject = { metadata: { name: "test-name", namespace: "test-ns" } }
 
     let result = await resourceLive(kind.GenericKind, kobject)
 
@@ -195,7 +195,7 @@ describe("resourceGone()", () => {
     K8s.mockImplementationOnce(() => (
       { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
     ))
-    const kobject = { name: "test-name", metadata: {} }
+    const kobject = { metadata: { name: "test-name" } }
 
     let result = await resourceGone(kind.GenericKind, kobject)
 
@@ -209,7 +209,7 @@ describe("resourceGone()", () => {
     K8s.mockImplementationOnce(() => (
       { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
     ))
-    const kobject = { name: "test-name", metadata: { namespace: "test-ns" } }
+    const kobject = { metadata: { name: "test-name", namespace: "test-ns" } }
 
     let result = await resourceGone(kind.GenericKind, kobject)
 

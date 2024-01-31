@@ -11,7 +11,6 @@ import {
   lock,
   unlock,
   resourceGone,
-  untilGone
 } from "./general";
 
 const trc = new TestRunCfg(__filename)

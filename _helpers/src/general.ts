@@ -74,16 +74,6 @@ export function nearestAncestor(filename: string, fromPath: string): string {
   throw `Can't find file "${filename}" in/above path "${fromPath}".`
 }
 
-export async function resourceGone(k: GenericClass, o: KubernetesObject) {
-  try { await K8s(k).InNamespace(o.metadata.namespace).Get(o.metadata.name) }
-  catch (e) { if (e.status === 404) { return Promise.resolve(true)} }
-  return Promise.resolve(false)
-}
-
-export async function untilGone(k: GenericClass, o: KubernetesObject) {
-  return untilTrue(() => resourceGone(k, o))
-}
-
 export async function resourceLive(k: GenericClass, o: KubernetesObject) {
   const ns = o.metadata.namespace ? o.metadata.namespace : ""
   const name = (o as { name: string }).name
@@ -96,6 +86,8 @@ export async function resourceLive(k: GenericClass, o: KubernetesObject) {
   return true
 }
 
-export async function untilLive(k: GenericClass, o: KubernetesObject) {
-  return untilTrue(() => resourceLive(k, o))
+export async function resourceGone(k: GenericClass, o: KubernetesObject) {
+  try { await K8s(k).InNamespace(o.metadata.namespace).Get(o.metadata.name) }
+  catch (e) { if (e.status === 404) { return Promise.resolve(true)} }
+  return Promise.resolve(false)
 }

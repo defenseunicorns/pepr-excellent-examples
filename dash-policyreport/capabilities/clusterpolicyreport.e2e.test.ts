@@ -14,7 +14,8 @@ import {
   secs,
   lock,
   unlock,
-  untilLive,
+  untilTrue,
+  resourceLive,
   sleep,
 } from "helpers/src/general";
 import { clean } from 'helpers/src/cluster';
@@ -31,7 +32,7 @@ const apply = async (resources) => {
     const kynd = kind[r.kind]
     const applied = await K8s(kynd).Apply(r)
 
-    return untilLive(kynd, applied)
+    return untilTrue(() => resourceLive(kynd, applied))
   }))
 }
 

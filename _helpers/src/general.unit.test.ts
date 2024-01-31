@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2023-Present The Pepr Authors
 
 import {
+  jest,
   beforeAll,
   afterAll,
   beforeEach,
@@ -19,8 +20,14 @@ import {
   sleep,
   untilTrue,
   waitLock,
-  nearestAncestor
+  nearestAncestor,
+  resourceLive,
 } from "./general";
+// import { K8sFilteredActions, K8sInit } from 'kubernetes-fluent-client/dist/fluent/types';
+
+import * as KFC from "kubernetes-fluent-client";
+jest.mock("kubernetes-fluent-client")
+const { K8s, kind } = jest.mocked(KFC)
 
 describe("sleep", () => {
   it("resolves after (roughly) given number of seconds", async () => {
@@ -147,5 +154,35 @@ describe("nearestAncestor()", () => {
 
   afterAll(async () => {
     await pfs.rm(rootdir, { recursive: true, force: true })
+  })
+})
+
+describe("resourceLive()", () => {
+  it("returns true when resource is Get-able", async () => {
+    const Get = jest.fn(name => Promise.resolve())
+    const InNamespace = jest.fn(ns => ({ Get }))
+    K8s.mockImplementationOnce(() => (
+      { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
+    ))
+    const kobject = { name: "test-name", metadata: {} }
+
+    let result = await resourceLive(kind.GenericKind, kobject)
+
+    expect(result).toBe(true)
+    expect(InNamespace.mock.calls[0][0]).toBe("")
+  })
+
+  it("returns false when resource isn't Get-able", async () => {
+    const Get = jest.fn(name => { throw { status: 404 } })
+    const InNamespace = jest.fn(ns => ({ Get }))
+    K8s.mockImplementationOnce(() => (
+      { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
+    ))
+    const kobject = { name: "test-name", metadata: { namespace: "test-ns" } }
+
+    let result = await resourceLive(kind.GenericKind, kobject)
+
+    expect(result).toBe(false)
+    expect(InNamespace.mock.calls[0][0]).toBe(kobject.metadata.namespace)
   })
 })

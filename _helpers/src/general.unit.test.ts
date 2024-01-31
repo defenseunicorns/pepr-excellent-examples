@@ -22,6 +22,7 @@ import {
   waitLock,
   nearestAncestor,
   resourceLive,
+  resourceGone,
 } from "./general";
 // import { K8sFilteredActions, K8sInit } from 'kubernetes-fluent-client/dist/fluent/types';
 
@@ -183,6 +184,36 @@ describe("resourceLive()", () => {
     let result = await resourceLive(kind.GenericKind, kobject)
 
     expect(result).toBe(false)
+    expect(InNamespace.mock.calls[0][0]).toBe(kobject.metadata.namespace)
+  })
+})
+
+describe("resourceGone()", () => {
+  it("returns false when resource is Get-able", async () => {
+    const Get = jest.fn(name => Promise.resolve())
+    const InNamespace = jest.fn(ns => ({ Get }))
+    K8s.mockImplementationOnce(() => (
+      { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
+    ))
+    const kobject = { name: "test-name", metadata: {} }
+
+    let result = await resourceGone(kind.GenericKind, kobject)
+
+    expect(result).toBe(false)
+    expect(InNamespace.mock.calls[0][0]).toBe("")
+  })
+
+  it("returns true when resource isn't Get-able", async () => {
+    const Get = jest.fn(name => { throw { status: 404 } })
+    const InNamespace = jest.fn(ns => ({ Get }))
+    K8s.mockImplementationOnce(() => (
+      { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
+    ))
+    const kobject = { name: "test-name", metadata: { namespace: "test-ns" } }
+
+    let result = await resourceGone(kind.GenericKind, kobject)
+
+    expect(result).toBe(true)
     expect(InNamespace.mock.calls[0][0]).toBe(kobject.metadata.namespace)
   })
 })

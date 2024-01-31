@@ -87,7 +87,10 @@ export async function resourceLive(k: GenericClass, o: KubernetesObject) {
 }
 
 export async function resourceGone(k: GenericClass, o: KubernetesObject) {
-  try { await K8s(k).InNamespace(o.metadata.namespace).Get(o.metadata.name) }
+  const ns = o.metadata.namespace ? o.metadata.namespace : ""
+  const name = (o as { name: string }).name
+
+  try { await K8s(k).InNamespace(ns).Get(name) }
   catch (e) { if (e.status === 404) { return Promise.resolve(true)} }
   return Promise.resolve(false)
 }

@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-validate
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fail-false
+  namespace: hello-pepr-validate
+data:
+  pass: false
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fail-missing
+  namespace: hello-pepr-validate
+data: {}

@@ -1,14 +1,14 @@
 # WebApp Operator
 
-The WebApp Operator, written in Pepr, deploys the `CustomResourceDefinition` for WebApp, then watches and reconciles for instances of WebApps in the cluster to ensure the desired state meets the actual state.
+The WebApp Operator deploys the `CustomResourceDefinition` for WebApp, then watches and reconciles against instances of WebApps to ensure the desired state meets the actual cluster state.
 
 The WebApp instance represents a `Deployment` object with confirgurable replicas, a `Service`, and a `ConfigMap` that has a `index.html` file that can be configured to a specific language, and theme. The resources the Operator deploys contain `ownerReferences`, causing a cascading delete effect when the WebApp instance is deleted.
 
-If a bad actor deletes an object deployed by the Operator, the object will abruptly redeploy the object. 
+If any object deployed by the Operator is deleted for any reason, other than through the `ownerReference` mechanism, the Operator will abruptly redeploy the object. 
 
 ## Demo
 
-_Create an ephemeral cluster. (Kind of k3d will work)_
+_Create an ephemeral cluster. (Kind or k3d will work)_
 
 Make sure Pepr is update to date
 
@@ -119,7 +119,7 @@ Delete the `ConfigMap` on the WebApp to watch it the operator reconcile it back
 
 ```bash
 kubectl delete cm -n webapps --all 
-# wait a second
+# wait 5 seconds
 kubectl get cm -n webapps 
 
 # output
@@ -162,6 +162,9 @@ Delete the WebApp and check the namespace
 ```bash
 kubectl delete wa -n webapps --all
 kubectl get cm,deploy,svc -n webapps
+# output
+NAME                         DATA   AGE
+configmap/kube-root-ca.crt   1      40s
 ```
 
 When the WebApp is deleted, all of the resources that it created are also deleted.

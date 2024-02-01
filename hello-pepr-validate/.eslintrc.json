@@ -19,7 +19,8 @@
   ],
   "ignorePatterns": [
     "node_modules",
-    "dist"
+    "dist",
+    "**/*.test.ts"
   ],
   "root": true,
   "rules": {

@@ -41,7 +41,7 @@ afterAll(async () => { await unlock(trc) });
 
 describe("validate.ts", () => {
   beforeAll(async () => {
-    // unset so pepr uses default tsconfig.json (rather than cli's tsconfig)
+    // unset so pepr uses default tsconfig.json (rather than cli's tsconfig.json)
     const pepr = { TS_NODE_PROJECT: "" }
     await new Cmd({ env: pepr, cmd: `npx pepr build` }).run()
     await new Cmd({ env: pepr, cmd: `npx pepr deploy --confirm` }).run()

@@ -3,4 +3,4 @@ import cfg from "./package.json";
 
 import { HelloPeprValidate } from "./capabilities/validate";
 
-new PeprModule(cfg, [ HelloPeprValidate ]);
+new PeprModule(cfg, [HelloPeprValidate]);

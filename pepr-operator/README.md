@@ -119,7 +119,7 @@ Delete the `ConfigMap` on the WebApp to watch it the operator reconcile it back
 
 ```bash
 kubectl delete cm -n webapps --all 
-# wait 5 seconds
+# wait a few seconds
 kubectl get cm -n webapps 
 
 # output
@@ -161,6 +161,7 @@ Delete the WebApp and check the namespace
 
 ```bash
 kubectl delete wa -n webapps --all
+# wait a few seconds
 kubectl get cm,deploy,svc -n webapps
 # output
 NAME                         DATA   AGE

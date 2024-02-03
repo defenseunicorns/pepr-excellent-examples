@@ -11,7 +11,7 @@ metadata:
   name: fail-false
   namespace: hello-pepr-validate
 data:
-  pass: false
+  pass: "false"
 
 ---
 apiVersion: v1

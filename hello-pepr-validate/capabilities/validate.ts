@@ -13,10 +13,10 @@ When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
   .Validate(req => {
-    const name = req.Raw.data?.name;
+    const name = req.Raw.metadata.name;
     const pass = req.Raw.data?.pass;
 
     return pass === "true"
       ? req.Approve()
-      : req.Deny(`${name}: pass must be true!`);
+      : req.Deny(name);
   });

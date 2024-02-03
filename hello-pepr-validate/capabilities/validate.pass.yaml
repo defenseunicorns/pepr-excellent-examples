@@ -11,4 +11,4 @@ metadata:
   name: example-1
   namespace: hello-pepr-validate
 data:
-  pass: true
+  pass: "true"

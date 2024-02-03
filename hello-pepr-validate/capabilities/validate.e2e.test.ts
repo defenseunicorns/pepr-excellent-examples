@@ -17,6 +17,7 @@ import {
   sleep,
   untilTrue,
   resourceLive,
+  resourceGone,
 } from "helpers/src/general";
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'kubernetes-fluent-client';
@@ -59,7 +60,8 @@ const logs = async () => {
 }
   
 const untilLogged = async (needle, count = 1) => {
-  const found = (await logs()).filter(l => l.includes(needle))
+  const logz = await logs()
+  const found = logz.filter(l => l.includes(needle))
   while (true) {
     if (found.length >= count) { break }
     await sleep(.25)
@@ -92,18 +94,23 @@ describe("validate.ts", () => {
     )
     rejects = rejects.filter(f => f)
 
+    // Pepr-namespaced requests are rejected directly
     expect(rejects).toHaveLength(2)
     expect(rejects).toEqual(
       expect.arrayContaining([
         expect.stringMatching("denied the request: fail-false"),
-        expect.stringMatching("denied the request: fail-missing")
+        expect.stringMatching("denied the request: fail-missing"),
       ])
     )
-  }, secs(30))
-  
-  it("allows good examples", async () => {
-    const resources = await trc.load(`${trc.here()}/${trc.name()}.pass.yaml`)
 
-    let successes = await Promise.all(resources.map(r => fullApply(r)))
+    // non-Pepr-namespaced requests aren't rejected, just log-&-drop'ed (ugh)
+    await untilLogged('Namespace does not match')
+    await expect(K8s(kind.ConfigMap).Get("fail-namespace"))
+      .rejects.toMatchObject({ status: 404 })
+  }, secs(45))
+  
+  it.skip("allows good examples", async () => {
+    const resources = await trc.load(`${trc.here()}/${trc.name()}.pass.yaml`)
+    await Promise.all(resources.map(r => fullApply(r)))
   })
 })

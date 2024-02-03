@@ -5,7 +5,7 @@ const name = "hello-pepr-validate";
 export const HelloPeprValidate = new Capability({
   name: name,
   description: name,
-  namespaces: [name],
+  namespaces: ["default", name],
 });
 const { When } = HelloPeprValidate;
 

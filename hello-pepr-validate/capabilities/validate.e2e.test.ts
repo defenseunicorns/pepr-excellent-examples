@@ -77,6 +77,29 @@ const untilLogged = async (needle, count = 1) => {
   }
 }
 
+const peprUp = async ({verbose = false} = {}) => {
+  console.time('pepr ready (total time)')
+
+  // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
+  const pepr = { TS_NODE_PROJECT: "" }
+
+  console.time('pepr built')
+  const build = await new Cmd({ env: pepr, cmd: `npx pepr build` }).run()
+  if (verbose) { console.log(build) }
+  console.timeEnd('pepr built')
+
+  console.time('pepr deployed')
+  const deploy = await new Cmd({ env: pepr, cmd: `npx pepr deploy --confirm` }).run()
+  if (verbose) { console.log(deploy)}
+  console.timeEnd('pepr deployed')
+
+  console.time('pepr scheduing started')
+  await untilLogged('✅ Scheduling processed', 2)
+  console.timeEnd('pepr scheduing started')
+
+  console.timeEnd("pepr ready (total time)")
+}
+
 
 const trc = new TestRunCfg(__filename)
 
@@ -85,30 +108,7 @@ const trc = new TestRunCfg(__filename)
 // afterAll(async () => { await unlock(trc) });
 
 describe("validate.ts", () => {
-  beforeAll(async () => {
-    console.time('pepr ready (total time)')
-
-    // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
-    const pepr = { TS_NODE_PROJECT: "" }
-
-    console.time('pepr built')
-    console.log(
-      await new Cmd({ env: pepr, cmd: `npx pepr build` }).run()
-    )
-    console.timeEnd('pepr built')
-
-    console.time('pepr deployed')
-    console.log(
-      await new Cmd({ env: pepr, cmd: `npx pepr deploy --confirm` }).run()
-    )
-    console.timeEnd('pepr deployed')
-
-    console.time('pepr scheduing started')
-    await untilLogged('✅ Scheduling processed', 2)
-    console.timeEnd('pepr scheduing started')
-
-    console.timeEnd("pepr ready (total time)")
-  }, mins(2))
+  beforeAll(async () => await peprUp(), mins(2))
 
   afterEach(async () => await clean(trc), mins(5))
 

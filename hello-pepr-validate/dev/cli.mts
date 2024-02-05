@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import 'dotenv/config';
-import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
-import { resolve, dirname, basename } from 'node:path';
+import { dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { program, Option } from 'commander';
 import { fileURLToPath } from 'url';
 import { up, down } from 'helpers/src/cluster';
-import { Cmd } from 'helpers/src/Cmd';
 import { unlock } from 'helpers/src/general';
 import { TestRunCfg } from 'helpers/src/TestRunCfg';
 

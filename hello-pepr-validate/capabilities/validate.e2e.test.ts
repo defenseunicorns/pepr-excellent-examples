@@ -1,26 +1,22 @@
 import {
   beforeAll,
-  // beforeEach,
   afterEach,
-  afterAll,
   describe,
   it,
   expect,
 } from "@jest/globals";
+import { dirname } from 'node:path';
 import { Cmd } from "helpers/src/Cmd";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import {
   mins,
   secs,
-  lock,
-  unlock,
   sleep,
   untilTrue,
   resourceLive,
 } from "helpers/src/general";
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'kubernetes-fluent-client';
-import { writeFile } from "node:fs/promises";
 
 const halfApply = async (resources) => {
   resources = [ resources ].flat()
@@ -78,26 +74,35 @@ const untilLogged = async (needle, count = 1) => {
 }
 
 const peprUp = async ({verbose = false} = {}) => {
-  console.time('pepr ready (total time)')
+
+  // determine npx pepr@version from workspace root
+  const root = (await new Cmd({cmd: `npm root`}).run()).stdout[0]
+  const workspace = dirname(root)
+  const version = (await new Cmd({cwd: workspace, cmd: `npm run pepr -- --version`}).run())
+    .stdout.filter(l => l !== '').slice(-1)[0]
+
+  console.time(`pepr@${version} ready (total time)`)
 
   // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
   const pepr = { TS_NODE_PROJECT: "" }
 
-  console.time('pepr built')
-  const build = await new Cmd({ env: pepr, cmd: `npx pepr build` }).run()
+  let cmd = `npx --yes pepr@${version} build`
+  console.time(cmd)
+  const build = await new Cmd({env: pepr, cmd}).run()
   if (verbose) { console.log(build) }
-  console.timeEnd('pepr built')
+  console.timeEnd(cmd)
 
-  console.time('pepr deployed')
-  const deploy = await new Cmd({ env: pepr, cmd: `npx pepr deploy --confirm` }).run()
-  if (verbose) { console.log(deploy)}
-  console.timeEnd('pepr deployed')
+  cmd = `npx --yes pepr@${version} deploy --confirm`
+  console.time(cmd)
+  const deploy = await new Cmd({env: pepr, cmd}).run()
+  if (verbose) { console.log(deploy) }
+  console.timeEnd(cmd)
 
-  console.time('pepr scheduing started')
+  console.time('controller scheduling')
   await untilLogged('✅ Scheduling processed', 2)
-  console.timeEnd('pepr scheduing started')
+  console.timeEnd('controller scheduling')
 
-  console.timeEnd("pepr ready (total time)")
+  console.timeEnd(`pepr@${version} ready (total time)`)
 }
 
 

@@ -8,15 +8,16 @@ metadata:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: example-1
+  name: pass-yep
   namespace: hello-pepr-validate
 data:
-  pass: "true"
+  pass: yep
 
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: example-2
+  name: pass-yep-default
+  namespace: default
 data:
-  pass: "true"
+  pass: yep

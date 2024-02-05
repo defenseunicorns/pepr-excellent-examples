@@ -8,10 +8,10 @@ metadata:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: fail-false
+  name: fail-oof
   namespace: hello-pepr-validate
 data:
-  pass: "false"
+  pass: oof
 
 ---
 apiVersion: v1
@@ -34,4 +34,4 @@ metadata:
   name: fail-namespace
   namespace: prohibited
 data:
-  pass: "true"
+  pass: yep

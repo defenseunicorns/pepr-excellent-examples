@@ -20,6 +20,7 @@ import {
 } from "helpers/src/general";
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'kubernetes-fluent-client';
+import { writeFile } from "node:fs/promises";
 
 const halfApply = async (resources) => {
   resources = [ resources ].flat()
@@ -137,7 +138,7 @@ describe("validate.ts", () => {
     const resources = await trc.load(`${trc.here()}/${trc.name()}.pass.yaml`)
     await Promise.all(resources.map(r => fullApply(r)))
 
-    // figure out how to see logs / validation messages for good CMs (ns'd & default)
-    console.log(await logs())
+    // fullApply will wait until resources are Get-able from cluster, hence
+    //  no need for expect()s -- test succeeds if it doensn't error/timeout
   }, secs(10))
 })

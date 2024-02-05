@@ -144,6 +144,6 @@ describe("validate.ts", () => {
     await Promise.all(resources.map(r => fullApply(r)))
 
     // fullApply will wait until resources are Get-able from cluster, hence
-    //  no need for expect()s -- test succeeds if it doensn't error/timeout
+    //  no need for expect()s -- test succeeds if it doesn't error/timeout
   }, secs(10))
 })

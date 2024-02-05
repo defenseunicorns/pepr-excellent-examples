@@ -41,7 +41,6 @@ const opts = program.opts();
 
 
 function testUnit(passthru) {
-  console.log("-----> oi")
   spawnSync(
     // eslint-disable-next-line no-useless-escape
     "jest", ["--testPathPattern", ".*\.unit\.test\.ts", ...passthru],
@@ -62,6 +61,7 @@ async function testE2e(passthru) {
       "jest", [
         // eslint-disable-next-line no-useless-escape
         "--testPathPattern", ".*\.e2e\.test\.ts",
+        "--runInBand",
         ...passthru
       ],
       {

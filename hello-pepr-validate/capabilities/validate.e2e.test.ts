@@ -77,10 +77,11 @@ const untilLogged = async (needle, count = 1) => {
 }
 
 
-const trc = new TestRunCfg(__filename);
+const trc = new TestRunCfg(__filename)
 
-beforeAll(async () => { await lock(trc) }, mins(10))
-afterAll(async () => { await unlock(trc) });
+// using Jest's --runInBand flag, so... shouldn't need the cluster lock (probably)
+// beforeAll(async () => { await lock(trc) }, mins(10))
+// afterAll(async () => { await unlock(trc) });
 
 describe("validate.ts", () => {
   beforeAll(async () => {
@@ -140,5 +141,3 @@ describe("validate.ts", () => {
     console.log(await logs())
   }, secs(10))
 })
-
-// swap-out cluster.lock for --runInBand..?

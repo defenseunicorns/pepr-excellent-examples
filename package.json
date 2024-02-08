@@ -10,7 +10,6 @@
     "pepr-operator",
     "pepr-scheduler",
     "dash-policyreport",
-    "hello-pepr-validate",
-    "pepr-dungeon-crawl"
+    "hello-pepr-validate"
   ]
 }

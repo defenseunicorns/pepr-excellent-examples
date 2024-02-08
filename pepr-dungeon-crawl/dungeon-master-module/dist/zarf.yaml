@@ -1,0 +1,16 @@
+kind: ZarfPackageConfig
+metadata:
+  name: pepr-3045671d-b4a8-5613-a6ae-9a508a229bdd
+  description: 'Pepr Module: Module for pepr-dungeon-crawl'
+  url: https://github.com/defenseunicorns/pepr
+  version: 0.0.1
+components:
+  - name: module
+    required: true
+    manifests:
+      - name: module
+        namespace: pepr-system
+        files:
+          - pepr-module-3045671d-b4a8-5613-a6ae-9a508a229bdd.yaml
+    images:
+      - ghcr.io/defenseunicorns/pepr/controller:v0.24.0

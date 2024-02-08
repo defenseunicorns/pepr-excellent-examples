@@ -1,0 +1,36 @@
+{
+  "name": "dungeon-crawl-module",
+  "version": "0.0.1",
+  "description": "Module for pepr-dungeon-crawl",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "pepr-module",
+    "security"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "name": "dungeon-crawl-module",
+    "uuid": "3045671d-b4a8-5613-a6ae-9a508a229bdd",
+    "onError": "reject",
+    "alwaysIgnore": {
+      "namespaces": [],
+      "labels": []
+    },
+    "includedFiles": [],
+    "env": {}
+  },
+  "scripts": {
+    "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "pepr": "0.24.0"
+  },
+  "devDependencies": {
+    "typescript": "5.3.3"
+  }
+}

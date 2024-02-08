@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pepr-3045671d-b4a8-5613-a6ae-9a508a229bdd
+  namespace: pepr-system
+  labels:
+    app: pepr-3045671d-b4a8-5613-a6ae-9a508a229bdd
+    pepr.dev/controller: admission
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pepr-3045671d-b4a8-5613-a6ae-9a508a229bdd
+      pepr.dev/controller: admission
+  template:
+    metadata:
+      annotations:
+        buildTimestamp: '1707334329609'
+      labels:
+        app: pepr-3045671d-b4a8-5613-a6ae-9a508a229bdd
+        pepr.dev/controller: admission
+    spec:
+      priorityClassName: system-node-critical
+      serviceAccountName: pepr-3045671d-b4a8-5613-a6ae-9a508a229bdd
+      securityContext:
+        runAsUser: 65532
+        runAsGroup: 65532
+        runAsNonRoot: true
+        fsGroup: 65532
+      containers:
+        - name: server
+          image: ghcr.io/defenseunicorns/pepr/controller:v0.24.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - node
+            - /app/node_modules/pepr/dist/controller.js
+            - c7987ed01ec962e5097469f3b7a99798dfeb685cb9909aafb28b474c8eadca62
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+              scheme: HTTPS
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+              scheme: HTTPS
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: 500m
+          env:
+            - name: PEPR_WATCH_MODE
+              value: 'false'
+            - name: PEPR_PRETTY_LOG
+              value: 'false'
+            - name: LOG_LEVEL
+              value: debug
+          securityContext:
+            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /etc/certs
+              readOnly: true
+            - name: api-token
+              mountPath: /app/api-token
+              readOnly: true
+            - name: module
+              mountPath: /app/load
+              readOnly: true
+            - name: notification-script-volume
+              mountPath: "/capabilities"
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: pepr-3045671d-b4a8-5613-a6ae-9a508a229bdd-tls
+        - name: api-token
+          secret:
+            secretName: pepr-3045671d-b4a8-5613-a6ae-9a508a229bdd-api-token
+        - name: module
+          secret:
+            secretName: pepr-3045671d-b4a8-5613-a6ae-9a508a229bdd-module
+        - name: notification-script-volume
+          configMap:
+            name: notification-script

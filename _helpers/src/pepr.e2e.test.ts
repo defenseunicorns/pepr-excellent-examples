@@ -72,9 +72,7 @@ describe("moduleUp()", () => {
     console.timeEnd(cmd)
   }, mins(2))
 
-  afterEach(async () => {
-    await K8s(kind.Namespace).Delete("pepr-system")
-  }, mins(2))
+  afterEach(async () => await clean(trc), mins(5))
 
   it("builds, deploys, and waits for local Pepr Module to come up", async () => {
     let timeEnd = jest.spyOn(console, "timeEnd")

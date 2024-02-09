@@ -5,13 +5,10 @@ import {
   it,
   expect,
 } from "@jest/globals";
-import { dirname } from 'node:path';
-import { Cmd } from "helpers/src/Cmd";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import {
   mins,
   secs,
-  sleep,
   untilTrue,
   resourceLive,
 } from "helpers/src/general";
@@ -40,10 +37,7 @@ const fullApply = async (resources) => {
 const trc = new TestRunCfg(__filename)
 
 describe("validate.ts", () => {
-  beforeAll(async () => {
-    const version = await peprVersion()
-    await moduleUp(version)
-  }, mins(2))
+  beforeAll(async () => await moduleUp(await peprVersion()), mins(2))
 
   afterEach(async () => await clean(trc), mins(5))
 

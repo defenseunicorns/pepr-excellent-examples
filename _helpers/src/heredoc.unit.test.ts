@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 import { heredoc } from './heredoc'
 
 describe("heredoc", () => {
-  it("trims head/tail empty lines & de-indents", async () => {
+  it("trims head/tail empty lines & de-indents", () => {
     const actual = heredoc`
       ---
       indented:

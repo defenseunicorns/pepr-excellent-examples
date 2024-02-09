@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { program, Option } from 'commander';
 import { spawnSync } from 'node:child_process';
-import { up, down } from './src/cluster';
+import { up, down } from '../src/cluster';
 
 program.name('cli')
   .version('0.0.0', '-v, --version')
@@ -20,7 +20,7 @@ const test = program.command('test')
   .addOption(
     new Option(
       '-p, --passthru [passthru...]',
-      'args to pass to test runner (e.g. --passthru="--testPathPattern=general.test.unit.ts")'
+      'args to pass to test runner (e.g. --passthru=\'--testNamePattern="testName()"\')'
     )
   )
   .action(async ({suite, passthru}) => {
@@ -37,7 +37,8 @@ const opts = program.opts();
 
 function testUnit(passthru) {
   spawnSync(
-    "jest", [ "--testRegex", ".*\.unit\.test\.ts", ...passthru ],
+    // eslint-disable-next-line no-useless-escape
+    "jest", ["--testPathPattern", ".*\.unit\.test\.ts", ...passthru],
     { stdio: 'inherit' }
   )
 }
@@ -65,9 +66,11 @@ async function testE2e(passthru) {
 
     // run tests that require a pre-existing cluster (and/or don't care)
     let result = spawnSync(
+      
       "jest", [
         "--testPathIgnorePatterns", "src/cluster\.e2e\.test\.ts",
         "--testPathPattern", ".*\.e2e\.test\.ts",
+        "--runInBand",
         ...passthru
       ],
       {

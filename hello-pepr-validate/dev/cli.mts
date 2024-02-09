@@ -23,7 +23,7 @@ const test = program.command('test')
   .description('run tests')
   .addOption(new Option('-s, --suite <suite>', 'suite type').choices(['unit', 'e2e', 'all']).default('all'))
   .addOption(new Option('-p, --passthru [passthru...]',
-    'args to pass to test runner (e.g. --passthru="--testPathPattern=general.test.unit.ts")'
+    'args to pass to test runner (e.g. --passthru=\'--testNamePattern="testName()"\')'
   ))
   .action(async ({ suite, passthru }) => {
     passthru = passthru || []

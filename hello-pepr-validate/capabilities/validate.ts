@@ -11,10 +11,11 @@ const { When } = HelloPeprValidate;
 
 When(a.ConfigMap)
   .IsCreated()
-  // .InNamespace(name)
+  .InNamespace(name)
   .Validate(req => {
     const name = req.Raw.metadata.name;
-    const pass = req.Raw.data?.pass;
+    if (name === "kube-root-ca.crt") { return req.Approve() }
 
-    return pass === "yep" ? req.Approve() : req.Deny(name);
+    const pass = req.Raw.data?.pass;
+    return pass === "yep" ? req.Approve() : req.Deny(name)
   });

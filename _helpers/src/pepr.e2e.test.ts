@@ -76,7 +76,7 @@ describe("moduleUp()", () => {
 
     const original = cwd()
     chdir(module)
-    await moduleUp(version)
+    await moduleUp({version})
     chdir(original)
 
     expect(timeEnd).toHaveBeenCalledWith(`pepr@${version} ready (total time)`)

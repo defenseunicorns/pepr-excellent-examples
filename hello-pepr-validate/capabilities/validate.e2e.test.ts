@@ -15,8 +15,7 @@ import { K8s, kind } from 'kubernetes-fluent-client';
 const trc = new TestRunCfg(__filename)
 
 describe("validate.ts", () => {
-  beforeAll(async () => await moduleUp(await peprVersion()), mins(2))
-
+  beforeAll(async () => await moduleUp(), mins(2))
   afterEach(async () => await clean(trc), mins(5))
 
   it("prevents bad examples", async () => {

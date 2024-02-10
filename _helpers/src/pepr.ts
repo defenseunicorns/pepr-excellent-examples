@@ -50,19 +50,22 @@ export async function peprVersion() {
   return version
 }
 
-export async function moduleUp(peprVersion, {verbose = false} = {}) {
-  console.time(`pepr@${peprVersion} ready (total time)`)
+export async function moduleUp({version = "", verbose = false} = {}) {
+  // can't have await expressions in default args, so gotta do it here
+  if (version === ""){ version = await peprVersion()}
+
+  console.time(`pepr@${version} ready (total time)`)
 
   // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
   const pepr = { TS_NODE_PROJECT: "" }
 
-  let cmd = `npx --yes pepr@${peprVersion} build`
+  let cmd = `npx --yes pepr@${version} build`
   console.time(cmd)
   const build = await new Cmd({env: pepr, cmd}).run()
   if (verbose) { console.log(build) }
   console.timeEnd(cmd)
 
-  cmd = `npx --yes pepr@${peprVersion} deploy --confirm`
+  cmd = `npx --yes pepr@${version} deploy --confirm`
   console.time(cmd)
   const deploy = await new Cmd({env: pepr, cmd}).run()
   if (verbose) { console.log(deploy) }
@@ -72,5 +75,5 @@ export async function moduleUp(peprVersion, {verbose = false} = {}) {
   await untilLogged('✅ Scheduling processed', 2)
   console.timeEnd('controller scheduling')
 
-  console.timeEnd(`pepr@${peprVersion} ready (total time)`)
+  console.timeEnd(`pepr@${version} ready (total time)`)
 }

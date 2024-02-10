@@ -9,34 +9,12 @@ import { TestRunCfg } from "helpers/src/TestRunCfg";
 import {
   mins,
   secs,
-  untilTrue,
-  resourceLive,
+  halfCreate,
+  fullCreate
 } from "helpers/src/general";
 import { peprVersion, moduleUp, untilLogged } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'kubernetes-fluent-client';
-
-const halfCreate = async (resources) => {
-  resources = [ resources ].flat()
-
-  return Promise.all(resources.map((r) => {
-    const kynd = kind[r.kind]
-    const applied = K8s(kynd).Apply(r)
-
-    return applied
-  }))
-}
-
-const fullCreate = async (resources) => {
-  resources = [ resources ].flat()
-
-  return Promise.all(resources.map(async (r) => {
-    const kynd = kind[r.kind]
-    const applied = await K8s(kynd).Apply(r)
-
-    return untilTrue(() => resourceLive(kynd, applied))
-  }))
-}
 
 const trc = new TestRunCfg(__filename)
 

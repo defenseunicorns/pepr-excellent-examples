@@ -1,12 +1,9 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as fsP from 'fs/promises';
-import {
-  GenericClass,
-  K8s,
-  KubernetesObject
-} from "kubernetes-fluent-client";
+import { K8s, kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from './TestRunCfg';
+import { live } from './resource';
 
 export function sleep(seconds: number): Promise<void> {
   return new Promise(res => setTimeout(res, secs(seconds)));
@@ -74,21 +71,24 @@ export function nearestAncestor(filename: string, fromPath: string): string {
   throw `Can't find file "${filename}" in/above path "${fromPath}".`
 }
 
-export async function resourceLive(k: GenericClass, o: KubernetesObject) {
-  const ns = o.metadata.namespace ? o.metadata.namespace : ""
+export async function halfCreate(resources, kinds = kind) {
+  resources = [ resources ].flat()
 
-  try { await K8s(k).InNamespace(ns).Get(o.metadata.name) }
-  catch (e) {
-    if (e.status === 404) { return false }
-    else { throw e }
-  }
-  return true
+  return Promise.all(resources.map((r) => {
+    const kynd = kinds[r.kind]
+    const applied = K8s(kynd).Apply(r)
+
+    return applied
+  }))
 }
 
-export async function resourceGone(k: GenericClass, o: KubernetesObject) {
-  const ns = o.metadata.namespace ? o.metadata.namespace : ""
+export async function fullCreate(resources, kinds = kind) {
+  resources = [ resources ].flat()
 
-  try { await K8s(k).InNamespace(ns).Get(o.metadata.name) }
-  catch (e) { if (e.status === 404) { return Promise.resolve(true)} }
-  return Promise.resolve(false)
+  return Promise.all(resources.map(async (r) => {
+    const kynd = kinds[r.kind]
+    const applied = await K8s(kynd).Apply(r)
+
+    return untilTrue(() => live(kynd, applied))
+  }))
 }

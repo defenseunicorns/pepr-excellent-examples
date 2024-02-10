@@ -21,8 +21,8 @@ import {
   untilTrue,
   waitLock,
   nearestAncestor,
-  resourceLive,
-  resourceGone,
+  halfCreate,
+  fullCreate
 } from "./general";
 // import { K8sFilteredActions, K8sInit } from 'kubernetes-fluent-client/dist/fluent/types';
 
@@ -158,62 +158,40 @@ describe("nearestAncestor()", () => {
   })
 })
 
-describe("resourceLive()", () => {
-  it("returns true when resource is Get-able", async () => {
-    const Get = jest.fn(name => Promise.resolve())
-    const InNamespace = jest.fn(ns => ({ Get }))
-    K8s.mockImplementationOnce(() => (
-      { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
+describe.skip("halfCreate()", () => {
+  it("resolves applied resources on successful apply to cluster", async () => {
+    const Apply = jest.fn((res: object) => Promise.resolve({...res, applied: true}))
+
+    K8s.mockImplementation(() => (
+      { Apply } as unknown as ReturnType<typeof K8s<any, any>>
     ))
-    const kobject = { metadata: { name: "test-name" } }
+    const resources = [
+      { kind: "ConfigMap", metadata: { name: "test-alpha" } },
+      { kind: "ConfigMap", metadata: { name: "test-bravo" } },
+      { kind: "ConfigMap", metadata: { name: "test-gamma" } }
+    ]
 
-    let result = await resourceLive(kind.GenericKind, kobject)
+    const applied = await halfCreate(resources)
 
-    expect(result).toBe(true)
-    expect(InNamespace.mock.calls[0][0]).toBe("")
-  })
-
-  it("returns false when resource isn't Get-able", async () => {
-    const Get = jest.fn(name => { throw { status: 404 } })
-    const InNamespace = jest.fn(ns => ({ Get }))
-    K8s.mockImplementationOnce(() => (
-      { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
-    ))
-    const kobject = { metadata: { name: "test-name", namespace: "test-ns" } }
-
-    let result = await resourceLive(kind.GenericKind, kobject)
-
-    expect(result).toBe(false)
-    expect(InNamespace.mock.calls[0][0]).toBe(kobject.metadata.namespace)
+    expect(applied.length).toBe(resources.length)
+    for (let r of resources) {
+      expect(applied).toContainEqual({...r, applied: true})
+    }
   })
 })
 
-describe("resourceGone()", () => {
-  it("returns false when resource is Get-able", async () => {
-    const Get = jest.fn(name => Promise.resolve())
-    const InNamespace = jest.fn(ns => ({ Get }))
-    K8s.mockImplementationOnce(() => (
-      { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
-    ))
-    const kobject = { metadata: { name: "test-name" } }
+describe.skip("fullCreate()", () => {
+  it("resolves applied resources when Get-able from cluster", async () => {
+    // const Get = jest.fn(name => Promise.resolve())
+    // const InNamespace = jest.fn(ns => ({ Get }))
+    // K8s.mockImplementationOnce(() => (
+    //   { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
+    // ))
+    // const kobject = { metadata: { name: "test-name" } }
 
-    let result = await resourceGone(kind.GenericKind, kobject)
+    // let result = await resources(kind.GenericKind, kobject)
 
-    expect(result).toBe(false)
-    expect(InNamespace.mock.calls[0][0]).toBe("")
-  })
-
-  it("returns true when resource isn't Get-able", async () => {
-    const Get = jest.fn(name => { throw { status: 404 } })
-    const InNamespace = jest.fn(ns => ({ Get }))
-    K8s.mockImplementationOnce(() => (
-      { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
-    ))
-    const kobject = { metadata: { name: "test-name", namespace: "test-ns" } }
-
-    let result = await resourceGone(kind.GenericKind, kobject)
-
-    expect(result).toBe(true)
-    expect(InNamespace.mock.calls[0][0]).toBe(kobject.metadata.namespace)
+    // expect(result).toBe(false)
+    // expect(InNamespace.mock.calls[0][0]).toBe("")
   })
 })

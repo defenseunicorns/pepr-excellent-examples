@@ -15,9 +15,9 @@ import {
   lock,
   unlock,
   untilTrue,
-  resourceLive,
   sleep,
 } from "helpers/src/general";
+import { live, gone } from 'helpers/src/resource';
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'kubernetes-fluent-client';
 import { ClusterPolicyReport } from '../types/clusterpolicyreport-v1alpha2';
@@ -32,7 +32,7 @@ const apply = async (resources) => {
     const kynd = kind[r.kind]
     const applied = await K8s(kynd).Apply(r)
 
-    return untilTrue(() => resourceLive(kynd, applied))
+    return untilTrue(() => live(kynd, applied))
   }))
 }
 

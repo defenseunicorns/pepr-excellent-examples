@@ -7,7 +7,8 @@ import {
   RegisterKind
 } from "kubernetes-fluent-client";
 import { TestRunCfg } from './TestRunCfg';
-import { untilTrue, resourceGone } from "./general";
+import { untilTrue } from './general';
+import { gone } from './resource';
 import { Cmd } from './Cmd'
 
 export async function up(name: string = 'pexex-helpers-cluster'): Promise<string> {
@@ -89,14 +90,14 @@ export async function clean(trc: TestRunCfg): Promise<void> {
 
     // delete test-labelled resources (in parallel)
     tbds.forEach(([k, o]) => K8s(k).Delete(o))
-    let terminating = tbds.map(tbd => untilTrue(() => resourceGone(...tbd)))
+    let terminating = tbds.map(tbd => untilTrue(() => gone(...tbd)))
     await Promise.all(terminating)
 
     // finally, delete the "pepr-system" namespace
     try {
       const peprSystem = await K8s(kind.Namespace).Get("pepr-system")
       await K8s(kind.Namespace).Delete("pepr-system")
-      await untilTrue(() => resourceGone(kind.Namespace, peprSystem))
+      await untilTrue(() => gone(kind.Namespace, peprSystem))
 
     } catch (e) {
       if ( ![404].includes(e.status) ) { throw e }

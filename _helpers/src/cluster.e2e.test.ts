@@ -10,7 +10,8 @@ import {
 } from '@jest/globals';
 import { existsSync } from 'node:fs';
 import { K8s, kind, RegisterKind } from "kubernetes-fluent-client";
-import { secs, mins, resourceGone } from "./general";
+import { secs, mins } from './general';
+import { gone } from './resource';
 import { TestRunCfg } from './TestRunCfg';
 import { clean, up, down } from './cluster'
 import { Cmd } from './Cmd';
@@ -83,7 +84,7 @@ describe("clean()", () => {
 
     await clean(trc)
 
-    expect(await resourceGone(kind.ConfigMap, applied)).toBe(true)
+    expect(await gone(kind.ConfigMap, applied)).toBe(true)
   }, secs(5))
 
   it("removes CRD & CRs with TestRunCfg-defined label", async () => {
@@ -146,8 +147,8 @@ describe("clean()", () => {
 
     await clean(trc)
 
-    expect(await resourceGone(cr_kind, applied_cr)).toBe(true)
-    expect(await resourceGone(kind.CustomResourceDefinition, applied_crd)).toBe(true)
+    expect(await gone(cr_kind, applied_cr)).toBe(true)
+    expect(await gone(kind.CustomResourceDefinition, applied_crd)).toBe(true)
   }, secs(10))
 
   it("removes the \"pepr-system\" namespace", async () => {
@@ -163,6 +164,6 @@ describe("clean()", () => {
 
     await clean(trc)
 
-    expect(await resourceGone(kind.Namespace, applied)).toBe(true)
+    expect(await gone(kind.Namespace, applied)).toBe(true)
   }, mins(2))
 })

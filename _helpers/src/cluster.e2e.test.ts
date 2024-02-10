@@ -10,7 +10,7 @@ import {
 } from '@jest/globals';
 import { existsSync } from 'node:fs';
 import { K8s, kind, RegisterKind } from "kubernetes-fluent-client";
-import { secs, mins } from './general';
+import { secs, mins } from './time';
 import { gone } from './resource';
 import { TestRunCfg } from './TestRunCfg';
 import { clean, up, down } from './cluster'

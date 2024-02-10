@@ -9,15 +9,9 @@ import {
 } from "@jest/globals";
 import { Cmd } from "helpers/src/Cmd";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import {
-  mins,
-  secs,
-  lock,
-  unlock,
-  untilTrue,
-  sleep,
-} from "helpers/src/general";
-import { live, gone } from 'helpers/src/resource';
+import { lock, unlock, untilTrue } from "helpers/src/general";
+import { secs, mins } from 'helpers/src/time';
+import { live } from 'helpers/src/resource';
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'kubernetes-fluent-client';
 import { ClusterPolicyReport } from '../types/clusterpolicyreport-v1alpha2';

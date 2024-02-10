@@ -1,13 +1,4 @@
-import {
-  GenericClass,
-  K8s,
-  kind,
-  KubernetesListObject,
-  KubernetesObject,
-  RegisterKind
-} from "kubernetes-fluent-client";
-import { TestRunCfg } from './TestRunCfg';
-import { sleep } from "./general";
+import { sleep } from "./time";
 import { Cmd } from './Cmd';
 import { dirname } from 'node:path';
 

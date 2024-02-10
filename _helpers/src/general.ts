@@ -4,18 +4,11 @@ import * as fsP from 'fs/promises';
 import { K8s, kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from './TestRunCfg';
 import { live } from './resource';
-
-export function sleep(seconds: number): Promise<void> {
-  return new Promise(res => setTimeout(res, secs(seconds)));
-}
+import { sleep } from './time';
 
 export async function untilTrue(predicate: () => Promise<boolean>) {
   while (true) { if (await predicate()) { break } await sleep(.25) }
 }
-
-export function ms(num: number): number { return num }
-export function secs(num: number): number { return num * 1000 }
-export function mins(num: number): number { return num * secs(60)}
 
 // Jest runs test files in parallel so we can't guarantee that test capabilities
 // will only touch non-conflicting cluster resources... which means we have to

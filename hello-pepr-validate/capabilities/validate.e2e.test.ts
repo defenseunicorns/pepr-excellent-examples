@@ -16,14 +16,18 @@ import { peprVersion, moduleUp, untilLogged } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'kubernetes-fluent-client';
 
-const halfApply = async (resources) => {
+const halfCreate = async (resources) => {
   resources = [ resources ].flat()
-  return Promise.all(
-    resources.map((r) => K8s(kind[r.kind]).Apply(r))
-  )
+
+  return Promise.all(resources.map((r) => {
+    const kynd = kind[r.kind]
+    const applied = K8s(kynd).Apply(r)
+
+    return applied
+  }))
 }
 
-const fullApply = async (resources) => {
+const fullCreate = async (resources) => {
   resources = [ resources ].flat()
 
   return Promise.all(resources.map(async (r) => {
@@ -45,7 +49,7 @@ describe("validate.ts", () => {
     const resources = await trc.load(`${trc.here()}/${trc.name()}.fail.yaml`)
 
     let rejects = (await Promise.all(
-      resources.map(r => halfApply(r).then(() => '').catch(e => e.data.message))
+      resources.map(r => halfCreate(r).then(() => '').catch(e => e.data.message))
     )).filter(f => f)
 
     // Pepr-namespaced requests are rejected directly
@@ -65,9 +69,9 @@ describe("validate.ts", () => {
   
   it("allows good examples", async () => {
     const resources = await trc.load(`${trc.here()}/${trc.name()}.pass.yaml`)
-    await Promise.all(resources.map(r => fullApply(r)))
+    await Promise.all(resources.map(r => fullCreate(r)))
 
-    // fullApply will wait until resources are Get-able from cluster, hence
+    // fullCreate will wait until resources are Get-able from cluster, hence
     //  no need for expect()s -- test succeeds if it doesn't error/timeout
   }, secs(10))
 })

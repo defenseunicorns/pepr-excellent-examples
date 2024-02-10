@@ -30,6 +30,10 @@ import * as KFC from "kubernetes-fluent-client";
 jest.mock("kubernetes-fluent-client")
 const { K8s, kind } = jest.mocked(KFC)
 
+import * as resource from "./resource";
+jest.mock("./resource")
+const { live } = jest.mocked(resource)
+
 describe("sleep", () => {
   it("resolves after (roughly) given number of seconds", async () => {
     const checkTheClock = () => new Date().valueOf();  // ms since epoch
@@ -158,10 +162,9 @@ describe("nearestAncestor()", () => {
   })
 })
 
-describe.skip("halfCreate()", () => {
+describe("halfCreate()", () => {
   it("resolves applied resources on successful apply to cluster", async () => {
     const Apply = jest.fn((res: object) => Promise.resolve({...res, applied: true}))
-
     K8s.mockImplementation(() => (
       { Apply } as unknown as ReturnType<typeof K8s<any, any>>
     ))
@@ -175,23 +178,36 @@ describe.skip("halfCreate()", () => {
 
     expect(applied.length).toBe(resources.length)
     for (let r of resources) {
+      expect(K8s).toHaveBeenCalledWith(kind[r.kind])
+      expect(Apply).toHaveBeenCalledWith(r)
       expect(applied).toContainEqual({...r, applied: true})
     }
   })
 })
 
-describe.skip("fullCreate()", () => {
+describe("fullCreate()", () => {
   it("resolves applied resources when Get-able from cluster", async () => {
-    // const Get = jest.fn(name => Promise.resolve())
-    // const InNamespace = jest.fn(ns => ({ Get }))
-    // K8s.mockImplementationOnce(() => (
-    //   { InNamespace } as unknown as ReturnType<typeof K8s<any, any>>
-    // ))
-    // const kobject = { metadata: { name: "test-name" } }
+    const Apply = jest.fn((res: object) => Promise.resolve({...res, applied: true}))
+    K8s.mockImplementation(() => (
+      { Apply } as unknown as ReturnType<typeof K8s<any, any>>
+    ))
+    live.mockImplementationOnce(() => Promise.resolve(false))
+    live.mockImplementationOnce(() => Promise.resolve(false))
+    live.mockImplementationOnce(() => Promise.resolve(false))
+    live.mockImplementation(() => Promise.resolve(true))
+    const resources = [
+      { kind: "ConfigMap", metadata: { name: "test-alpha" } },
+      { kind: "ConfigMap", metadata: { name: "test-bravo" } },
+      { kind: "ConfigMap", metadata: { name: "test-gamma" } }
+    ]
 
-    // let result = await resources(kind.GenericKind, kobject)
+    const applied = await fullCreate(resources)
 
-    // expect(result).toBe(false)
-    // expect(InNamespace.mock.calls[0][0]).toBe("")
+    expect(applied.length).toBe(resources.length)
+    for (let r of resources) {
+      expect(K8s).toHaveBeenCalledWith(kind[r.kind])
+      expect(Apply).toHaveBeenCalledWith(r)
+      expect(applied).toContainEqual({...r, applied: true})
+    }
   })
 })

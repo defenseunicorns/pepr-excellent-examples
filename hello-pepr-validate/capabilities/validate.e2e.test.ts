@@ -8,7 +8,7 @@ import {
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { halfCreate, fullCreate } from "helpers/src/general";
 import { secs, mins } from 'helpers/src/time';
-import { peprVersion, moduleUp, untilLogged } from 'helpers/src/pepr';
+import { moduleUp, untilLogged } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'kubernetes-fluent-client';
 
@@ -21,9 +21,9 @@ describe("validate.ts", () => {
   it("prevents bad examples", async () => {
     const resources = await trc.load(`${trc.here()}/${trc.name()}.fail.yaml`)
 
-    let rejects = (await Promise.all(
-      resources.map(r => halfCreate(r).then(() => '').catch(e => e.data.message))
-    )).filter(f => f)
+    let rejects = (await Promise.all(resources.map(r => {
+      return halfCreate(r).then(() => '').catch(e => e.data.message)}
+    ))).filter(f => f)
 
     // Pepr-namespaced requests are rejected directly
     expect(rejects).toHaveLength(2)
@@ -34,7 +34,7 @@ describe("validate.ts", () => {
       ])
     )
 
-    // non-Pepr-namespaced requests aren't rejected, just log-&-drop'ed (ugh)
+    // non-Pepr-namespaced requests AREN'T rejected (just log-&-drop'ed, ugh)
     await untilLogged('Namespace does not match')
     await expect(K8s(kind.ConfigMap).Get("fail-namespace"))
       .rejects.toMatchObject({ status: 404 })

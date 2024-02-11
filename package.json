@@ -2,7 +2,8 @@
   "name": "pepr-excellent-examples",
   "license": "Apache-2.0",
   "scripts": {
-    "pepr": "npx pepr@0.25.0"
+    "pepr": "npx pepr@0.25.0",
+    "test:e2e": "npm run --workspaces test:e2e"
   },
   "workspaces": [
     "_helpers",

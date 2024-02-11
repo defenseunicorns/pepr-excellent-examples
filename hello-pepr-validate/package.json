@@ -40,9 +40,8 @@
     "yaml": "2.3.4"
   },
   "scripts": {
-    "_node": "node --no-warnings=ExperimentalWarning --experimental-specifier-resolution=node --loader ts-node/esm",
     "pepr": "pepr",
-    "cli": "TS_NODE_PROJECT='dev/tsconfig.json' npx dotenv -e dev/.env.dev -- npm run _node -- dev/cli.mts",
+    "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
     "test": "npm run cli -- test --suite all",
     "test:e2e": "npm run cli -- test --suite e2e",
     "test:unit": "npm run cli -- test --suite unit"

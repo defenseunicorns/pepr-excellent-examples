@@ -40,10 +40,9 @@
     "yaml": "2.3.4"
   },
   "scripts": {
-    "_node": "node --no-warnings=ExperimentalWarning --experimental-specifier-resolution=node --loader ts-node/esm",
-    "_kfc": "kubernetes-fluent-client",
-    "_pepr": "pepr",
-    "cli": "npx dotenv -e .env.dev -- npm run _node -- dev/cli.mts",
+    "kfc": "kubernetes-fluent-client",
+    "pepr": "pepr",
+    "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
     "test": "npm run cli -- test --suite all",
     "test:e2e": "npm run cli -- test --suite e2e",
     "test:unit": "npm run cli -- test --suite unit"

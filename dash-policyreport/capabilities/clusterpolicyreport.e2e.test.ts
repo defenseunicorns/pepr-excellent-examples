@@ -9,7 +9,7 @@ import {
 } from "@jest/globals";
 import { Cmd } from "helpers/src/Cmd";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { lock, unlock, untilTrue } from "helpers/src/general";
+import { untilTrue } from "helpers/src/general";
 import { secs, mins } from 'helpers/src/time';
 import { live } from 'helpers/src/resource';
 import { clean } from 'helpers/src/cluster';
@@ -31,9 +31,6 @@ const apply = async (resources) => {
 }
 
 const trc = new TestRunCfg(__filename);
-
-beforeAll(async () => { await lock(trc) }, mins(10))
-afterAll(async () => { await unlock(trc) });
 
 describe("Pepr ClusterPolicyReport()", () => {
   beforeAll(async () => {

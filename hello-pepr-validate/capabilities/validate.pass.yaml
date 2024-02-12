@@ -17,7 +17,21 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: pass-yep-default
+  name: pass-default
   namespace: default
 data:
   pass: yep
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: unconcerned
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pass-unconcerned
+  namespace: unconcerned
+data: {}

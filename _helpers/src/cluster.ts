@@ -93,16 +93,6 @@ export async function clean(trc: TestRunCfg): Promise<void> {
     let terminating = tbds.map(tbd => untilTrue(() => gone(...tbd)))
     await Promise.all(terminating)
 
-    // finally, delete the "pepr-system" namespace
-    try {
-      const peprSystem = await K8s(kind.Namespace).Get("pepr-system")
-      await K8s(kind.Namespace).Delete("pepr-system")
-      await untilTrue(() => gone(kind.Namespace, peprSystem))
-
-    } catch (e) {
-      if ( ![404].includes(e.status) ) { throw e }
-    }
-
   } finally {
     process.env = { ...originalEnv }
   }

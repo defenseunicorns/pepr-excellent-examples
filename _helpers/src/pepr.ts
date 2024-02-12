@@ -1,6 +1,9 @@
+import { dirname } from 'node:path';
+import { K8s, kind } from 'kubernetes-fluent-client';
 import { sleep } from "./time";
 import { Cmd } from './Cmd';
-import { dirname } from 'node:path';
+import { untilTrue } from './general';
+import { gone } from './resource';
 
 
 function sift(stdout) {
@@ -76,4 +79,15 @@ export async function moduleUp({version = "", verbose = false} = {}) {
   console.timeEnd('controller scheduling')
 
   console.timeEnd(`pepr@${version} ready (total time)`)
+}
+
+export async function moduleDown() {
+  try {
+    const peprSystem = await K8s(kind.Namespace).Get("pepr-system")
+    await K8s(kind.Namespace).Delete("pepr-system")
+    await untilTrue(() => gone(kind.Namespace, peprSystem))
+
+  } catch (e) {
+    if ( ![404].includes(e.status) ) { throw e }
+  }
 }

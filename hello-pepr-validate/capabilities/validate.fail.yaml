@@ -20,18 +20,3 @@ metadata:
   name: fail-missing
   namespace: hello-pepr-validate
 data: {}
-
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: prohibited
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: fail-namespace
-  namespace: prohibited
-data:
-  pass: yep

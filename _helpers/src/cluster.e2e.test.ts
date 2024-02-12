@@ -150,20 +150,4 @@ describe("clean()", () => {
     expect(await gone(cr_kind, applied_cr)).toBe(true)
     expect(await gone(kind.CustomResourceDefinition, applied_crd)).toBe(true)
   }, secs(10))
-
-  it("removes the \"pepr-system\" namespace", async () => {
-    const namespace = {
-      apiVersion: "v1",
-      kind: "Namespace",
-      metadata: {
-        name: "pepr-system",
-      }
-    }
-
-    const applied = await K8s(kind.Namespace).Apply(namespace)
-
-    await clean(trc)
-
-    expect(await gone(kind.Namespace, applied)).toBe(true)
-  }, mins(2))
 })

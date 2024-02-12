@@ -6,13 +6,15 @@ import {
   it,
   jest
 } from '@jest/globals';
+import { K8s, kind } from 'kubernetes-fluent-client';
 import { mins } from './time';
+import { gone } from './resource';
 import { chdir, cwd } from 'node:process';
 import { TestRunCfg } from './TestRunCfg';
 import { Cmd } from './Cmd';
 import { clean } from './cluster';
 import { readFile, rm, writeFile } from 'node:fs/promises';
-import { peprVersion, moduleUp } from './pepr';
+import { peprVersion, moduleUp, moduleDown } from './pepr';
 
 const trc = new TestRunCfg(__filename)
 
@@ -69,8 +71,6 @@ describe("moduleUp()", () => {
     console.timeEnd(cmd)
   }, mins(2))
 
-  afterEach(async () => await clean(trc), mins(5))
-
   it("builds, deploys, and waits for local Pepr Module to come up", async () => {
     let timeEnd = jest.spyOn(console, "timeEnd")
 
@@ -82,5 +82,22 @@ describe("moduleUp()", () => {
     expect(timeEnd).toHaveBeenCalledWith(`pepr@${version} ready (total time)`)
 
     timeEnd.mockRestore()
+  }, mins(2))
+})
+
+describe("moduleDown()", () => {
+  it("removes the \"pepr-system\" namespace", async () => {
+    const namespace = {
+      apiVersion: "v1",
+      kind: "Namespace",
+      metadata: {
+        name: "pepr-system",
+      }
+    }
+    const applied = await K8s(kind.Namespace).Apply(namespace)
+
+    await moduleDown()
+
+    expect(await gone(kind.Namespace, applied)).toBe(true)
   }, mins(2))
 })

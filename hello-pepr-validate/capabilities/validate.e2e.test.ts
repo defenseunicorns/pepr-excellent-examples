@@ -10,7 +10,6 @@ import { halfCreate, fullCreate } from "helpers/src/general";
 import { secs, mins, sleep } from 'helpers/src/time';
 import { moduleUp, untilLogged, logs } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
-import { K8s, kind } from 'kubernetes-fluent-client';
 
 const trc = new TestRunCfg(__filename)
 

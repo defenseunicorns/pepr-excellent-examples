@@ -1,5 +1,6 @@
 import {
   beforeAll,
+  afterAll,
   afterEach,
   describe,
   it,
@@ -7,14 +8,16 @@ import {
 } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { halfCreate, fullCreate } from "helpers/src/general";
-import { secs, mins, sleep } from 'helpers/src/time';
-import { moduleUp, untilLogged, logs } from 'helpers/src/pepr';
+import { secs, mins } from 'helpers/src/time';
+import { moduleUp, moduleDown } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
 
 const trc = new TestRunCfg(__filename)
 
 describe("validate.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2))
+  afterAll(async () => await moduleDown(), mins(2))
+
   afterEach(async () => await clean(trc), mins(5))
 
   it("prevents bad examples", async () => {
@@ -36,7 +39,7 @@ describe("validate.ts", () => {
   
   it("allows good examples", async () => {
     const resources = await trc.load(`${trc.here()}/${trc.name()}.pass.yaml`)
-    await Promise.all(resources.map(r => fullCreate(r)))
+    await fullCreate(resources)
 
     // fullCreate will wait until resources are Get-able from cluster, hence
     //  no need for expect()s -- test succeeds if it doesn't error/timeout

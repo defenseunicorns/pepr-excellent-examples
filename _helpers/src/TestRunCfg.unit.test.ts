@@ -105,6 +105,78 @@ describe("TestRunCfg", () => {
     expect(trc.labelKey()).toBe(lk)
   })
 
+  describe("loadRaw()", () => {
+    it("reads single resource from manifest yaml", async () => {
+      const trc = new TestRunCfg(me)
+      const yaml = `${here}/fake.yaml`
+      const original = heredoc`
+        ---
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: alpha
+          labels:
+            alpha: alpha
+      `
+      const expected = [{
+        apiVersion: "v1",
+        kind: "Namespace",
+        metadata: {
+          name: "alpha",
+          labels: {
+            alpha: "alpha",
+          }
+        }
+      }]
+      readFile.mockImplementation((path) => path === yaml
+        ? Promise.resolve(original)
+        : Promise.reject()
+      )
+
+      const actual = await trc.loadRaw(yaml)
+
+      expect(actual).toEqual(expected)
+    })
+
+    it("reads all resources from manifest yaml", async () => {
+      const trc = new TestRunCfg(me)
+      const yaml = `${here}/fake.yaml`
+      const original = heredoc`
+        ---
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: alpha
+        ---
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: beta
+      `
+      const expected = [{
+        apiVersion: "v1",
+        kind: "Namespace",
+        metadata: {
+          name: "alpha",
+        }
+      }, {
+        apiVersion: "v1",
+        kind: "Namespace",
+        metadata: {
+          name: "beta",
+        }
+      }]
+      readFile.mockImplementation((path) => path === yaml
+        ? Promise.resolve(original)
+        : Promise.reject()
+      )
+
+      const actual = await trc.loadRaw(yaml)
+
+      expect(actual).toEqual(expected)
+    })
+  })
+
   describe("load()", () => {
     it("adds test label to single resource loaded from manifest yaml", async () => {
       const trc = new TestRunCfg(me)

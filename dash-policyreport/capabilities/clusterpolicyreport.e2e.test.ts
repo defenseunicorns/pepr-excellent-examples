@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, describe, it, expect } from "@jest/globals";
+import { afterEach, beforeEach, beforeAll, afterAll, describe, it, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate, untilTrue } from "helpers/src/general";
 import { moduleUp, moduleDown, logs, untilLogged } from "helpers/src/pepr";
@@ -22,9 +22,13 @@ const apply = async res => {
 describe("Pepr ClusterPolicyReport()", () => {
   beforeAll(async () => {
     // want the CRD to install automagically w/ the Pepr Module startup (eventually)
-    const crds = await trc.load(
+    let crds = await trc.load(
       `${trc.root()}/types/wgpolicyk8s.io_clusterpolicyreports.yaml`,
     );
+    crds = crds.map( (crd) => {
+      delete crd.metadata.labels
+      return crd
+    })
     const crds_applied = await apply(crds);
     const exemption_applied = await K8s(kind.CustomResourceDefinition).Apply(
       UDSExemptionCRD,
@@ -32,6 +36,20 @@ describe("Pepr ClusterPolicyReport()", () => {
 
     await moduleUp();
   }, mins(4));
+
+  beforeEach( async () => {
+    const resources = await trc.load(
+      `${trc.root()}/capabilities/exemption.yaml`,
+    );
+    const resources_applied = await apply(resources);
+  }, secs(30))
+
+  afterEach( async () => {
+    console.log("in after each")
+    await clean(trc)
+    console.log("cleaning up")
+  }, secs(30))
+
 
   // afterAll(async () => {
   //   await moduleDown();
@@ -41,11 +59,6 @@ describe("Pepr ClusterPolicyReport()", () => {
   it(
     "Generate policy report when there is a uds exemption",
     async () => {
-      const resources = await trc.load(
-        `${trc.root()}/capabilities/exemption.yaml`,
-      );
-      const resources_applied = await apply(resources);
-
       const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
       expect(cpr).not.toBeFalsy();
     },
@@ -55,11 +68,6 @@ describe("Pepr ClusterPolicyReport()", () => {
   it(
     "When there are no exemptions delete the cluster policy report",
     async () => {
-      const resources = await trc.load(
-        `${trc.root()}/capabilities/exemption.yaml`,
-      );
-      const resources_applied = await apply(resources);
-
       await K8s(Exemption).InNamespace("pexex-policy-report").Delete("exemption")
       await untilTrue(() => gone(ClusterPolicyReport, {metadata: {name: "pepr-report"} }))
     },

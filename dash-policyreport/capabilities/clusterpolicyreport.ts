@@ -10,8 +10,6 @@ export const PeprReport = new Capability({
 
 const { When } = PeprReport;
 
-Log.info("--> asdf");
-
 When(Exemption)
   .IsCreatedOrUpdated()
   .Validate(async request => {

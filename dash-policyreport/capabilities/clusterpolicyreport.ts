@@ -1,19 +1,44 @@
-import { a, Capability, Log } from "pepr";
+import { a, Capability, K8s, Log } from "pepr";
+import { Exemption } from "../types/uds-exemption-v1alpha1";
+import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1alpha2";
 
 export const PeprReport = new Capability({
   name: "pepr-report",
   description: "pepr-report",
-  namespaces: []
+  namespaces: [],
 });
 
 const { When } = PeprReport;
 
-Log.info('--> asdf')
+Log.info("--> asdf");
 
-// When(a.ConfigMap)
-//   .IsCreated()
-//   .Validate(async request => {
-//     const name = request.Raw.metadata.name
-//     if (name === "fail") { return request.Deny(name) }
-//     return request.Approve()
-// });
+When(Exemption)
+  .IsCreatedOrUpdated()
+  .Validate(async request => {
+    try {
+      const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
+    } catch (e) {
+      if (e.status === 404) { 
+        const cpr: ClusterPolicyReport = {
+          apiVersion: "wgpolicyk8s.io/v1alpha2",
+          kind: "ClusterPolicyReport",
+          metadata: {
+            name: "pepr-report",
+          },
+          results: [],
+          summary: {
+            pass: 0,
+            fail: 0,
+            warn: 0,
+            error: 0,
+            skip: 0,
+          },
+        };
+        await K8s(ClusterPolicyReport).Apply(cpr);
+      } else { 
+        Log.error(e);
+      }
+    }
+
+    return request.Approve();
+  });

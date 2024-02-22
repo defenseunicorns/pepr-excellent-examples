@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { V1CustomResourceDefinitionVersion, V1JSONSchemaProps } from "@kubernetes/client-node";
+import {
+  V1CustomResourceDefinitionVersion,
+  V1JSONSchemaProps,
+} from "@kubernetes/client-node";
 import { CustomResourceDefinition } from "kubernetes-fluent-client/dist/upstream";
 
 export const UDSExemptionCRDVersion: V1CustomResourceDefinitionVersion = {
@@ -79,7 +82,8 @@ export const UDSExemptionCRDVersion: V1CustomResourceDefinitionVersion = {
                     },
                   },
                   matcher: {
-                    description: "Name and namespace of pod to exempt. Regex allowed for name.",
+                    description:
+                      "Name and namespace of pod to exempt. Regex allowed for name.",
                     type: "object",
                     required: ["namespace", "name"],
                     properties: {
@@ -101,7 +105,6 @@ export const UDSExemptionCRDVersion: V1CustomResourceDefinitionVersion = {
   },
 };
 
-
 export const UDSExemptionCRD: CustomResourceDefinition = {
   apiVersion: "apiextensions.k8s.io/v1",
   kind: "CustomResourceDefinition",
@@ -119,4 +122,4 @@ export const UDSExemptionCRD: CustomResourceDefinition = {
       shortNames: ["exempt"],
     },
   },
-}
+};

@@ -1,6 +1,6 @@
 import { beforeAll, afterAll, describe, it, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { fullCreate } from "helpers/src/general";
+import { fullCreate, untilTrue } from "helpers/src/general";
 import { moduleUp, moduleDown, logs, untilLogged } from "helpers/src/pepr";
 import { sleep, secs, mins } from "helpers/src/time";
 import { clean } from "helpers/src/cluster";
@@ -8,6 +8,7 @@ import { K8s, kind } from "kubernetes-fluent-client";
 import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1alpha2";
 import { UDSExemptionCRD } from "../types/uds-exemption-crd-v1alpha1";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
+import { gone } from "helpers/src/resource";
 
 const trc = new TestRunCfg(__filename);
 
@@ -38,7 +39,7 @@ describe("Pepr ClusterPolicyReport()", () => {
   }, mins(2));
 
   it(
-    "can generate a cluster policy report",
+    "Generate policy report when there is a uds exemption",
     async () => {
       const resources = await trc.load(
         `${trc.root()}/capabilities/exemption.yaml`,
@@ -47,6 +48,20 @@ describe("Pepr ClusterPolicyReport()", () => {
 
       const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
       expect(cpr).not.toBeFalsy();
+    },
+    secs(30),
+  );
+
+  it(
+    "When there are no exemptions delete the cluster policy report",
+    async () => {
+      const resources = await trc.load(
+        `${trc.root()}/capabilities/exemption.yaml`,
+      );
+      const resources_applied = await apply(resources);
+
+      await K8s(Exemption).InNamespace("pexex-policy-report").Delete("exemption")
+      await untilTrue(() => gone(ClusterPolicyReport, {metadata: {name: "pepr-report"} }))
     },
     secs(30),
   );

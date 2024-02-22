@@ -40,3 +40,11 @@ When(Exemption)
 
     return request.Approve();
   });
+
+When(Exemption)
+.IsDeleted().Validate(
+  async request => { 
+    await K8s(ClusterPolicyReport).Delete("pepr-report")
+    return request.Approve()
+  }
+)

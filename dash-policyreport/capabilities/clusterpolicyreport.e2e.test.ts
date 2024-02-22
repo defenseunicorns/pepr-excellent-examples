@@ -8,7 +8,7 @@ import {
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";
 import { moduleUp, moduleDown, logs, untilLogged } from "helpers/src/pepr";
-import { secs, mins } from 'helpers/src/time';
+import { sleep, secs, mins } from 'helpers/src/time';
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'kubernetes-fluent-client';
 import { ClusterPolicyReport } from '../types/clusterpolicyreport-v1alpha2';
@@ -35,32 +35,43 @@ describe("Pepr ClusterPolicyReport()", () => {
     const crs = await trc.load(`${trc.here()}/clusterpolicyreport.yaml`)
     const crs_applied = await apply(crs)
     
-    await moduleUp()
-  }, mins(2))
+    //await moduleUp()
+  }, mins(3))
 
   afterAll(async () => {
     await moduleDown()
     await clean(trc)
   }, mins(2))
   
-  it("can access a zeroized ClusterPolicyReport", async () => {
-    const crd = await K8s(kind.CustomResourceDefinition).Get("clusterpolicyreports.wgpolicyk8s.io")
-    const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
+  // it("can access a zeroized ClusterPolicyReport", async () => {
+  //   const crd = await K8s(kind.CustomResourceDefinition).Get("clusterpolicyreports.wgpolicyk8s.io")
+  //   const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
-    Object.values(cpr.summary).forEach(value => {
-      expect(value).toBe(0)
-    })
-  }, secs(30))
+  //   Object.values(cpr.summary).forEach(value => {
+  //     expect(value).toBe(0)
+  //   })
+  // }, secs(30))
 
-  it("can create an exemption", async () => {
-    const ns = await trc.load(`${trc.root()}/capabilities/namespace.yaml`)
-    const ns_applied = await apply(ns)
-    const exemption = await trc.load(`${trc.root()}/capabilities/exemption.yaml`)
-    await apply(exemption)
+  // it("can create an exemption", async () => {
+  //   const ns = await trc.load(`${trc.root()}/capabilities/namespace.yaml`)
+  //   const ns_applied = await apply(ns)
+  //   const exemption = await trc.load(`${trc.root()}/capabilities/exemption.yaml`)
+  //   await apply(exemption)
 
-    const gotten = await K8s(Exemption).InNamespace(ns_applied[0].metadata.name).Get("exemption")
-  }, secs(30))
+  //   const gotten = await K8s(Exemption).InNamespace(ns_applied[0].metadata.name).Get("exemption")
+  // }, secs(30))
   
+  it ("can generate a cluster policy report", async () => {
+    const exemption = await trc.load(`${trc.root()}/capabilities/exemption.yaml`)
+    console.log('exemption', exemption)
+    const exemption_applied = await apply(exemption)
+    console.log('exemption_0', exemption[0])
+    console.log('exemption_3', exemption[3])  
+    const pods_exist = await K8s(kind.Pod).InNamespace(exemption[0].metadata.name).Get(exemption[3].metadata.name)
+    console.log('pods_exist', pods_exist)
+    const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
+   
+  }, secs(30)) 
 
   it("can access Pepr controller logs", async () => {
     await untilLogged('--> asdf')

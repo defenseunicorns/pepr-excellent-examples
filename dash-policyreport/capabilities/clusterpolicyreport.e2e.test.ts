@@ -45,10 +45,10 @@ describe("Pepr ClusterPolicyReport()", () => {
   }, secs(30))
 
   afterEach( async () => {
-    console.log("in after each")
+    console.time("cleaning up")
     await clean(trc)
-    console.log("cleaning up")
-  }, secs(30))
+    console.timeEnd("cleaning up")
+  }, secs(180))
 
 
   // afterAll(async () => {

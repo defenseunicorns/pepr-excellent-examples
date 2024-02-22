@@ -3,7 +3,6 @@ kind: Namespace
 metadata:
   name: pexex-policy-report
 ---
-# Setup the exemption test for the policy report
 apiVersion: uds.dev/v1alpha1
 kind: Exemption
 metadata:
@@ -23,8 +22,9 @@ metadata:
   name: example-good-pod
 spec:
   containers:
-  - name: myapp
-    image: busybox:latest
+    - name: busybox
+      image: busybox:latest
+      command: ['sh', '-c', 'sleep infinity']
 ---
 apiVersion: v1
 kind: Pod
@@ -32,5 +32,6 @@ metadata:
   name: example-bad-pod
 spec:
   containers:
-  - name: myapp
-    image: busybox:latest
+    - name: busybox
+      image: busybox:latest
+      command: ['sh', '-c', 'sleep infinity']

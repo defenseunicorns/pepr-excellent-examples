@@ -12,6 +12,7 @@ import { secs, mins } from 'helpers/src/time';
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'kubernetes-fluent-client';
 import { ClusterPolicyReport } from '../types/clusterpolicyreport-v1alpha2';
+import { UDSExemptionCRD } from "../types/v1alpha1";
 
 const trc = new TestRunCfg(__filename)
 
@@ -24,6 +25,9 @@ describe("Pepr ClusterPolicyReport()", () => {
     // want the CRD to install automagically w/ the Pepr Module startup (eventually)
     const crds = await trc.load(`${trc.root()}/types/wgpolicyk8s.io_clusterpolicyreports.yaml`)
     const crds_applied = await apply(crds)
+    K8s(kind.CustomResourceDefinition).Apply(
+      UDSExemptionCRD
+    )
     
     // want intial CR to install automagically on first .Validate() (eventually)
     const crs = await trc.load(`${trc.here()}/clusterpolicyreport.yaml`)
@@ -41,6 +45,8 @@ describe("Pepr ClusterPolicyReport()", () => {
     const crd = await K8s(kind.CustomResourceDefinition).Get("clusterpolicyreports.wgpolicyk8s.io")
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
+    const exemptionCRD = await K8s(kind.CustomResourceDefinition).Get("exemptions.uds.dev")
+
     Object.values(cpr.summary).forEach(value => {
       expect(value).toBe(0)
     })
@@ -48,7 +54,6 @@ describe("Pepr ClusterPolicyReport()", () => {
 
   it("can access Pepr controller logs", async () => {
     await untilLogged('--> asdf')
-    console.log(await logs())
 
   }, secs(10))
 })

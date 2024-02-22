@@ -80,17 +80,9 @@ export async function fullCreate(resources, kinds = kind) {
 
   return Promise.all(resources.map(async (r) => {
     const kynd = kinds[r.kind]
-    try {
-      const applied = await K8s(kynd).Apply(r)
-      await untilTrue(() => live(kynd, applied))
-      return applied
+    const applied = await K8s(kynd).Apply(r)
+    await untilTrue(() => live(kynd, applied))
 
-    } catch (e) {
-      console.log(e)
-      console.log(kynd)
-      console.log(r)
-      throw e
-    }
-    
+    return applied
   }))
 }

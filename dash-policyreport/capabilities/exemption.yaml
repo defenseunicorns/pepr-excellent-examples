@@ -20,6 +20,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: example-good-pod
+  namespace: default
 spec:
   containers:
     - name: busybox
@@ -30,6 +31,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: example-bad-pod
+  namespace: pexex-policy-report
 spec:
   containers:
     - name: busybox

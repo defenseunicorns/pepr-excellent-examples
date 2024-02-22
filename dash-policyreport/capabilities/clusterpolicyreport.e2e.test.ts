@@ -27,15 +27,9 @@ describe("Pepr ClusterPolicyReport()", () => {
     // want the CRD to install automagically w/ the Pepr Module startup (eventually)
     const crds = await trc.load(`${trc.root()}/types/wgpolicyk8s.io_clusterpolicyreports.yaml`)
     const crds_applied = await apply(crds)
-    K8s(kind.CustomResourceDefinition).Apply(
-      UDSExemptionCRD
-    )
-    
-    // want intial CR to install automagically on first .Validate() (eventually)
-    const crs = await trc.load(`${trc.here()}/clusterpolicyreport.yaml`)
-    const crs_applied = await apply(crs)
-    
-    //await moduleUp()
+    const exemption_applied = await K8s(kind.CustomResourceDefinition).Apply(UDSExemptionCRD)
+
+    await moduleUp()
   }, mins(3))
 
   afterAll(async () => {
@@ -62,19 +56,15 @@ describe("Pepr ClusterPolicyReport()", () => {
   // }, secs(30))
   
   it ("can generate a cluster policy report", async () => {
-    const exemption = await trc.load(`${trc.root()}/capabilities/exemption.yaml`)
-    console.log('exemption', exemption)
-    const exemption_applied = await apply(exemption)
-    console.log('exemption_0', exemption[0])
-    console.log('exemption_3', exemption[3])  
-    const pods_exist = await K8s(kind.Pod).InNamespace(exemption[0].metadata.name).Get(exemption[3].metadata.name)
-    console.log('pods_exist', pods_exist)
+    const resources = await trc.load(`${trc.root()}/capabilities/exemption.yaml`)
+    const resources_applied = await apply(resources)
+    
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
-   
+    expect(cpr).not.toBeFalsy()
   }, secs(30)) 
 
-  it("can access Pepr controller logs", async () => {
-    await untilLogged('--> asdf')
+  // it("can access Pepr controller logs", async () => {
+  //   await untilLogged('--> asdf')
 
-  }, secs(10))
+  // }, secs(10))
 })

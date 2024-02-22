@@ -33,10 +33,10 @@ describe("Pepr ClusterPolicyReport()", () => {
     await moduleUp();
   }, mins(4));
 
-  afterAll(async () => {
-    await moduleDown();
-    await clean(trc);
-  }, mins(2));
+  // afterAll(async () => {
+  //   await moduleDown();
+  //   await clean(trc);
+  // }, mins(2));
 
   it(
     "Generate policy report when there is a uds exemption",
@@ -62,11 +62,7 @@ describe("Pepr ClusterPolicyReport()", () => {
 
       await K8s(Exemption).InNamespace("pexex-policy-report").Delete("exemption")
       await untilTrue(() => gone(ClusterPolicyReport, {metadata: {name: "pepr-report"} }))
-      console.log(await logs())
     },
     secs(30),
   );
-
-
-
 });

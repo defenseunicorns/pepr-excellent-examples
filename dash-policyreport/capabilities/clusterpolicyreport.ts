@@ -42,18 +42,18 @@ When(Exemption)
   });
 
 When(Exemption)
-.IsDeleted().Validate(
-  async request => { 
+  .IsDeleted()
+  .Validate(async request => { 
     const exemption_list = await K8s(Exemption).Get()
-    Log.info("=========== Exemption List ===========")
-    Log.info(`\n $$$$ ${exemption_list}`)
-    Log.info("============END EXEMPTION============")
+    if (exemption_list.items.length > 1) { return request.Approve() }
+
     try {
       await K8s(ClusterPolicyReport).Delete("pepr-report")
     } 
     catch (e) {
       if (e.status != 404) {
         Log.error(e)
+        return request.Deny()
       }
     }
     return request.Approve()

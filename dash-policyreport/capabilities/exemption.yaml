@@ -1,0 +1,12 @@
+apiVersion: uds.dev/v1alpha1
+kind: Exemption
+metadata:
+  name: exemption
+  namespace: pexex-policy-report
+spec:
+  exemptions:
+    - policies:
+        - Disallow_Privileged
+      matcher:
+        namespace: pexex-policy-report
+        name: "example-pod"

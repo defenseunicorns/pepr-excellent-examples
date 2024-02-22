@@ -12,11 +12,13 @@ import { secs, mins } from 'helpers/src/time';
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'kubernetes-fluent-client';
 import { ClusterPolicyReport } from '../types/clusterpolicyreport-v1alpha2';
-import { UDSExemptionCRD } from "../types/v1alpha1";
+import { UDSExemptionCRD } from "../types/uds-exemption-crd-v1alpha1";
+import { Exemption } from "../types/uds-exemption-v1alpha1";
 
 const trc = new TestRunCfg(__filename)
 
 kind["ClusterPolicyReport"] = ClusterPolicyReport
+kind["Exemption"] = Exemption
 
 const apply = async (res) => { return await fullCreate(res, kind) }
 
@@ -45,12 +47,20 @@ describe("Pepr ClusterPolicyReport()", () => {
     const crd = await K8s(kind.CustomResourceDefinition).Get("clusterpolicyreports.wgpolicyk8s.io")
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
-    const exemptionCRD = await K8s(kind.CustomResourceDefinition).Get("exemptions.uds.dev")
-
     Object.values(cpr.summary).forEach(value => {
       expect(value).toBe(0)
     })
   }, secs(30))
+
+  it("can create an exemption", async () => {
+    const ns = await trc.load(`${trc.root()}/capabilities/namespace.yaml`)
+    const ns_applied = await apply(ns)
+    const exemption = await trc.load(`${trc.root()}/capabilities/exemption.yaml`)
+    await apply(exemption)
+
+    const gotten = await K8s(Exemption).InNamespace(ns_applied[0].metadata.name).Get("exemption")
+  }, secs(30))
+  
 
   it("can access Pepr controller logs", async () => {
     await untilLogged('--> asdf')

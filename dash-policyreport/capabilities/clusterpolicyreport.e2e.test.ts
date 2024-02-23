@@ -81,8 +81,9 @@ describe("Pepr ClusterPolicyReport()", () => {
     expect(cpr.results).toEqual(
       expect.arrayContaining([
         expect.objectContaining({policy: "exemption:Disallow_Privileged"}),
-        expect.objectContaining({policy: "exemption:Drop_All_Capabilities"})
+        expect.objectContaining({policy: "exemption:Drop_All_Capabilities"}),
+        expect.objectContaining({policy: "exemption:Restrict_Volume_Types"}),
       ])
     )
-  }, secs(100))
+  }, secs(10))
 });

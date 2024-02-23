@@ -16,6 +16,12 @@ spec:
       matcher:
         namespace: pexex-policy-report
         name: "example-bad-pod"
+    
+    - policies:
+        - Restrict_Volume_Types
+      matcher:
+        namespace: pexex-policy-report
+        name: "example-bad-pod"
 ---
 apiVersion: v1
 kind: Pod

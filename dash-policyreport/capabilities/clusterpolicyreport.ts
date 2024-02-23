@@ -65,28 +65,33 @@ When(a.Pod)
   .IsCreatedOrUpdated()
   .Validate(async request => { 
     const exemptions = await K8s(Exemption).Get();
+    const policies = []
 
-    let match = false
-    for(const exempt of exemptions.items) {
-      if (exempt.spec.exemptions[0].matcher.namespace !== request.Raw.metadata?.namespace){
-        continue
+    for(const exempt_crs of exemptions.items) {
+      for(const exempt of exempt_crs.spec.exemptions){
+        if (exempt.matcher.namespace !== request.Raw.metadata?.namespace){
+          continue
+        }
+
+        if (exempt.matcher.name !== request.Raw.metadata?.name){
+          continue
+        }
+
+        for (const policy of exempt.policies) {
+          if (!policies.includes(policy)) {
+            policies.push([exempt_crs.metadata.name, policy] )         
+          }
+        }
       }
-
-      if (exempt.spec.exemptions[0].matcher.name !== request.Raw.metadata?.name){
-        continue
-      }
-
-      match = true
-      break
+     
     }
 
-    if(match){ 
+    if(policies.length > 0){ 
       const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
       delete cpr.metadata.managedFields
-      for (let policy of exemptions.items[0].spec.exemptions[0].policies){
-        const exemptionName = exemptions.items[0].metadata.name
+      for (let [name, policy] of policies){
         const result: ResultElement = { 
-          policy: `${exemptionName}:${policy}`,
+          policy: `${name}:${policy}`,
           message: policy
         }
         cpr.results.push(result)

@@ -84,11 +84,12 @@ When(a.Pod)
       const policy = exemptions.items[0].spec.exemptions[0].policies[0]
       const exemptionName = exemptions.items[0].metadata.name
       const result: ResultElement = { 
-        message: `${exemptionName}:${policy}`,
-        policy: policy
+        policy: `${exemptionName}:${policy}`,
+        message: policy
       }
       cpr.results.push(result)
-      await await K8s(ClusterPolicyReport).Apply(cpr)
+      delete cpr.metadata.managedFields
+      await K8s(ClusterPolicyReport).Apply(cpr)
     }
 
     return request.Approve()

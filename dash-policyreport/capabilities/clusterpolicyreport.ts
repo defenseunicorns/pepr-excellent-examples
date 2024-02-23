@@ -92,7 +92,11 @@ When(a.Pod)
       for (let [name, policy] of policies){
         const result: ResultElement = { 
           policy: `${name}:${policy}`,
-          message: policy
+          message: policy,
+          resources:[{
+            name: request.Raw.metadata.name,
+            kind: request.Raw.kind
+          }]
         }
         cpr.results.push(result)
       }

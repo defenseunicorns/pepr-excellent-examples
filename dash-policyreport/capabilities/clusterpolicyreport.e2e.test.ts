@@ -77,12 +77,22 @@ describe("Pepr ClusterPolicyReport()", () => {
 
   it("Adds a result to the policy report", async () => {
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
+    const test_resources = [{kind:"Pod",name:"example-bad-pod"}]
 
     expect(cpr.results).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({policy: "exemption:Disallow_Privileged"}),
-        expect.objectContaining({policy: "exemption:Drop_All_Capabilities"}),
-        expect.objectContaining({policy: "exemption:Restrict_Volume_Types"}),
+        expect.objectContaining({
+          policy: "exemption:Disallow_Privileged",
+          resources: test_resources
+        }),
+        expect.objectContaining({
+          policy: "exemption:Drop_All_Capabilities",
+          resources: test_resources
+        }),
+        expect.objectContaining({
+          policy: "exemption:Restrict_Volume_Types",
+          resources: test_resources
+        }),
       ])
     )
   }, secs(10))

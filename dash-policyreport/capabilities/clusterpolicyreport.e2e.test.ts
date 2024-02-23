@@ -59,7 +59,7 @@ describe("Pepr ClusterPolicyReport()", () => {
         )
         return found
       }
-      await untilLogged(matches, 3)
+      await untilLogged(matches)
     })
   }, secs(30))
 

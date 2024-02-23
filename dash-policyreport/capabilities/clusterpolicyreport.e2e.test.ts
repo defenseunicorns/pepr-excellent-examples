@@ -49,22 +49,9 @@ describe("Pepr ClusterPolicyReport()", () => {
       const resources = await trc.load(file)
       const resources_applied = await apply(resources)
 
-      // '{"level":20,"time":1708704596527,"pid":16,"hostname":"pepr-5f4e99be-321f-5a32-85bd-eb2c9bfcc291-6546c47845-zhlbc","uid":"fef1a632-4be6-4f0b-9778-88bf3f55881c","namespace":"pexex-policy-report","name":"/example-bad-pod","kubeAdmissionResponse":{"uid":"fef1a632-4be6-4f0b-9778-88bf3f55881c","allowed":true,"status":{"message":""}},"msg":"Outgoing response"}',
-      const matches = line => {
-        const l = JSON.parse(line)
-        const found = (
-          l?.namespace === 'pexex-policy-report'  &&
-          l?.name === '/example-bad-pod' &&
-          l?.kubeAdmissionResponse?.allowed === true
-        )
-        if (found){
-          console.log(line)
-        }
-        return found
-      }
-      await untilLogged(matches)
+      await untilLogged('"msg":"pepr-report updated"')
     })
-  }, secs(30))
+  }, secs(10))
 
   afterEach(async () => {
     await timed("clean test-labelled resources", async () => {
@@ -89,16 +76,13 @@ describe("Pepr ClusterPolicyReport()", () => {
   }, secs(30))
 
   it("Adds a result to the policy report", async () => {
-
-    await sleep(40)
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
-    console.log(await logs())
+
     expect(cpr.results).toEqual(
       expect.arrayContaining([
         expect.objectContaining({policy: "exemption:Disallow_Privileged"}),
         expect.objectContaining({policy: "exemption:Drop_All_Capabilities"})
       ])
     )
-
   }, secs(100))
 });

@@ -66,6 +66,7 @@ When(a.Pod)
   .Validate(async request => { 
     Log.info("in update pod")
     const exemptions = await K8s(Exemption).Get();
+    Log.info(exemptions, "pepr-report pull?")
     let match = false
     for(const exempt of exemptions.items) {
       if (exempt.spec.exemptions[0].matcher.namespace !== request.Raw.metadata?.namespace){
@@ -93,11 +94,8 @@ When(a.Pod)
         }
         cpr.results.push(result)
       }
-      Log.info("before apply")
-      const apply = await K8s(ClusterPolicyReport).Apply(cpr)
-      Log.info("This is the apply", apply)
-      Log.info("we are done")
-      await sleep(5)
+      const applied = await K8s(ClusterPolicyReport).Apply(cpr)
+      Log.info(applied, "pepr-report updated")
     }
     return request.Approve()
   }

@@ -17,7 +17,7 @@ When(Exemption)
     try {
       const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
     } catch (e) {
-      if (e.status === 404) { 
+      if (e.status === 404) {
         const cpr: ClusterPolicyReport = {
           apiVersion: "wgpolicyk8s.io/v1alpha2",
           kind: "ClusterPolicyReport",
@@ -34,7 +34,7 @@ When(Exemption)
           },
         };
         await K8s(ClusterPolicyReport).Apply(cpr);
-      } else { 
+      } else {
         Log.error(e);
       }
     }
@@ -44,13 +44,13 @@ When(Exemption)
 
 When(Exemption)
   .IsDeleted()
-  .Validate(async request => { 
+  .Validate(async request => {
     const exemption_list = await K8s(Exemption).Get()
     if (exemption_list.items.length > 1) { return request.Approve() }
 
     try {
       await K8s(ClusterPolicyReport).Delete("pepr-report")
-    } 
+    }
     catch (e) {
       if (e.status != 404) {
         Log.error(e)
@@ -59,50 +59,33 @@ When(Exemption)
     }
     return request.Approve()
   }
-)
+  )
 
-When(a.Pod)
+When(a.GenericKind)
   .IsCreatedOrUpdated()
-  .Validate(async request => { 
-    const exemptions = await K8s(Exemption).Get();
-    const policies = []
+  .WithLabel("uds.dev.v1alpha1/exemption","true")
+  .Validate(async request => {
 
-    for(const exempt_crs of exemptions.items) {
-      for(const exempt of exempt_crs.spec.exemptions){
-        if (exempt.matcher.namespace !== request.Raw.metadata?.namespace){
-          continue
-        }
 
-        if (exempt.matcher.name !== request.Raw.metadata?.name){
-          continue
-        }
+    Log.info(request, "we are in logging for generic kind")
 
-        for (const policy of exempt.policies) {
-          if (!policies.includes(policy)) {
-            policies.push([exempt_crs.metadata.name, policy] )         
-          }
-        }
-      }
-     
-    }
-
-    if(policies.length > 0){ 
-      const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
-      delete cpr.metadata.managedFields
-      for (let [name, policy] of policies){
-        const result: ResultElement = { 
-          policy: `${name}:${policy}`,
-          message: policy,
-          resources:[{
-            name: request.Raw.metadata.name,
-            kind: request.Raw.kind
-          }]
-        }
-        cpr.results.push(result)
-      }
-      const applied = await K8s(ClusterPolicyReport).Apply(cpr)
-      Log.info(applied, "pepr-report updated")
-    }
+    // if (policies.length > 0) {
+    //   const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
+    //   delete cpr.metadata.managedFields
+    //   for (let [name, policy] of policies) {
+    //     const result: ResultElement = {
+    //       policy: `${name}:${policy}`,
+    //       message: policy,
+    //       resources: [{
+    //         name: request.Raw.metadata.name,
+    //         kind: request.Raw.kind
+    //       }]
+    //     }
+    //     cpr.results.push(result)
+    //   }
+    //   const applied = await K8s(ClusterPolicyReport).Apply(cpr)
+    //   Log.info(applied, "pepr-report updated")
+    // }
     return request.Approve()
   }
-)
+  )

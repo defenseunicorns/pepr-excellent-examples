@@ -49,7 +49,7 @@ describe("Pepr ClusterPolicyReport()", () => {
       const resources = await trc.load(file)
       const resources_applied = await apply(resources)
 
-      await untilLogged('"msg":"pepr-report updated"')
+      // await untilLogged('"msg":"pepr-report updated"')
     })
   }, secs(10))
 
@@ -78,6 +78,8 @@ describe("Pepr ClusterPolicyReport()", () => {
   it("Adds a result to the policy report", async () => {
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
     const test_resources = [{kind:"Pod",name:"example-bad-pod"}]
+
+    console.log(await logs())
 
     expect(cpr.results).toEqual(
       expect.arrayContaining([

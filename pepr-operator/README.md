@@ -132,7 +132,7 @@ web-content-webapp-light-en   1      0s
 
 Update the `WebApp` and change the theme to dark and language to spanish
 
-```bash
+```yaml
 kubectl apply -f -<<EOF
 kind: WebApp
 apiVersion: pepr.io/v1alpha1

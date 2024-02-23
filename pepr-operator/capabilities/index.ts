@@ -32,8 +32,8 @@ When(WebApp)
 
 When(WebApp)
   .IsDeleted()
-  .Mutate(instance => {
-    Store.removeItem(instance.Raw.metadata.name);
+  .Mutate(async instance => {
+    await Store.removeItemAndWait(instance.Raw.metadata.name);
     instance.SetAnnotation("deletionTimestamp", new Date().toISOString());
   });
 

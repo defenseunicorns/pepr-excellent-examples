@@ -9,6 +9,7 @@ import { K8s, kind } from "kubernetes-fluent-client";
 import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1alpha2";
 import { UDSExemptionCRD } from "../types/uds-exemption-crd-v1alpha1";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
+import exp from "constants";
 
 const trc = new TestRunCfg(__filename);
 
@@ -63,12 +64,22 @@ describe("Pepr ClusterPolicyReport()", () => {
   }, mins(2));
 
   it("Generate policy report when there is a uds exemption", async () => {
-      const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
-      expect(cpr).not.toBeFalsy();
+    const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
+    expect(cpr).not.toBeFalsy();
   }, secs(30))
 
   it("When there are no exemptions delete the cluster policy report", async () => {
-      await K8s(Exemption).InNamespace("pexex-policy-report").Delete("exemption")
-      await untilTrue(() => gone(ClusterPolicyReport, {metadata: {name: "pepr-report"} }))
+    await K8s(Exemption).InNamespace("pexex-policy-report").Delete("exemption")
+    await untilTrue(() => gone(ClusterPolicyReport, { metadata: { name: "pepr-report" } }))
+  }, secs(30))
+
+  it("Adds a result to the policy report", async () => {
+
+    const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
+    const policy = "exemption:Disallow_Privileged"
+    const message = "Disallow_Privileged"
+    const status = "Warn"
+    expect(cpr.results[0].policy).toEqual(policy)
+
   }, secs(30))
 });

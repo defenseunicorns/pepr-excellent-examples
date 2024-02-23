@@ -1,6 +1,6 @@
 import { a, Capability, K8s, Log } from "pepr";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
-import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1alpha2";
+import { ClusterPolicyReport, ResultElement } from "../types/clusterpolicyreport-v1alpha2";
 
 export const PeprReport = new Capability({
   name: "pepr-report",
@@ -56,6 +56,41 @@ When(Exemption)
         return request.Deny()
       }
     }
+    return request.Approve()
+  }
+)
+
+When(a.Pod)
+  .IsCreatedOrUpdated()
+  .Validate(async request => { 
+    const exemptions = await K8s(Exemption).Get();
+    let match = false
+    for(const exempt of exemptions.items) {
+
+      if (exempt.spec.exemptions[0].matcher.namespace !== request.Raw.metadata?.namespace){
+        continue
+      }
+
+      if (exempt.spec.exemptions[0].matcher.name !== request.Raw.metadata?.name){
+        continue
+      }
+
+      match = true
+      break
+    }
+
+    if(match){ 
+      const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
+      const policy = exemptions.items[0].spec.exemptions[0].policies[0]
+      const exemptionName = exemptions.items[0].metadata.name
+      const result: ResultElement = { 
+        message: `${exemptionName}:${policy}`,
+        policy: policy
+      }
+      cpr.results.push(result)
+      await await K8s(ClusterPolicyReport).Apply(cpr)
+    }
+
     return request.Approve()
   }
 )

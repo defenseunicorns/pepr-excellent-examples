@@ -12,6 +12,7 @@ spec:
   exemptions:
     - policies:
         - Disallow_Privileged
+        - Drop_All_Capabilities
       matcher:
         namespace: pexex-policy-report
         name: "example-bad-pod"

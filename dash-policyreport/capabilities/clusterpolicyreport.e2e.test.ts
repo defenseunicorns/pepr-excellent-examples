@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, beforeAll, afterAll, describe, it, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate, untilTrue } from "helpers/src/general";
-import { moduleUp, moduleDown, untilLogged } from "helpers/src/pepr";
-import { secs, mins } from "helpers/src/time";
+import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
+import { secs, mins, sleep } from "helpers/src/time";
 import { clean } from "helpers/src/cluster";
 import { gone } from "helpers/src/resource";
 import { K8s, kind } from "kubernetes-fluent-client";
@@ -57,6 +57,9 @@ describe("Pepr ClusterPolicyReport()", () => {
           l?.name === '/example-bad-pod' &&
           l?.kubeAdmissionResponse?.allowed === true
         )
+        if (found){
+          console.log(line)
+        }
         return found
       }
       await untilLogged(matches)
@@ -87,18 +90,15 @@ describe("Pepr ClusterPolicyReport()", () => {
 
   it("Adds a result to the policy report", async () => {
 
+    await sleep(40)
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
-    const policy = "exemption:Disallow_Privileged"
-    const message = "Disallow_Privileged"
-    const status = "Warn"
-    // console.log(cpr)
-    // console.log(await logs())
-
+    console.log(await logs())
     expect(cpr.results).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({policy})
+        expect.objectContaining({policy: "exemption:Disallow_Privileged"}),
+        expect.objectContaining({policy: "exemption:Drop_All_Capabilities"})
       ])
     )
 
-  }, secs(30))
+  }, secs(100))
 });

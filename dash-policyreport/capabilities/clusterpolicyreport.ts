@@ -1,6 +1,7 @@
 import { a, Capability, K8s, Log } from "pepr";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
 import { ClusterPolicyReport, ResultElement } from "../types/clusterpolicyreport-v1alpha2";
+import { sleep } from "helpers/src/time";
 
 export const PeprReport = new Capability({
   name: "pepr-report",
@@ -80,17 +81,20 @@ When(a.Pod)
 
     if(match){ 
       const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
-      const policy = exemptions.items[0].spec.exemptions[0].policies[0]
-      const exemptionName = exemptions.items[0].metadata.name
-      const result: ResultElement = { 
-        policy: `${exemptionName}:${policy}`,
-        message: policy
-      }
-      cpr.results.push(result)
       delete cpr.metadata.managedFields
-      await K8s(ClusterPolicyReport).Apply(cpr)
+      for (let policy of exemptions.items[0].spec.exemptions[0].policies){
+        const exemptionName = exemptions.items[0].metadata.name
+        const result: ResultElement = { 
+          policy: `${exemptionName}:${policy}`,
+          message: policy
+        }
+        cpr.results.push(result)
+      }
+      const apply = await K8s(ClusterPolicyReport).Apply(cpr)
+      Log.info("This is the apply", apply)
+      Log.info("we are done")
+      await sleep(5)
     }
-
     return request.Approve()
   }
 )

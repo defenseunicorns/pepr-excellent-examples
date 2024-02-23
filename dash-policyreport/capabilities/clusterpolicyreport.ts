@@ -1,4 +1,5 @@
 import { a, Capability, K8s, Log } from "pepr";
+import { ValidateActionResponse } from "pepr/src/lib/types";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
 import { ClusterPolicyReport, ResultElement } from "../types/clusterpolicyreport-v1alpha2";
 import { sleep } from "helpers/src/time";
@@ -61,31 +62,35 @@ When(Exemption)
   }
   )
 
-When(a.GenericKind)
+const exVal = async (request) => {
+  Log.info(request, "we are in logging for generic kind")
+
+  // if (policies.length > 0) {
+  //   const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
+  //   delete cpr.metadata.managedFields
+  //   for (let [name, policy] of policies) {
+  //     const result: ResultElement = {
+  //       policy: `${name}:${policy}`,
+  //       message: policy,
+  //       resources: [{
+  //         name: request.Raw.metadata.name,
+  //         kind: request.Raw.kind
+  //       }]
+  //     }
+  //     cpr.results.push(result)
+  //   }
+  //   const applied = await K8s(ClusterPolicyReport).Apply(cpr)
+  //   Log.info(applied, "pepr-report updated")
+  // }
+  return request.Approve()
+}
+
+When(a.Pod)
   .IsCreatedOrUpdated()
   .WithLabel("uds.dev.v1alpha1/exemption","true")
-  .Validate(async request => {
+  .Validate(exVal)
 
-
-    Log.info(request, "we are in logging for generic kind")
-
-    // if (policies.length > 0) {
-    //   const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
-    //   delete cpr.metadata.managedFields
-    //   for (let [name, policy] of policies) {
-    //     const result: ResultElement = {
-    //       policy: `${name}:${policy}`,
-    //       message: policy,
-    //       resources: [{
-    //         name: request.Raw.metadata.name,
-    //         kind: request.Raw.kind
-    //       }]
-    //     }
-    //     cpr.results.push(result)
-    //   }
-    //   const applied = await K8s(ClusterPolicyReport).Apply(cpr)
-    //   Log.info(applied, "pepr-report updated")
-    // }
-    return request.Approve()
-  }
-  )
+When(a.Service)
+  .IsCreatedOrUpdated()
+  .WithLabel("uds.dev.v1alpha1/exemption","true")
+  .Validate(exVal)

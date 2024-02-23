@@ -28,11 +28,11 @@ kind: Pod
 metadata:
   name: example-good-pod
   namespace: default
-  annotations:
-    uds.dev.v1alpha1/Disallow_Privileged: true
-    uds.dev.v1alpha1/Drop_All_Capabilities: true
   labels:
-    uds.dev.v1alpha1/exemption: true
+    uds.dev.v1alpha1/exemption: "true"
+  annotations:
+    uds.dev.v1alpha1/Disallow_Privileged: "true"
+    uds.dev.v1alpha1/Drop_All_Capabilities: "true"
 spec:
   containers:
     - name: busybox

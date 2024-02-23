@@ -64,6 +64,7 @@ When(Exemption)
 When(a.Pod)
   .IsCreatedOrUpdated()
   .Validate(async request => { 
+    Log.info("in update pod")
     const exemptions = await K8s(Exemption).Get();
     let match = false
     for(const exempt of exemptions.items) {
@@ -80,7 +81,9 @@ When(a.Pod)
     }
 
     if(match){ 
+      Log.info("before get")
       const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
+      Log.info("after get")
       delete cpr.metadata.managedFields
       for (let policy of exemptions.items[0].spec.exemptions[0].policies){
         const exemptionName = exemptions.items[0].metadata.name
@@ -90,6 +93,7 @@ When(a.Pod)
         }
         cpr.results.push(result)
       }
+      Log.info("before apply")
       const apply = await K8s(ClusterPolicyReport).Apply(cpr)
       Log.info("This is the apply", apply)
       Log.info("we are done")

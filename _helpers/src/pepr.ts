@@ -34,10 +34,17 @@ export async function logs() {
   return sift(logs)
 }
 
-export async function untilLogged(needle, count = 1) {
+export async function untilLogged(needle: String | Function, count = 1) {
   while (true) {
     const logz = await logs()
-    const found = logz.filter(l => l.includes(needle))
+
+    let found = []
+    if (typeof needle === 'string'){
+      found = logz.filter(l => l.includes(needle))
+    }
+    else if (typeof needle === 'function') {
+      found = logz.filter(l => needle(l))
+    }
 
     if (found.length >= count) { break }
     await sleep(1)

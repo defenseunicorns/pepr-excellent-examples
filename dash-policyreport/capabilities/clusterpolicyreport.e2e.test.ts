@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, beforeAll, afterAll, describe, it, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate, untilTrue } from "helpers/src/general";
-import { moduleUp, moduleDown, logs } from "helpers/src/pepr";
+import { moduleUp, moduleDown, untilLogged } from "helpers/src/pepr";
 import { secs, mins } from "helpers/src/time";
 import { clean } from "helpers/src/cluster";
 import { gone } from "helpers/src/resource";
@@ -48,6 +48,18 @@ describe("Pepr ClusterPolicyReport()", () => {
     await timed(`load: ${file}`, async () => {
       const resources = await trc.load(file)
       const resources_applied = await apply(resources)
+
+      // '{"level":20,"time":1708704596527,"pid":16,"hostname":"pepr-5f4e99be-321f-5a32-85bd-eb2c9bfcc291-6546c47845-zhlbc","uid":"fef1a632-4be6-4f0b-9778-88bf3f55881c","namespace":"pexex-policy-report","name":"/example-bad-pod","kubeAdmissionResponse":{"uid":"fef1a632-4be6-4f0b-9778-88bf3f55881c","allowed":true,"status":{"message":""}},"msg":"Outgoing response"}',
+      const matches = line => {
+        const l = JSON.parse(line)
+        const found = (
+          l?.namespace === 'pexex-policy-report'  &&
+          l?.name === '/example-bad-pod' &&
+          l?.kubeAdmissionResponse?.allowed === true
+        )
+        return found
+      }
+      await untilLogged(matches, 3)
     })
   }, secs(30))
 
@@ -79,16 +91,8 @@ describe("Pepr ClusterPolicyReport()", () => {
     const policy = "exemption:Disallow_Privileged"
     const message = "Disallow_Privileged"
     const status = "Warn"
-    console.log(cpr)
-    console.log(await logs())
-
-    // const finished_message = {
-    // "namespace":"pexex-policy-report","name":"/example-bad-pod",
-    // "res":{
-    //   "allowed":true
-    // },
-    //   "msg":"Check response"}
-    // }
+    // console.log(cpr)
+    // console.log(await logs())
 
     expect(cpr.results).toEqual(
       expect.arrayContaining([

@@ -66,7 +66,6 @@ When(a.Pod)
     const exemptions = await K8s(Exemption).Get();
     let match = false
     for(const exempt of exemptions.items) {
-
       if (exempt.spec.exemptions[0].matcher.namespace !== request.Raw.metadata?.namespace){
         continue
       }

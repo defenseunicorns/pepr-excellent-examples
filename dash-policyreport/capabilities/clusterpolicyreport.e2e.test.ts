@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, beforeAll, afterAll, describe, it, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate, untilTrue } from "helpers/src/general";
-import { moduleUp, moduleDown } from "helpers/src/pepr";
+import { moduleUp, moduleDown, logs } from "helpers/src/pepr";
 import { secs, mins } from "helpers/src/time";
 import { clean } from "helpers/src/cluster";
 import { gone } from "helpers/src/resource";
@@ -79,6 +79,22 @@ describe("Pepr ClusterPolicyReport()", () => {
     const policy = "exemption:Disallow_Privileged"
     const message = "Disallow_Privileged"
     const status = "Warn"
+    console.log(cpr)
+    console.log(await logs())
+
+    // const finished_message = {
+    // "namespace":"pexex-policy-report","name":"/example-bad-pod",
+    // "res":{
+    //   "allowed":true
+    // },
+    //   "msg":"Check response"}
+    // }
+
+    expect(cpr.results).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({policy})
+      ])
+    )
 
   }, secs(30))
 });

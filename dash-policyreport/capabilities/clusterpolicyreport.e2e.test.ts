@@ -26,7 +26,7 @@ const timed = async (m, f) => {
   console.timeEnd(m)
 }
 
-describe("Pepr ClusterPolicyReport()", () => {
+describe("ClusterPolicyReport", () => {
   beforeAll(async () => {
     // want the CRD to install automagically w/ the Pepr Module startup (eventually)
     await timed("load ClusterPolicyReport CRD", async () => {
@@ -65,17 +65,17 @@ describe("Pepr ClusterPolicyReport()", () => {
     })
   }, mins(2));
 
-  it("Generate policy report when there is a uds exemption", async () => {
+  it("is created when UDS Exemption exists", async () => {
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
     expect(cpr).not.toBeFalsy();
   }, secs(30))
 
-  it("When there are no exemptions delete the cluster policy report", async () => {
+  it("is deleted when UDS Exemptions are gone", async () => {
     await K8s(Exemption).InNamespace("pexex-policy-report").Delete("exemption")
     await untilTrue(() => gone(ClusterPolicyReport, { metadata: { name: "pepr-report" } }))
   }, secs(30))
 
-  it("Adds a result to the policy report", async () => {
+  it("has results for each UDS Exemption", async () => {
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
     const test_resources = [{kind:"Pod",name:"example-bad-pod"}]
 

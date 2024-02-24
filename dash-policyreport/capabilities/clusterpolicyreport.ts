@@ -1,8 +1,6 @@
 import { a, Capability, K8s, Log } from "pepr";
-import { ValidateActionResponse } from "pepr/src/lib/types";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
 import { ClusterPolicyReport, ResultElement } from "../types/clusterpolicyreport-v1alpha2";
-import { sleep } from "helpers/src/time";
 
 export const PeprReport = new Capability({
   name: "pepr-report",
@@ -12,6 +10,22 @@ export const PeprReport = new Capability({
 
 const { When } = PeprReport;
 
+const empty: ClusterPolicyReport = {
+  apiVersion: "wgpolicyk8s.io/v1alpha2",
+  kind: "ClusterPolicyReport",
+  metadata: {
+    name: "pepr-report",
+  },
+  results: [],
+  summary: {
+    pass: 0,
+    fail: 0,
+    warn: 0,
+    error: 0,
+    skip: 0,
+  },
+};
+
 When(Exemption)
   .IsCreatedOrUpdated()
   .Validate(async request => {
@@ -19,22 +33,7 @@ When(Exemption)
       const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
     } catch (e) {
       if (e.status === 404) {
-        const cpr: ClusterPolicyReport = {
-          apiVersion: "wgpolicyk8s.io/v1alpha2",
-          kind: "ClusterPolicyReport",
-          metadata: {
-            name: "pepr-report",
-          },
-          results: [],
-          summary: {
-            pass: 0,
-            fail: 0,
-            warn: 0,
-            error: 0,
-            skip: 0,
-          },
-        };
-        await K8s(ClusterPolicyReport).Apply(cpr);
+        await K8s(ClusterPolicyReport).Apply(empty);
       } else {
         Log.error(e);
       }
@@ -46,8 +45,8 @@ When(Exemption)
 When(Exemption)
   .IsDeleted()
   .Validate(async request => {
-    const exemption_list = await K8s(Exemption).Get()
-    if (exemption_list.items.length > 1) { return request.Approve() }
+    const list = await K8s(Exemption).Get()
+    if (list.items.length > 1) { return request.Approve() }
 
     try {
       await K8s(ClusterPolicyReport).Delete("pepr-report")
@@ -62,8 +61,8 @@ When(Exemption)
   }
   )
 
-const exVal = async (request) => {
-  Log.info(request, "we are in logging for generic kind")
+const asExemptedResource = async (request) => {
+  Log.info(request, "we are in logging for multiple kinds!")
 
   // if (policies.length > 0) {
   //   const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
@@ -85,12 +84,10 @@ const exVal = async (request) => {
   return request.Approve()
 }
 
-When(a.Pod)
-  .IsCreatedOrUpdated()
-  .WithLabel("uds.dev.v1alpha1/exemption","true")
-  .Validate(exVal)
+const lbl: [string, string] = [ "uds.dev.v1alpha1/exemption", "true" ]
+When(a.Pod).IsCreatedOrUpdated().WithLabel(...lbl).Validate(asExemptedResource)
+When(a.Service).IsCreatedOrUpdated().WithLabel(...lbl).Validate(asExemptedResource)
 
-When(a.Service)
-  .IsCreatedOrUpdated()
-  .WithLabel("uds.dev.v1alpha1/exemption","true")
-  .Validate(exVal)
+// adding resources to PoClRe when exemption label is added... but what about when it's taken away?
+// - does a resource with a label being removed still trigger .WithLabel()?
+// - how will we see things that "used to be" exempted but aren't anymore?

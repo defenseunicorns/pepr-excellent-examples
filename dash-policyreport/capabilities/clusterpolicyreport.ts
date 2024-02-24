@@ -8,8 +8,6 @@ export const PeprReport = new Capability({
   namespaces: [],
 });
 
-const { When } = PeprReport;
-
 const empty: ClusterPolicyReport = {
   apiVersion: "wgpolicyk8s.io/v1alpha2",
   kind: "ClusterPolicyReport",
@@ -25,6 +23,8 @@ const empty: ClusterPolicyReport = {
   },
   results: [],
 };
+
+const { When } = PeprReport;
 
 When(Exemption)
   .IsCreatedOrUpdated()
@@ -58,31 +58,52 @@ When(Exemption)
       }
     }
     return request.Approve()
-  }
-  )
+  });
 
 const asExemptedResource = async (request) => {
-  Log.info(request, "we are in logging for multiple kinds!")
+  const EXEMPTIONS = "exemptions.uds.dev/v1alpha1"
 
-  // "annotations":{"exemptions.uds.dev/v1alpha1":"Disallow_Privileged Drop_All_Capabilities"
+  const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
+  delete cpr.metadata.managedFields
 
-  // if (policies.length > 0) {
-  //   const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
-  //   delete cpr.metadata.managedFields
-  //   for (let [name, policy] of policies) {
-      // const result: ResultElement = {
-  //       policy: `${name}:${policy}`,
-  //       message: policy,
-  //       resources: [{
-  //         name: request.Raw.metadata.name,
-  //         kind: request.Raw.kind
-  //       }]
-  //     }
-  //     cpr.results.push(result)
-  //   }
-  //   const applied = await K8s(ClusterPolicyReport).Apply(cpr)
-  //   Log.info(applied, "pepr-report updated")
-  // }
+  const raw = request.Raw
+  const kind = raw.kind
+  const name = raw.metadata.name
+  const nspc = raw.metadata.namespace
+  const exms = raw.metadata.annotations[EXEMPTIONS].split(" ")
+
+  const res = [ kind, nspc, name ].join(":")
+  Log.info({ resource: res, exemptions: exms }, `Exempt: ${res}`)
+
+  // include exempted resource under relevant policies
+  for (const exm of exms) {
+
+    // locate / create result element
+    const results = cpr.results.filter(r => r.policy === exm)
+    let result = results.length > 0
+      ? { ...results[0] }
+      : { policy: exm, resources: [] }
+
+    // locate / create resource element
+    let found = result.resources.filter(r => (
+      r.kind === kind &&
+      r.namespace === nspc &&
+      r.name === name
+    ))
+    if (found.length === 0) {
+      result.resources.push({ kind, namespace: nspc, name })
+    }
+
+    // update / create result element
+    const idx = cpr.results.findIndex(r => r.policy === exm)
+    idx === -1
+      ? cpr.results.push(result)
+      : cpr.results.splice(idx, 1, result)
+  }
+
+  const applied = await K8s(ClusterPolicyReport).Apply(cpr)
+  Log.info(applied, "pepr-report updated")
+
   return request.Approve()
 }
 
@@ -90,6 +111,9 @@ const lbl: [string, string] = [ "exemptions.uds.dev",  "v1alpha1" ]
 When(a.Pod).IsCreatedOrUpdated().WithLabel(...lbl).Validate(asExemptedResource)
 When(a.Service).IsCreatedOrUpdated().WithLabel(...lbl).Validate(asExemptedResource)
 
-// adding resources to PoClRe when exemption label is added... but what about when it's taken away?
+// When(a.Pod).IsDeleted().WithLabel(...lbl).Validate(asDeletedResource)
+// When(a.Service).IsDeleted().WithLabel(...lbl).Validate(asDeletedResource)
+
+// adding resources to CPR when exemption label is added... but what about when it's taken away?
 // - does a resource with a label being removed still trigger .WithLabel()?
 // - how will we see things that "used to be" exempted but aren't anymore?

@@ -41,27 +41,27 @@ describe("ClusterPolicyReport", () => {
     })
 
     await moduleUp()
-  }, mins(4))
+  }, mins(3))
 
   beforeEach(async () => {
-    const file = `${trc.root()}/capabilities/scenario.exemptions.yaml`
+    const file = `${trc.root()}/capabilities/scenario.basic.yaml`
     await timed(`load: ${file}`, async () => {
       const resources = await trc.load(file)
       const resources_applied = await apply(resources)
 
-      // await untilLogged('"msg":"pepr-report updated"')
+      await untilLogged('"msg":"pepr-report updated"')
     })
   }, secs(10))
 
   afterEach(async () => {
     await timed("clean test-labelled resources", async () => {
-      //await clean(trc)
+      await clean(trc)
     })
   }, mins(3))
 
   afterAll(async () => {
     await timed("teardown Pepr module", async () => {
-      //await moduleDown()
+      await moduleDown()
     })
   }, mins(2));
 
@@ -71,55 +71,32 @@ describe("ClusterPolicyReport", () => {
   }, secs(30))
 
   it("is deleted when UDS Exemptions are gone", async () => {
-    await K8s(Exemption).InNamespace("pexex-policy-report").Delete("exemption")
+    await K8s(Exemption).InNamespace("pexex-policy-report").Delete("allow-naughtiness")
     await untilTrue(() => gone(ClusterPolicyReport, { metadata: { name: "pepr-report" } }))
   }, secs(30))
 
-  it("has results for each UDS Exemption", async () => {
+  it("has a result for each UDS Exemption policy", async () => {
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
-    console.log(await logs())
+    const naughty = {
+      kind: "Pod", namespace: "pexex-clusterpolicyreport", name: "naughty-pod"
+    }
 
     expect(cpr.results).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           policy: "pexex-clusterpolicyreport:allow-naughtiness:Disallow_Privileged",
-          resources: [
-
-          ]
+          resources: [ naughty ]
         }),
         expect.objectContaining({
           policy: "pexex-clusterpolicyreport:allow-naughtiness:Drop_All_Capabilities",
-          resources: [
-            
-          ]
+          resources: [ naughty ]
         }),
         expect.objectContaining({
           policy: "pexex-clusterpolicyreport:allow-naughtiness:Restrict_Volume_Types",
-          resources: [
-            
-          ]
+          resources: [ naughty ]
         }),
       ])
     )
-
-    // const pod = {kind:"Pod",name:"naughty-pod"}
-
-    // expect(cpr.results).toEqual(
-    //   expect.arrayContaining([
-    //     expect.objectContaining({
-    //       policy: "exemption:Disallow_Privileged",
-    //       resources: [ pod ]
-    //     }),
-    //     expect.objectContaining({
-    //       policy: "exemption:Drop_All_Capabilities",
-    //       resources: [ pod ]
-    //     }),
-    //     expect.objectContaining({
-    //       policy: "exemption:Restrict_Volume_Types",
-    //       resources: [ pod ]
-    //     }),
-    //   ])
-    // )
   }, secs(10))
 });

@@ -14,8 +14,8 @@ spec: {}
 # resource used to:
 # - trigger create / delete of ClusterPolicyReport resource
 # - report missing / outdated resource exemption annotations
-# spec block NOT used / assumes UDS operator adds exemption annotations
-#   to expempted resources
+# resource NOT used to:
+# - add exemption annotations to resources (assumes UDS operator will do that)
 
 ---
 apiVersion: v1

@@ -1,49 +1,54 @@
+---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: pexex-policy-report
+  name: pexex-clusterpolicyreport
+
 ---
 apiVersion: uds.dev/v1alpha1
 kind: Exemption
 metadata:
-  name: exemption
-  namespace: pexex-policy-report
+  name: allow-naughtiness
+  namespace: pexex-clusterpolicyreport
 spec:
   exemptions:
     - policies:
         - Disallow_Privileged
         - Drop_All_Capabilities
       matcher:
-        namespace: pexex-policy-report
-        name: "example-bad-pod"
+        namespace: pexex-clusterpolicyreport
+        name: naughty-pod
     
     - policies:
         - Restrict_Volume_Types
       matcher:
-        namespace: pexex-policy-report
-        name: "example-bad-pod"
+        namespace: pexex-clusterpolicyreport
+        name: naughty-pod
+
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: example-good-pod
+  name: nice-pod
   namespace: default
-  labels:
-    uds.dev.v1alpha1/exemption: "true"
-  annotations:
-    uds.dev.v1alpha1/Disallow_Privileged: "true"
-    uds.dev.v1alpha1/Drop_All_Capabilities: "true"
 spec:
   containers:
     - name: busybox
       image: busybox:latest
       command: ['sh', '-c', 'sleep infinity']
+
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: example-bad-pod
-  namespace: pexex-policy-report
+  name: naughty-pod
+  namespace: pexex-clusterpolicyreport
+  labels:
+    exemptions.uds.dev: v1alpha1
+  annotations:
+    exemptions.uds.dev/v1alpha1: >-
+      Disallow_Privileged
+      Drop_All_Capabilities
 spec:
   containers:
     - name: busybox

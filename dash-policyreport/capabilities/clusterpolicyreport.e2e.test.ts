@@ -34,6 +34,7 @@ describe("ClusterPolicyReport", () => {
       const crds_applied = await apply(crds)
     })
 
+    // assumed to already exist as part of UDS install
     await timed("load UDS Exemption CRD", async () => {
       const exemption_applied = await K8s(kind.CustomResourceDefinition).Apply(
         UDSExemptionCRD,
@@ -44,7 +45,7 @@ describe("ClusterPolicyReport", () => {
   }, mins(4))
 
   beforeEach(async () => {
-    const file = `${trc.root()}/capabilities/exemption.yaml`
+    const file = `${trc.root()}/capabilities/scenario.exemptions.yaml`
     await timed(`load: ${file}`, async () => {
       const resources = await trc.load(file)
       const resources_applied = await apply(resources)
@@ -77,7 +78,7 @@ describe("ClusterPolicyReport", () => {
 
   it("has results for each UDS Exemption", async () => {
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
-    const test_resources = [{kind:"Pod",name:"example-bad-pod"}]
+    const pod = [{kind:"Pod",name:"example-bad-pod"}]
 
     console.log(await logs())
 
@@ -85,15 +86,15 @@ describe("ClusterPolicyReport", () => {
       expect.arrayContaining([
         expect.objectContaining({
           policy: "exemption:Disallow_Privileged",
-          resources: test_resources
+          resources: pod
         }),
         expect.objectContaining({
           policy: "exemption:Drop_All_Capabilities",
-          resources: test_resources
+          resources: pod
         }),
         expect.objectContaining({
           policy: "exemption:Restrict_Volume_Types",
-          resources: test_resources
+          resources: pod
         }),
       ])
     )

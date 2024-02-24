@@ -84,7 +84,7 @@ const asExemptedResource = async (request) => {
   return request.Approve()
 }
 
-const lbl: [string, string] = [ "uds.dev.v1alpha1/exemption", "true" ]
+const lbl: [string, string] = [ "exemptions.uds.dev",  "v1alpha1" ]
 When(a.Pod).IsCreatedOrUpdated().WithLabel(...lbl).Validate(asExemptedResource)
 When(a.Service).IsCreatedOrUpdated().WithLabel(...lbl).Validate(asExemptedResource)
 

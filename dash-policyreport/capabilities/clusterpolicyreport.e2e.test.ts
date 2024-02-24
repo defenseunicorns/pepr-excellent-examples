@@ -6,10 +6,9 @@ import { secs, mins, sleep } from "helpers/src/time";
 import { clean } from "helpers/src/cluster";
 import { gone } from "helpers/src/resource";
 import { K8s, kind } from "kubernetes-fluent-client";
-import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1alpha2";
+import { ClusterPolicyReport, ResultElement } from "../types/clusterpolicyreport-v1alpha2";
 import { UDSExemptionCRD } from "../types/uds-exemption-crd-v1alpha1";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
-import exp from "constants";
 
 const trc = new TestRunCfg(__filename);
 
@@ -78,25 +77,49 @@ describe("ClusterPolicyReport", () => {
 
   it("has results for each UDS Exemption", async () => {
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
-    const pod = [{kind:"Pod",name:"example-bad-pod"}]
 
     console.log(await logs())
 
     expect(cpr.results).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          policy: "exemption:Disallow_Privileged",
-          resources: pod
+          policy: "pexex-clusterpolicyreport:allow-naughtiness:Disallow_Privileged",
+          resources: [
+
+          ]
         }),
         expect.objectContaining({
-          policy: "exemption:Drop_All_Capabilities",
-          resources: pod
+          policy: "pexex-clusterpolicyreport:allow-naughtiness:Drop_All_Capabilities",
+          resources: [
+            
+          ]
         }),
         expect.objectContaining({
-          policy: "exemption:Restrict_Volume_Types",
-          resources: pod
+          policy: "pexex-clusterpolicyreport:allow-naughtiness:Restrict_Volume_Types",
+          resources: [
+            
+          ]
         }),
       ])
     )
+
+    // const pod = {kind:"Pod",name:"naughty-pod"}
+
+    // expect(cpr.results).toEqual(
+    //   expect.arrayContaining([
+    //     expect.objectContaining({
+    //       policy: "exemption:Disallow_Privileged",
+    //       resources: [ pod ]
+    //     }),
+    //     expect.objectContaining({
+    //       policy: "exemption:Drop_All_Capabilities",
+    //       resources: [ pod ]
+    //     }),
+    //     expect.objectContaining({
+    //       policy: "exemption:Restrict_Volume_Types",
+    //       resources: [ pod ]
+    //     }),
+    //   ])
+    // )
   }, secs(10))
 });

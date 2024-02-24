@@ -16,7 +16,6 @@ const empty: ClusterPolicyReport = {
   metadata: {
     name: "pepr-report",
   },
-  results: [],
   summary: {
     pass: 0,
     fail: 0,
@@ -24,6 +23,7 @@ const empty: ClusterPolicyReport = {
     error: 0,
     skip: 0,
   },
+  results: [],
 };
 
 When(Exemption)
@@ -64,11 +64,13 @@ When(Exemption)
 const asExemptedResource = async (request) => {
   Log.info(request, "we are in logging for multiple kinds!")
 
+  // "annotations":{"exemptions.uds.dev/v1alpha1":"Disallow_Privileged Drop_All_Capabilities"
+
   // if (policies.length > 0) {
   //   const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
   //   delete cpr.metadata.managedFields
   //   for (let [name, policy] of policies) {
-  //     const result: ResultElement = {
+      // const result: ResultElement = {
   //       policy: `${name}:${policy}`,
   //       message: policy,
   //       resources: [{

@@ -71,7 +71,7 @@ describe("ClusterPolicyReport", () => {
   }, secs(30))
 
   it("is deleted when UDS Exemptions are gone", async () => {
-    await K8s(Exemption).InNamespace("pexex-policy-report").Delete("allow-naughtiness")
+    await K8s(Exemption).InNamespace("pexex-clusterpolicyreport").Delete("allow-naughtiness")
     await untilTrue(() => gone(ClusterPolicyReport, { metadata: { name: "pepr-report" } }))
   }, secs(30))
 

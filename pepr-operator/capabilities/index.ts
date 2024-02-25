@@ -1,9 +1,9 @@
 import { Capability, a, Log } from "pepr";
 import { WebApp } from "./crd";
 import { validator } from "./crd/validator";
-import { Queue } from "./enqueue";
 import { WebAppCRD } from "./crd/source/webapp.crd";
 import { RegisterCRD } from "./crd/register";
+import { reconciler } from "./reconciler";
 import "./crd/register";
 import Deploy from "./controller/generators";
 
@@ -15,18 +15,16 @@ export const WebAppController = new Capability({
 
 const { When, Store } = WebAppController;
 
-const queue = new Queue();
-
 // When instance is created or updated, validate it and enqueue it for processing
 When(WebApp)
   .IsCreatedOrUpdated()
   .Validate(validator)
-  .Watch(async instance => {
+  .Reconcile(async instance => {
     try {
       Store.setItem(instance.metadata.name, JSON.stringify(instance));
-      await queue.enqueue(instance);
+      await reconciler(instance);
     } catch (error) {
-      Log.info(`Error enqueing instance of WebApp`);
+      Log.info(`Error reconciling instance of WebApp`);
     }
   });
 
@@ -34,7 +32,6 @@ When(WebApp)
   .IsDeleted()
   .Mutate(async instance => {
     await Store.removeItemAndWait(instance.Raw.metadata.name);
-    instance.SetAnnotation("deletionTimestamp", new Date().toISOString());
   });
 
 // Don't let the CRD get deleted

@@ -9,7 +9,8 @@ import {
 import { TestRunCfg } from './TestRunCfg';
 import { untilTrue } from './general';
 import { gone } from './resource';
-import { Cmd } from './Cmd'
+import { Cmd } from './Cmd';
+
 
 export async function up(name: string = 'pexex-helpers-cluster'): Promise<string> {
   const create = await new Cmd({
@@ -32,6 +33,9 @@ export async function down(name: string = 'pexex-helpers-cluster'): Promise<void
 
 export async function clean(trc: TestRunCfg): Promise<void> {
   const originalEnv = { ...process.env }
+
+  let msg = "clean test-owned resources"
+  console.time(msg)
   try {
     // config KFC to use test-specific kube config
     process.env.KUBECONFIG = trc.kubeConfig
@@ -96,4 +100,5 @@ export async function clean(trc: TestRunCfg): Promise<void> {
   } finally {
     process.env = { ...originalEnv }
   }
+  console.timeEnd(msg)
 }

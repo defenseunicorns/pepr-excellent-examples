@@ -93,6 +93,11 @@ export async function moduleDown() {
   const modPkg = `${cwd()}/package.json`
   const cfg = JSON.parse( (await readFile(modPkg)).toString() )
 
+  const summary = "pepr module removed (total time)"
+  console.time(summary)
+
+  let msg = 'remove pepr namespace'
+  console.time(msg)
   try {
     const name = "pepr-system"
     const peprSystem = await K8s(kind.Namespace).Get(name)
@@ -102,7 +107,10 @@ export async function moduleDown() {
   } catch (e) {
     if ( ![404].includes(e.status) ) { throw e }
   }
+  console.timeEnd(msg)
 
+  msg = "remove default pepr store"
+  console.time(msg)
   try {
     const name = "peprstores.pepr.dev"
     const peprStore = await K8s(kind.CustomResourceDefinition).Get(name)
@@ -112,7 +120,10 @@ export async function moduleDown() {
   } catch (e) {
     if ( ![404].includes(e.status) ) { throw e }
   }
+  console.timeEnd(msg)
 
+  msg = "remove pepr cluster role binding"
+  console.time(msg)
   try {
     const name = `pepr-${cfg.pepr.uuid}`
     const peprBinding = await K8s(kind.ClusterRoleBinding).Get(name)
@@ -122,7 +133,10 @@ export async function moduleDown() {
   } catch (e) {
     if ( ![404].includes(e.status) ) { throw e }
   }
+  console.timeEnd(msg)
 
+  msg = "remove pepr cluster role"
+  console.time(msg)
   try {
     const name = `pepr-${cfg.pepr.uuid}`
     const peprRole = await K8s(kind.ClusterRole).Get(name)
@@ -132,4 +146,7 @@ export async function moduleDown() {
   } catch (e) {
     if ( ![404].includes(e.status) ) { throw e }
   }
+  console.timeEnd(msg)
+
+  console.timeEnd(summary)
 }

@@ -47,17 +47,9 @@ describe("ClusterPolicyReport", () => {
     })
   }, secs(10))
 
-  afterEach(async () => {
-    await timed("clean test-labelled resources", async () => {
-      await clean(trc)
-    })
-  }, mins(3))
+  afterEach(async () => { await clean(trc) }, mins(3))
 
-  afterAll(async () => {
-    await timed("teardown Pepr module", async () => {
-      await moduleDown()
-    })
-  }, mins(2));
+  afterAll(async () => { await moduleDown() }, mins(2));
 
   it("is created when UDS Exemption exists", async () => {
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")

@@ -16,6 +16,7 @@
     "name": "WebAppController",
     "uuid": "774fab07-77fa-517c-b5f8-c682c96c20c0",
     "onError": "reject",
+    "webhookTimeout": 20,
     "alwaysIgnore": {
       "namespaces": [],
       "labels": []
@@ -27,7 +28,7 @@
     "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system"
   },
   "dependencies": {
-    "pepr": "^0.26.1"
+    "pepr": "^0.26.2"
   },
   "devDependencies": {
     "typescript": "5.3.3"

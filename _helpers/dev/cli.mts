@@ -61,7 +61,11 @@ const opts = program.opts();
 function testUnit(passthru) {
   spawnSync(
     // eslint-disable-next-line no-useless-escape
-    "jest", ["--testPathPattern", ".*\.unit\.test\.ts", ...passthru],
+    "jest", [
+      "--testPathPattern", ".*\.unit\.test\.ts",
+      "--verbose",
+      ...passthru
+    ],
     { stdio: 'inherit' }
   )
 }
@@ -86,6 +90,7 @@ async function testE2e(passthru) {
       "jest", [
         "--testPathPattern", "src/cluster\.e2e\.test\.ts",
         "--runInBand",
+        "--verbose",
         ...passthru
       ],
       { stdio: 'inherit' }
@@ -103,6 +108,7 @@ async function testE2e(passthru) {
           "--testPathIgnorePatterns", "src/cluster\.e2e\.test\.ts",
           "--testPathPattern", ".*\.e2e\.test\.ts",
           "--runInBand",
+          "--verbose",
           ...passthru
         ],
         {
@@ -125,6 +131,7 @@ async function testE2e(passthru) {
           // eslint-disable-next-line no-useless-escape
           "--testPathPattern", ".*\.e2e\.test\.ts",
           "--runInBand",
+          "--verbose",
           ...passthru
         ],
         {

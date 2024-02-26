@@ -1,82 +1,102 @@
-import {
-  beforeAll,
-  beforeEach,
-  afterEach,
-  afterAll,
-  describe,
-  it,
-  expect,
-} from "@jest/globals";
-import { Cmd } from "helpers/src/Cmd";
+import { afterEach, beforeEach, beforeAll, afterAll, describe, it, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { untilTrue } from "helpers/src/general";
-import { secs, mins } from 'helpers/src/time';
-import { live } from 'helpers/src/resource';
-import { clean } from 'helpers/src/cluster';
-import { K8s, kind } from 'kubernetes-fluent-client';
-import { ClusterPolicyReport } from '../types/clusterpolicyreport-v1alpha2';
-
-const apply = async (resources) => {
-  kind["ClusterPolicyReport"] = ClusterPolicyReport
-
-  // normalize single / lists of resourcse as iterable list
-  resources = [ resources ].flat()
-
-  return Promise.all(resources.map(async (r) => {
-    const kynd = kind[r.kind]
-    const applied = await K8s(kynd).Apply(r)
-
-    return untilTrue(() => live(kynd, applied))
-  }))
-}
+import { fullCreate, untilTrue } from "helpers/src/general";
+import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
+import { secs, mins, sleep } from "helpers/src/time";
+import { clean } from "helpers/src/cluster";
+import { gone } from "helpers/src/resource";
+import { K8s, kind } from "kubernetes-fluent-client";
+import { ClusterPolicyReport, ResultElement } from "../types/clusterpolicyreport-v1alpha2";
+import { UDSExemptionCRD } from "../types/uds-exemption-crd-v1alpha1";
+import { Exemption } from "../types/uds-exemption-v1alpha1";
 
 const trc = new TestRunCfg(__filename);
 
-describe("Pepr ClusterPolicyReport()", () => {
+kind["ClusterPolicyReport"] = ClusterPolicyReport;
+kind["Exemption"] = Exemption;
+
+const apply = async res => {
+  return await fullCreate(res, kind);
+};
+
+const timed = async (m, f) => {
+  console.time(m)
+  await f()
+  console.timeEnd(m)
+}
+
+describe("ClusterPolicyReport", () => {
   beforeAll(async () => {
     // want the CRD to install automagically w/ the Pepr Module startup (eventually)
-    const crds = await trc.load(`${trc.root()}/types/wgpolicyk8s.io_clusterpolicyreports.yaml`)
-    const crds_applied = await apply(crds)
+    await timed("load ClusterPolicyReport CRD", async () => {
+      const crds = await trc.loadRaw(`${trc.root()}/types/wgpolicyk8s.io_clusterpolicyreports.yaml`)
+      const crds_applied = await apply(crds)
+    })
 
-    // want intial CR to install automagically on Pepr Module startup (eventually)
-    const crs = await trc.load(`${trc.here()}/clusterpolicyreport.yaml`)
-    const crs_applied = await apply(crs)
+    // assumed to already exist as part of UDS install
+    await timed("load UDS Exemption CRD", async () => {
+      const exemption_applied = await K8s(kind.CustomResourceDefinition).Apply(
+        UDSExemptionCRD,
+      )
+    })
 
-    await new Cmd({ cmd: `npx pepr build` }).run()
-    await new Cmd({ cmd: `npx pepr deploy --confirm` }).run()
-  }, mins(5))
-
-  afterAll(async () => await clean(trc), mins(5))
+    await moduleUp()
+  }, mins(3))
 
   beforeEach(async () => {
-    // TODO: create "zero'ed" cpr
-  })
+    const file = `${trc.root()}/capabilities/scenario.basic.yaml`
+    await timed(`load: ${file}`, async () => {
+      const resources = await trc.load(file)
+      const resources_applied = await apply(resources)
+
+      await untilLogged('"msg":"pepr-report updated"')
+    })
+  }, secs(10))
 
   afterEach(async () => {
-    // TODO: clean out "dirty" cpr
-  })
+    await timed("clean test-labelled resources", async () => {
+      await clean(trc)
+    })
+  }, mins(3))
 
-  it("can access a zeroized ClusterPolicyReport", async () => {
-    const crd = await K8s(kind.CustomResourceDefinition).Get("clusterpolicyreports.wgpolicyk8s.io")
+  afterAll(async () => {
+    await timed("teardown Pepr module", async () => {
+      await moduleDown()
+    })
+  }, mins(2));
+
+  it("is created when UDS Exemption exists", async () => {
+    const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
+    expect(cpr).not.toBeFalsy();
+  }, secs(30))
+
+  it("is deleted when UDS Exemptions are gone", async () => {
+    await K8s(Exemption).InNamespace("pexex-clusterpolicyreport").Delete("allow-naughtiness")
+    await untilTrue(() => gone(ClusterPolicyReport, { metadata: { name: "pepr-report" } }))
+  }, secs(30))
+
+  it("has a result for each UDS Exemption policy", async () => {
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
-    Object.values(cpr.summary).forEach(value => {
-      expect(value).toBe(0)
-    })
-  }, secs(30))
+    const naughty = {
+      kind: "Pod", namespace: "pexex-clusterpolicyreport", name: "naughty-pod"
+    }
 
-  it("can access Pepr controller logs", async () => {
-    const raw = await new Cmd({
-      env: { KUBECONFIG: process.env.KUBECONFIG },
-      cmd: `kubectl -n pepr-system logs -l 'pepr.dev/controller=admission'`
-    }).run()
-
-    const logs = raw.stdout.filter(l => l !== '')
-      .map(l => JSON.parse(l))
-      .filter(l => l.url !== "/healthz" && l.msg !== "Pepr Store update")
-
-    const needle = '✅ Controller startup complete'
-    expect(logs.filter(u => u.msg === needle)).toHaveLength(2)
-
-  }, secs(30))
-})
+    expect(cpr.results).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          policy: "pexex-clusterpolicyreport:allow-naughtiness:Disallow_Privileged",
+          resources: [ naughty ]
+        }),
+        expect.objectContaining({
+          policy: "pexex-clusterpolicyreport:allow-naughtiness:Drop_All_Capabilities",
+          resources: [ naughty ]
+        }),
+        expect.objectContaining({
+          policy: "pexex-clusterpolicyreport:allow-naughtiness:Restrict_Volume_Types",
+          resources: [ naughty ]
+        }),
+      ])
+    )
+  }, secs(10))
+});

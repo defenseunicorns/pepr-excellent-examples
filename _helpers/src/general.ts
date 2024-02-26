@@ -78,11 +78,21 @@ export async function halfCreate(resources, kinds = kind) {
 export async function fullCreate(resources, kinds = kind) {
   resources = [ resources ].flat()
 
-  return Promise.all(resources.map(async (r) => {
-    const kynd = kinds[r.kind]
-    const applied = await K8s(kynd).Apply(r)
-    await untilTrue(() => live(kynd, applied))
+  // return Promise.all(resources.map(async (r) => {
+  //   const kynd = kinds[r.kind]
+  //   const applied = await K8s(kynd).Apply(r)
+  //   await untilTrue(() => live(kynd, applied))
 
-    return applied
-  }))
+  //   return applied
+  // }))
+
+  let applied = []
+  for(let r of resources) {
+    const kynd = kinds[r.kind]
+    const appl = await K8s(kynd).Apply(r)
+    await untilTrue(() => live(kynd, appl))
+
+    applied.push(appl)
+  }
+  return applied
 }

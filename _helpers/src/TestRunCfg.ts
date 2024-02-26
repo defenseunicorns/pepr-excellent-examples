@@ -42,10 +42,14 @@ export class TestRunCfg {
     return `test-transient/${this.name()}`
   }
 
-  async load(manifest) {
+  async loadRaw(manifest) {
     // read yaml doc into list of js resources
-    const resources = parseAllDocuments(await readFile(manifest, "utf8"))
+    return parseAllDocuments(await readFile(manifest, "utf8"))
       .map(doc => JSON.parse(String(doc.contents)))
+  }
+
+  async load(manifest) {
+    const resources = await this.loadRaw(manifest)
 
       // add test-specific label to resources
     for (const resource of resources) {
@@ -57,7 +61,7 @@ export class TestRunCfg {
     }
     return resources
   }
-  
+
   // module(): string {
   //   return `${this.here()}/${this.name()}.pepr.ts`
   // }

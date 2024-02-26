@@ -1,0 +1,49 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pexex-clusterpolicyreport
+
+---
+apiVersion: uds.dev/v1alpha1
+kind: Exemption
+metadata:
+  name: allow-naughtiness
+  namespace: pexex-clusterpolicyreport
+spec: {}
+# resource used to:
+# - trigger create / delete of ClusterPolicyReport resource
+# - report missing / outdated resource exemption annotations
+# resource NOT used to:
+# - add exemption annotations to resources (assumes UDS operator will do that)
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nice-pod
+  namespace: default
+spec:
+  containers:
+    - name: busybox
+      image: busybox:latest
+      command: ['sh', '-c', 'sleep infinity']
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: naughty-pod
+  namespace: pexex-clusterpolicyreport
+  labels:
+    exemptions.uds.dev: v1alpha1
+  annotations:
+    exemptions.uds.dev/v1alpha1: >-
+      pexex-clusterpolicyreport:allow-naughtiness:Disallow_Privileged
+      pexex-clusterpolicyreport:allow-naughtiness:Drop_All_Capabilities
+      pexex-clusterpolicyreport:allow-naughtiness:Restrict_Volume_Types
+spec:
+  containers:
+    - name: busybox
+      image: busybox:latest
+      command: ['sh', '-c', 'sleep infinity']

@@ -3,8 +3,9 @@ import { K8s, kind } from 'kubernetes-fluent-client';
 import { sleep } from "./time";
 import { Cmd } from './Cmd';
 import { untilTrue } from './general';
-import { gone } from './resource';
-
+import { gone } from './resource'
+import { cwd } from 'node:process';
+import { readFile } from 'node:fs/promises';
 
 function sift(stdout) {
   const parsed = stdout
@@ -33,10 +34,17 @@ export async function logs() {
   return sift(logs)
 }
 
-export async function untilLogged(needle, count = 1) {
+export async function untilLogged(needle: String | Function, count = 1) {
   while (true) {
     const logz = await logs()
-    const found = logz.filter(l => l.includes(needle))
+
+    let found = []
+    if (typeof needle === 'string'){
+      found = logz.filter(l => l.includes(needle))
+    }
+    else if (typeof needle === 'function') {
+      found = logz.filter(l => needle(l))
+    }
 
     if (found.length >= count) { break }
     await sleep(1)
@@ -82,10 +90,44 @@ export async function moduleUp({version = "", verbose = false} = {}) {
 }
 
 export async function moduleDown() {
+  const modPkg = `${cwd()}/package.json`
+  const cfg = JSON.parse( (await readFile(modPkg)).toString() )
+
   try {
-    const peprSystem = await K8s(kind.Namespace).Get("pepr-system")
-    await K8s(kind.Namespace).Delete("pepr-system")
+    const name = "pepr-system"
+    const peprSystem = await K8s(kind.Namespace).Get(name)
+    await K8s(kind.Namespace).Delete(name)
     await untilTrue(() => gone(kind.Namespace, peprSystem))
+
+  } catch (e) {
+    if ( ![404].includes(e.status) ) { throw e }
+  }
+
+  try {
+    const name = "peprstores.pepr.dev"
+    const peprStore = await K8s(kind.CustomResourceDefinition).Get(name)
+    await K8s(kind.CustomResourceDefinition).Delete(name)
+    await untilTrue(() => gone(kind.CustomResourceDefinition, peprStore))
+
+  } catch (e) {
+    if ( ![404].includes(e.status) ) { throw e }
+  }
+
+  try {
+    const name = `pepr-${cfg.pepr.uuid}`
+    const peprBinding = await K8s(kind.ClusterRoleBinding).Get(name)
+    await K8s(kind.ClusterRoleBinding).Delete(name)
+    await untilTrue(() => gone(kind.ClusterRoleBinding, peprBinding))
+
+  } catch (e) {
+    if ( ![404].includes(e.status) ) { throw e }
+  }
+
+  try {
+    const name = `pepr-${cfg.pepr.uuid}`
+    const peprRole = await K8s(kind.ClusterRole).Get(name)
+    await K8s(kind.ClusterRole).Delete(name)
+    await untilTrue(() => gone(kind.ClusterRole, peprRole))
 
   } catch (e) {
     if ( ![404].includes(e.status) ) { throw e }

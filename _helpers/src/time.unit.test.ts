@@ -5,9 +5,11 @@ import {
   jest,
   describe,
   expect,
-  it
+  it,
+  beforeAll,
+  afterAll,
 } from '@jest/globals';
-import { ms, secs, mins, sleep } from "./time";
+import { ms, secs, mins, sleep, timed } from "./time";
 
 import * as KFC from "kubernetes-fluent-client";
 jest.mock("kubernetes-fluent-client")
@@ -69,4 +71,34 @@ describe("mins()", () => {
       expect(mins(input)).toBe(result)
     })
   })
+})
+
+describe("timed()", () => {
+  let time
+  let timeEnd
+
+  beforeAll(() => {
+    time = jest.spyOn(console, 'time').mockImplementation(() => {} )
+    timeEnd = jest.spyOn(console, 'timeEnd').mockImplementation(() => {})
+  })
+  
+  afterAll(() => {
+    time.mockRestore();
+    timeEnd.mockRestore();
+  })
+
+  it("runs given function and prints execution duration", async () => {
+    const msg = "msg"
+    const func = jest.fn( async () => { return Promise.resolve("func") } )
+
+    await timed(msg, func)
+
+    expect(time).toHaveBeenCalledTimes(1)
+    expect(time).toHaveBeenCalledWith(msg)
+    expect(func).toHaveBeenCalledTimes(1)
+    expect(timeEnd).toHaveBeenCalledTimes(1)
+    expect(timeEnd).toHaveBeenCalledWith(msg)
+  })
+
+
 })

@@ -2,11 +2,11 @@ import { afterEach, beforeEach, beforeAll, afterAll, describe, it, expect } from
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate, untilTrue } from "helpers/src/general";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
-import { secs, mins, sleep } from "helpers/src/time";
+import { secs, mins, timed } from "helpers/src/time";
 import { clean } from "helpers/src/cluster";
 import { gone } from "helpers/src/resource";
 import { K8s, kind } from "kubernetes-fluent-client";
-import { ClusterPolicyReport, ResultElement } from "../types/clusterpolicyreport-v1alpha2";
+import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1alpha2";
 import { UDSExemptionCRD } from "../types/uds-exemption-crd-v1alpha1";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
 
@@ -18,12 +18,6 @@ kind["Exemption"] = Exemption;
 const apply = async res => {
   return await fullCreate(res, kind);
 };
-
-const timed = async (m, f) => {
-  console.time(m)
-  await f()
-  console.timeEnd(m)
-}
 
 describe("ClusterPolicyReport", () => {
   beforeAll(async () => {

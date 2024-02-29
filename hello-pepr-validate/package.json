@@ -15,7 +15,7 @@
   "pepr": {
     "name": "hello-pepr-validate",
     "uuid": "aac63ece-b202-5b18-b3c8-fff5b631a4f1",
-    "onError": "ignore",
+    "onError": "reject",
     "alwaysIgnore": {
       "namespaces": [],
       "labels": []

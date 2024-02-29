@@ -1,6 +1,6 @@
 import { a, Capability, K8s, Log } from "pepr";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
-import { ClusterPolicyReport, ResultElement } from "../types/clusterpolicyreport-v1alpha2";
+import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1beta1";
 
 export const PeprReport = new Capability({
   name: "pepr-report",
@@ -9,7 +9,7 @@ export const PeprReport = new Capability({
 });
 
 const empty: ClusterPolicyReport = {
-  apiVersion: "wgpolicyk8s.io/v1alpha2",
+  apiVersion: "wgpolicyk8s.io/v1beta1",
   kind: "ClusterPolicyReport",
   metadata: {
     name: "pepr-report",

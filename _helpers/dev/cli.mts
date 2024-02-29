@@ -156,8 +156,8 @@ async function generateTypes() {
   await mkdir(typesDir, { recursive: true })
 
   const remoteYamls = [
-    "https://raw.githubusercontent.com/kubernetes-sigs/wg-policy-prototypes/master/policy-report/crd/v1alpha2/wgpolicyk8s.io_clusterpolicyreports.yaml",
-    "https://raw.githubusercontent.com/kubernetes-sigs/wg-policy-prototypes/master/policy-report/crd/v1alpha2/wgpolicyk8s.io_policyreports.yaml"
+    "https://raw.githubusercontent.com/kubernetes-sigs/wg-policy-prototypes/master/policy-report/crd/v1beta1/wgpolicyk8s.io_clusterpolicyreports.yaml",
+    "https://raw.githubusercontent.com/kubernetes-sigs/wg-policy-prototypes/master/policy-report/crd/v1beta1/wgpolicyk8s.io_policyreports.yaml"
   ]
   for (const remoteYaml of remoteYamls) {
     const localYaml = resolve(typesDir, basename(remoteYaml))

@@ -6,7 +6,7 @@ import { secs, mins, timed } from "helpers/src/time";
 import { clean } from "helpers/src/cluster";
 import { gone } from "helpers/src/resource";
 import { K8s, kind } from "kubernetes-fluent-client";
-import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1alpha2";
+import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1beta1";
 import { UDSExemptionCRD } from "../types/uds-exemption-crd-v1alpha1";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
 

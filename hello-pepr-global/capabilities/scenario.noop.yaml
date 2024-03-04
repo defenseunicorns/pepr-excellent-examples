@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-global
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: noop
+  namespace: hello-pepr-global
+data: {}

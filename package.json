@@ -11,7 +11,9 @@
     "pepr-operator",
     "pepr-scheduler",
     "dash-policyreport",
-    "hello-pepr-validate",
-    "hello-pepr-mutate"
+    "hello-pepr-global",
+    "hello-pepr-store",
+    "hello-pepr-mutate",
+    "hello-pepr-validate"
   ]
 }

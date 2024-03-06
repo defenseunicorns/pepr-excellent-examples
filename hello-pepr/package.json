@@ -13,7 +13,6 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "name": "hello-pepr",
     "uuid": "05b16e8b-9c54-5083-be22-3149a9b102b0",
     "onError": "reject",
     "alwaysIgnore": {

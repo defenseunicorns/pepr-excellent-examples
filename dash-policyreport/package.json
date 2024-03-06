@@ -13,7 +13,6 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "name": "dash-policyreport",
     "uuid": "5f4e99be-321f-5a32-85bd-eb2c9bfcc291",
     "onError": "reject",
     "alwaysIgnore": {

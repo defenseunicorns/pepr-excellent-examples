@@ -13,7 +13,6 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "name": "hello-pepr-store",
     "uuid": "57067ccd-e94d-416f-a1c5-d57d983f3172",
     "onError": "reject",
     "webhookTimeout": 20,

@@ -13,7 +13,6 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "name": "hello-pepr-mutate",
     "uuid": "c6600eb7-5020-4bf0-87e3-61ffb6d607d8",
     "onError": "reject",
     "alwaysIgnore": {

@@ -13,7 +13,6 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "name": "pepr-scheduler",
     "uuid": "ce099eec-6516-5395-940e-2a57102f4ea7",
     "onError": "reject",
     "alwaysIgnore": {

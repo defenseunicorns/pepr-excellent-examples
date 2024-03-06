@@ -7,12 +7,13 @@ import {
   it,
   expect,
 } from "@jest/globals";
-import { K8s, kind } from "kubernetes-fluent-client";
+import { K8s, KubernetesObject, kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { halfCreate, fullCreate } from "helpers/src/general";
 import { secs, mins, sleep, timed } from 'helpers/src/time';
 import { moduleUp, moduleDown, untilLogged, logs } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
+import { live } from 'helpers/src/resource';
 import cfg from "../package.json";
 
 
@@ -28,25 +29,67 @@ const trc = new TestRunCfg(__filename)
 describe("global.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2))
 
-  // afterEach(async () => await clean(trc), mins(5))
+  afterAll(async () => await moduleDown(), mins(2))
 
-  // afterAll(async () => await moduleDown(), mins(2))
-
-  describe("package.json > pepr", () => {
-    let mwc: kind.MutatingWebhookConfiguration
-    let vwc: kind.ValidatingWebhookConfiguration
+  describe("respects package.json > pepr key:", () => {
 
     beforeAll(async () => {
-      const name = `pepr-${cfg.pepr.uuid}`
-      mwc = await K8s(kind.MutatingWebhookConfiguration).Get(name)
-      vwc = await K8s(kind.ValidatingWebhookConfiguration).Get(name)
-    }, secs(10))
+      const file = `${trc.root()}/capabilities/scenario.default.yaml`
+      await timed(`load: ${file}`, async () => {
+        const resources = await trc.load(file)
+        const resources_applied = await apply(resources)
+  
+        await untilLogged('"msg":"noop"')
+      })
+    })
 
-    // will pass once release is cut that includes fix:
+    afterAll(async () => await clean(trc), mins(5))
+
+    const moduleName = `pepr-${cfg.pepr.uuid}`
+
+    // will pass once release a is cut to include fix:
     //  https://github.com/defenseunicorns/pepr/pull/616
-    it.skip("webhookTimeout is respected", async () => {
+    it.skip("webhookTimeout", async () => {
+      const mwc = await K8s(kind.MutatingWebhookConfiguration).Get(moduleName)
+      const vwc = await K8s(kind.ValidatingWebhookConfiguration).Get(moduleName)
+
       expect(mwc.webhooks![0].timeoutSeconds).toBe(cfg.pepr.webhookTimeout)
       expect(vwc.webhooks![0].timeoutSeconds).toBe(cfg.pepr.webhookTimeout)
+    }, secs(10))
+
+    it("onError", async () => {
+      const mwc = await K8s(kind.MutatingWebhookConfiguration).Get(moduleName)
+      const vwc = await K8s(kind.ValidatingWebhookConfiguration).Get(moduleName)
+
+      const failurePolicy =
+        cfg.pepr.onError == "reject" ? "Fail" :
+        cfg.pepr.onError == "ignore" ? "Ignore" : null
+
+      expect(mwc.webhooks![0].failurePolicy).toBe(failurePolicy)
+      expect(vwc.webhooks![0].failurePolicy).toBe(failurePolicy)
+    }, secs(10))
+
+    it("customLabels", async () => {
+      const ns = await K8s(kind.Namespace).Get("pepr-system")
+      expect(ns.metadata?.labels).toEqual(
+        expect.objectContaining(cfg.pepr.customLabels.namespace)
+      )
+    }, secs(10))
+
+    it("env", async () => {
+      const logz = await logs()
+      expect(logz.join("\n")).toMatch(`"ITS":"a bird, a plane, superman"`)
+    }, secs(5))
+
+    it("alwaysIgnore", async () => {
+      const mutated = await K8s(kind.Namespace).Get("hello-pepr-global")
+      const ignored = await K8s(kind.Namespace).Get("hello-pepr-global-ignore")
+
+      expect(mutated.metadata?.annotations).toEqual({
+        [`${cfg.pepr.uuid}.pepr.dev/hello-pepr-global`]: 'succeeded',
+        pepr: "was here"
+      })
+      expect(ignored.metadata?.annotations).toBe(undefined)
     }, secs(10))
   })
 })

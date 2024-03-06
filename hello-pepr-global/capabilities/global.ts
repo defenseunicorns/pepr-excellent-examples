@@ -7,14 +7,20 @@ export const HelloPeprGlobal = new Capability({
   description: name,
   namespaces: [name],
 });
-const { When, Store } = HelloPeprGlobal;
+const { When } = HelloPeprGlobal;
+
+When(a.Namespace)
+  .IsCreated()
+  .Mutate(async request => {
+    request.SetAnnotation("pepr", "was here")
+  });
 
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
   .WithName("noop")
   .Mutate(async request => {
-    Log.info({}, "noop")
+    Log.info({ITS: process.env.ITS}, "env")
   });
 
 When(a.ConfigMap)

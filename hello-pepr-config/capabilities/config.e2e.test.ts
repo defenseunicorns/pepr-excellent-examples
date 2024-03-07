@@ -1,19 +1,16 @@
 import {
   beforeAll,
-  beforeEach,
-  afterEach,
   afterAll,
   describe,
   it,
   expect,
 } from "@jest/globals";
-import { K8s, KubernetesObject, kind } from "kubernetes-fluent-client";
+import { K8s, kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { halfCreate, fullCreate } from "helpers/src/general";
 import { secs, mins, sleep, timed } from 'helpers/src/time';
 import { moduleUp, moduleDown, untilLogged, logs } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
-import { live } from 'helpers/src/resource';
 import cfg from "../package.json";
 
 
@@ -26,7 +23,7 @@ const apply = async res => {
 
 const trc = new TestRunCfg(__filename)
 
-describe("global.ts", () => {
+describe("config.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2))
 
   afterAll(async () => await moduleDown(), mins(2))
@@ -34,7 +31,7 @@ describe("global.ts", () => {
   describe("respects package.json > pepr key:", () => {
 
     beforeAll(async () => {
-      const file = `${trc.root()}/capabilities/scenario.default.yaml`
+      const file = `${trc.root()}/capabilities/scenario.config.yaml`
       await timed(`load: ${file}`, async () => {
         const resources = await trc.load(file)
         const resources_applied = await apply(resources)
@@ -82,11 +79,11 @@ describe("global.ts", () => {
     }, secs(5))
 
     it("alwaysIgnore", async () => {
-      const mutated = await K8s(kind.Namespace).Get("hello-pepr-global")
-      const ignored = await K8s(kind.Namespace).Get("hello-pepr-global-ignore")
+      const mutated = await K8s(kind.Namespace).Get("hello-pepr-config")
+      const ignored = await K8s(kind.Namespace).Get("hello-pepr-config-ignore")
 
       expect(mutated.metadata?.annotations).toEqual({
-        [`${cfg.pepr.uuid}.pepr.dev/hello-pepr-global`]: 'succeeded',
+        [`${cfg.pepr.uuid}.pepr.dev/hello-pepr-config`]: 'succeeded',
         pepr: "was here"
       })
       expect(ignored.metadata?.annotations).toBe(undefined)

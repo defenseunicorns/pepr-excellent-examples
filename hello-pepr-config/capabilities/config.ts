@@ -1,13 +1,13 @@
 import { Capability, a, Log } from "pepr";
 
-const name = "hello-pepr-global";
+const name = "hello-pepr-config";
 
-export const HelloPeprGlobal = new Capability({
+export const HelloPeprConfig = new Capability({
   name: name,
   description: name,
   namespaces: [name],
 });
-const { When } = HelloPeprGlobal;
+const { When } = HelloPeprConfig;
 
 When(a.Namespace)
   .IsCreated()

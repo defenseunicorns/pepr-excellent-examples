@@ -1,7 +1,7 @@
 {
-  "name": "hello-pepr-global",
+  "name": "hello-pepr-config",
   "version": "0.0.1",
-  "description": "Pepr feature: Global Features",
+  "description": "Pepr feature: Configuration Features",
   "keywords": [
     "pepr",
     "k8s",

@@ -25,7 +25,7 @@ const trc = new TestRunCfg(__filename)
 describe("hooks.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2))
 
-  // afterAll(async () => await moduleDown(), mins(2))
+  afterAll(async () => await moduleDown(), mins(2))
 
   describe("honors module hooks:", () => {
     let logz: any[]
@@ -43,7 +43,7 @@ describe("hooks.ts", () => {
       })
     })
 
-    // afterAll(async () => await clean(trc), mins(5))
+    afterAll(async () => await clean(trc), mins(5))
 
     it("mutate-me", async () => {
       const mutateRequest = logz

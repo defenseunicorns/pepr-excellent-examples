@@ -12,23 +12,23 @@ const { When } = HelloPeprHooks;
 When(a.Secret)
   .IsCreated()
   .InNamespace(name)
-  .WithName("mutate-me")
+  .WithName("mutate-only")
   .Mutate(() => {});
 
 When(a.Secret)
   .IsCreated()
   .InNamespace(name)
-  .WithName("validate-me")
+  .WithName("validate-only")
   .Validate(request => request.Approve());
 
 When(a.Secret)
   .IsCreated()
   .InNamespace(name)
-  .WithName("mutate-and-validate-me")
+  .WithName("mutate-and-validate")
   .Mutate(() => {});
 
 When(a.Secret)
   .IsCreated()
   .InNamespace(name)
-  .WithName("mutate-and-validate-me")
+  .WithName("mutate-and-validate")
   .Validate(request => request.Approve());

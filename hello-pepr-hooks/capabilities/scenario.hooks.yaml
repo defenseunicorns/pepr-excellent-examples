@@ -8,7 +8,7 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mutate-me
+  name: mutate-only
   namespace: hello-pepr-hooks
 data: {}
 
@@ -16,7 +16,7 @@ data: {}
 apiVersion: v1
 kind: Secret
 metadata:
-  name: validate-me
+  name: validate-only
   namespace: hello-pepr-hooks
 data: {}
 
@@ -24,6 +24,6 @@ data: {}
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mutate-and-validate-me
+  name: mutate-and-validate
   namespace: hello-pepr-hooks
 data: {}

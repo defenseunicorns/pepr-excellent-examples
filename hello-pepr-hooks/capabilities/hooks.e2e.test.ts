@@ -45,11 +45,11 @@ describe("hooks.ts", () => {
 
     afterAll(async () => await clean(trc), mins(5))
 
-    it("mutate-me", async () => {
+    it("mutate-only", async () => {
       const mutateRequest = logz
         .filter(l => l.msg === "Incoming request")
         .filter(l => l.admissionKind === "Mutate")
-        .filter(l => l.name === "/mutate-me")
+        .filter(l => l.name === "/mutate-only")
         [0]
 
       const mutateBefore = logz
@@ -65,7 +65,7 @@ describe("hooks.ts", () => {
       const validateRequest = logz
         .filter(l => l.msg === "Incoming request")
         .filter(l => l.admissionKind === "Validate")
-        .filter(l => l.name === "/mutate-me")
+        .filter(l => l.name === "/mutate-only")
         [0]
 
       const validateBefore = logz
@@ -82,11 +82,11 @@ describe("hooks.ts", () => {
       expect(validateAfter).toHaveLength(1)
     }, secs(10))
 
-    it("validate-me", async () => {
+    it("validate-only", async () => {
       const mutateRequest = logz
         .filter(l => l.msg === "Incoming request")
         .filter(l => l.admissionKind === "Mutate")
-        .filter(l => l.name === "/validate-me")
+        .filter(l => l.name === "/validate-only")
         [0]
 
       const mutateBefore = logz
@@ -102,7 +102,7 @@ describe("hooks.ts", () => {
       const validateRequest = logz
         .filter(l => l.msg === "Incoming request")
         .filter(l => l.admissionKind === "Validate")
-        .filter(l => l.name === "/validate-me")
+        .filter(l => l.name === "/validate-only")
         [0]
 
       const validateBefore = logz
@@ -116,11 +116,11 @@ describe("hooks.ts", () => {
       expect(validateAfter).toHaveLength(1)
     }, secs(10))
 
-    it("mutate-and-validate-me", async () => {
+    it("mutate-and-validate", async () => {
       const mutateRequest = logz
         .filter(l => l.msg === "Incoming request")
         .filter(l => l.admissionKind === "Mutate")
-        .filter(l => l.name === "/mutate-and-validate-me")
+        .filter(l => l.name === "/mutate-and-validate")
         [0]
 
       const mutateBefore = logz
@@ -136,7 +136,7 @@ describe("hooks.ts", () => {
       const validateRequest = logz
         .filter(l => l.msg === "Incoming request")
         .filter(l => l.admissionKind === "Validate")
-        .filter(l => l.name === "/mutate-and-validate-me")
+        .filter(l => l.name === "/mutate-and-validate")
         [0]
 
       const validateBefore = logz

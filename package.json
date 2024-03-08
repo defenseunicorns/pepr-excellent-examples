@@ -12,6 +12,7 @@
     "pepr-scheduler",
     "dash-policyreport",
     "hello-pepr-config",
+    "hello-pepr-hooks",
     "hello-pepr-store",
     "hello-pepr-mutate",
     "hello-pepr-validate"

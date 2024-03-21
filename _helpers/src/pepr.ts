@@ -61,11 +61,9 @@ export async function peprVersion() {
   return version
 }
 
-export async function moduleUp({version = "", verbose = false} = {}) {
+export async function moduleBuild({version = "", verbose = false} = {}) {
   // can't have await expressions in default args, so gotta do it here
   if (version === ""){ version = await peprVersion()}
-
-  console.time(`pepr@${version} ready (total time)`)
 
   // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
   const pepr = { TS_NODE_PROJECT: "" }
@@ -75,8 +73,20 @@ export async function moduleUp({version = "", verbose = false} = {}) {
   const build = await new Cmd({env: pepr, cmd}).run()
   if (verbose) { console.log(build) }
   console.timeEnd(cmd)
+}
 
-  cmd = `npx --yes pepr@${version} deploy --confirm`
+export async function moduleUp({version = "", verbose = false} = {}) {
+  // can't have await expressions in default args, so gotta do it here
+  if (version === ""){ version = await peprVersion()}
+
+  console.time(`pepr@${version} ready (total time)`)
+
+  // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
+  const pepr = { TS_NODE_PROJECT: "" }
+
+  await moduleBuild({version, verbose})
+
+  let cmd = `npx --yes pepr@${version} deploy --confirm`
   console.time(cmd)
   const deploy = await new Cmd({env: pepr, cmd}).run()
   if (verbose) { console.log(deploy) }

@@ -25,7 +25,7 @@
   "dependencies": {
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
-    "pepr": "^0.26.1"
+    "pepr": "^0.28.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

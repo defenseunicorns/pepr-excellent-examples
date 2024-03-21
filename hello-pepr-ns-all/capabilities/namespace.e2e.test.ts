@@ -22,7 +22,7 @@ const trc = new TestRunCfg(__filename)
 describe("namespace.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2))
 
-  // afterAll(async () => await moduleDown(), mins(2))
+  afterAll(async () => await moduleDown(), mins(2))
 
   describe("unspecified module namespaces", () => {
     beforeAll(async () => {
@@ -36,7 +36,7 @@ describe("namespace.ts", () => {
       })
     })
 
-    // afterAll(async () => await clean(trc), mins(5))
+    afterAll(async () => await clean(trc), mins(5))
 
     it("handles: default namespace resources", async () => {
       const cm = await K8s(kind.ConfigMap).InNamespace("default").Get("cm-def")

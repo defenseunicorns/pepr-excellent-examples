@@ -7,7 +7,7 @@ import {
 } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";
-import { mins } from 'helpers/src/time';
+import { mins, secs, timed } from 'helpers/src/time';
 import { moduleUp, moduleDown } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
 import cfg from '../package.json';
@@ -22,8 +22,11 @@ describe("mutate.ts", () => {
     let applied
 
     beforeAll(async () => {
-      const resources = await trc.load(`${trc.here()}/${trc.name()}.pass.yaml`)
-      applied = await fullCreate(resources)
+      const file = `${trc.root()}/capabilities/mutate.pass.yaml`
+      await timed(`load: ${file}`, async () => {
+        const resources = await trc.load(file)
+        applied = await fullCreate(resources)
+      })
     })
     afterAll(async () => await clean(trc), mins(5))
 
@@ -42,5 +45,19 @@ describe("mutate.ts", () => {
       const annote = `${cfg.pepr.uuid}.pepr.dev/hello-pepr-mutate`
       expect(actual.metadata.annotations[annote]).toBe('succeeded')
     })
+  })
+
+  describe("fail", () => {
+    afterAll(async () => await clean(trc), mins(5))
+
+    it("rejects forbidden resources", async () => {
+      try {
+        const resources = await trc.load(`${trc.root()}/capabilities/mutate.fail.yaml`)
+        const applied = await fullCreate(resources)
+      }
+      catch (err) {
+        expect(err.data.message).toMatch(/admission webhook .* denied the request/)
+      }
+    }, secs(30))
   })
 })

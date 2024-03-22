@@ -13,7 +13,6 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "name": "whut",
     "uuid": "201764fa-a155-43e5-ab53-e4217cd217ab",
     "onError": "reject",
     "webhookTimeout": 10,

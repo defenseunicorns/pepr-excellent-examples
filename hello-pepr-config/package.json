@@ -13,7 +13,6 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "name": "rm-after-next-pepr-release",
     "uuid": "aac63ece-b202-5b18-b3c8-fff5b631a4f1",
     "onError": "reject",
     "webhookTimeout": 15,

@@ -6,8 +6,8 @@ import {
   expect,
 } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { halfCreate, fullCreate } from "helpers/src/general";
-import { secs, mins } from 'helpers/src/time';
+import { fullCreate } from "helpers/src/general";
+import { mins } from 'helpers/src/time';
 import { moduleUp, moduleDown } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
 import cfg from '../package.json';
@@ -39,7 +39,7 @@ describe("mutate.ts", () => {
 
     it("annotates mutated resources", async () => {
       const actual = applied.filter(f => f.metadata.name === "pass-full" )[0]
-      const annote = `${cfg.pepr.uuid}.pepr.dev/${cfg.pepr.name}`
+      const annote = `${cfg.pepr.uuid}.pepr.dev/hello-pepr-mutate`
       expect(actual.metadata.annotations[annote]).toBe('succeeded')
     })
   })

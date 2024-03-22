@@ -13,9 +13,6 @@ import { moduleUp, moduleDown, untilLogged, logs } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
 import { live } from 'helpers/src/resource';
 
-// kind["ClusterPolicyReport"] = ClusterPolicyReport
-// kind["Exemption"] = Exemption
-
 const apply = async res => {
   return await fullCreate(res, kind);
 }

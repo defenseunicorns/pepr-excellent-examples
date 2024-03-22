@@ -12,6 +12,6 @@ const { When } = HelloPeprNamespace;
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace("wrong")
-  .Validate(async request => {
+  .Validate(async function validateWrong(request) {
     return request.Approve();
   });

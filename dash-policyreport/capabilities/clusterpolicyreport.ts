@@ -28,7 +28,7 @@ const { When } = PeprReport;
 
 When(Exemption)
   .IsCreatedOrUpdated()
-  .Validate(async request => {
+  .Validate(async function createCPR(request) {
     try {
       const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
     } catch (e) {
@@ -44,7 +44,7 @@ When(Exemption)
 
 When(Exemption)
   .IsDeleted()
-  .Validate(async request => {
+  .Validate(async function deleteCPR(request) {
     const list = await K8s(Exemption).Get()
     if (list.items.length > 1) { return request.Approve() }
 
@@ -110,10 +110,3 @@ const asExemptedResource = async (request) => {
 const lbl: [string, string] = [ "exemptions.uds.dev",  "v1alpha1" ]
 When(a.Pod).IsCreatedOrUpdated().WithLabel(...lbl).Validate(asExemptedResource)
 When(a.Service).IsCreatedOrUpdated().WithLabel(...lbl).Validate(asExemptedResource)
-
-// When(a.Pod).IsDeleted().WithLabel(...lbl).Validate(asDeletedResource)
-// When(a.Service).IsDeleted().WithLabel(...lbl).Validate(asDeletedResource)
-
-// adding resources to CPR when exemption label is added... but what about when it's taken away?
-// - does a resource with a label being removed still trigger .WithLabel()?
-// - how will we see things that "used to be" exempted but aren't anymore?

@@ -12,10 +12,10 @@ const { When } = HelloPeprValidate;
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
-  .Validate(req => {
-    const name = req.Raw.metadata.name;
-    if (name === "kube-root-ca.crt") { return req.Approve() }
+  .Validate(function validateAll(request) {
+    const name = request.Raw.metadata.name;
+    if (name === "kube-root-ca.crt") { return request.Approve() }
 
-    const pass = req.Raw.data?.pass;
-    return pass === "yep" ? req.Approve() : req.Deny(name)
+    const pass = request.Raw.data?.pass;
+    return pass === "yep" ? request.Approve() : request.Deny(name)
   });

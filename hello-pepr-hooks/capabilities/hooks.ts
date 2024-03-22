@@ -1,4 +1,4 @@
-import { Capability, a, Log } from "pepr";
+import { Capability, a } from "pepr";
 
 const name = "hello-pepr-hooks";
 
@@ -13,22 +13,22 @@ When(a.Secret)
   .IsCreated()
   .InNamespace(name)
   .WithName("mutate-only")
-  .Mutate(() => {});
+  .Mutate(function mutateOnly(){});
 
 When(a.Secret)
   .IsCreated()
   .InNamespace(name)
   .WithName("validate-only")
-  .Validate(request => request.Approve());
+  .Validate(function validateOnly(request) {return request.Approve()});
 
 When(a.Secret)
   .IsCreated()
   .InNamespace(name)
   .WithName("mutate-and-validate")
-  .Mutate(() => {});
+  .Mutate(function mutateMutVal(){});
 
 When(a.Secret)
   .IsCreated()
   .InNamespace(name)
   .WithName("mutate-and-validate")
-  .Validate(request => request.Approve());
+  .Validate(function validateMutVal(request) {return request.Approve()});

@@ -14,7 +14,7 @@ When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
   .WithName("setter")
-  .Validate(async request => {
+  .Validate(async function validateSetter(request) {
     const alphabet = request.Raw.data.alphabet
     await Store.setItemAndWait("alphabet", alphabet)
     return request.Approve()
@@ -24,7 +24,7 @@ When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
   .WithName("getter")
-  .Mutate(async request => {
+  .Mutate(async function mutateGetter(request) {
     let alphabet
     const found = () => {
       alphabet = Store.getItem("alphabet")

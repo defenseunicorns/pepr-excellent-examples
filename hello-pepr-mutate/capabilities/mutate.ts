@@ -12,7 +12,7 @@ const { When } = HelloPeprMutate;
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
-  .Mutate(request => {
+  .Mutate(function mutateStuff(request) {
     if (Object.hasOwn(request.Raw.data, 'oof')) {
       throw "oof"
     }

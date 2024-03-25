@@ -18,6 +18,7 @@
     "hello-pepr-ns-all",
     "hello-pepr-ns-bounded",
     "hello-pepr-ns-wrong",
+    "hello-pepr-reconcile",
     "hello-pepr-validate"
   ]
 }

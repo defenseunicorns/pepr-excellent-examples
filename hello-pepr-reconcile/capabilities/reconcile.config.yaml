@@ -4,52 +4,25 @@ metadata:
   name: pepr-demo
 ---
 apiVersion: v1
-kind: Service
+data:
+  one: one
+kind: ConfigMap
 metadata:
-  labels:
-    run: svc-one
-  name: svc-one
+  name: cm-one
   namespace: pepr-demo
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 80
-  selector:
-    run: svc-one
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
-kind: Service
+data:
+  two: two
+kind: ConfigMap
 metadata:
-  labels:
-    run: svc-two
-  name: svc-two
+  name: cm-two
   namespace: pepr-demo
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 80
-  selector:
-    run: svc-two
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
-kind: Service
+data:
+  three: three
+kind: ConfigMap
 metadata:
-  labels:
-    run: svc-three
-  name: svc-three
+  name: cm-three
   namespace: pepr-demo
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 80
-  selector:
-    run: svc-three
-status:
-  loadBalancer: {}

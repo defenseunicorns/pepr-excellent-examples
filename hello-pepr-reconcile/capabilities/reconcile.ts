@@ -9,7 +9,7 @@ export const HelloPeprReconcile = new Capability({
 const { When } = HelloPeprReconcile;
 
 let i = 0;
-When(a.Service)
+When(a.ConfigMap)
   .IsCreatedOrUpdated()
   .InNamespace("pepr-demo")
   .Reconcile(async instance => {

@@ -21,11 +21,17 @@ function sift(stdout) {
 }
 
 export async function logs() {
-  const pods = await new Cmd({
+  const podsAdmission = await new Cmd({
     cmd: `kubectl get pods -A -l 'pepr.dev/controller=admission' --no-headers --output=name`
   }).run()
 
-  const results = await Promise.all(pods.stdout.filter(n => n !== '').map(async name => new Cmd({
+  const podsWatcher = await new Cmd({
+    cmd: `kubectl get pods -A -l 'pepr.dev/controller=watcher' --no-headers --output=name`
+  }).run()
+
+  const podsOut = podsAdmission.stdout.concat(podsWatcher.stdout)
+
+  const results = await Promise.all(podsOut.filter(n => n !== '').map(async name => new Cmd({
     cmd: `kubectl logs -n pepr-system ${name}`
   }).run()))
 

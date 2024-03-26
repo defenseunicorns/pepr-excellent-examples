@@ -13,15 +13,17 @@ When(a.ConfigMap)
   .IsCreatedOrUpdated()
   .InNamespace("pepr-demo")
   .Reconcile(async instance => {
-    return new Promise(resolve => {
-      const timeOut = i++ % 2 == 0 ? 20000 : 5000;
-      setTimeout(() => {
-        Log.info(
-          `Callback: Reconciling ${instance.metadata.name} after ${
-            timeOut / 1000
-          }s`,
-        );
-        resolve();
-      }, timeOut);
-    });
+    if (instance.metadata?.name !== "kube-root-ca.crt") {
+      return new Promise(resolve => {
+        const timeOut = i++ % 2 == 0 ? 20000 : 5000;
+        setTimeout(() => {
+          Log.info(
+            `Callback: Reconciling ${instance.metadata.name} after ${
+              timeOut / 1000
+            }s`,
+          );
+          resolve();
+        }, timeOut);
+      });
+    }
   });

@@ -11,8 +11,6 @@ describe("reconcile.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2));
   afterAll(async () => await moduleDown(), mins(2))
 
-  const LOG_RESULTS: string[] = ["three", "two", "one"];
-
   describe("tests reconcile module", () => {
     let logz: string[] = [];
     beforeAll(async () => {
@@ -20,17 +18,17 @@ describe("reconcile.ts", () => {
       await timed(`load: ${file}`, async () => {
         const resources = await trc.load(file);
         await fullCreate(resources, kind);
-        await untilLogged("Callback: Reconciling svc-three");
+        await untilLogged("Callback: Reconciling cm-three");
         logz = await logs();
       });
     }, mins(1));
-    it("maintains callback order in a queue when execution times vary", async () => {
-      for (const l of logz) {
-        if (l.includes(`Callback: Reconciling svc-${LOG_RESULTS[LOG_RESULTS.length - 1]}`)) {
-          LOG_RESULTS.pop()
-        }
-      }
-      expect(LOG_RESULTS).toHaveLength(0);
+    it("maintains callback order in a queue when execution times vary", () => {
+
+      const results = logz.filter(l => l.includes("Callback: Reconciling"))
+      expect(results[0]).toContain("cm-one")
+      expect(results[1]).toContain("cm-two")
+      expect(results[2]).toContain("cm-three")
+
     });
   });
 });

@@ -23,7 +23,7 @@ describe("reconcile.ts", () => {
         await untilLogged("Callback: Reconciling svc-three");
         logz = await logs();
       });
-    }, mins(4));
+    }, mins(1));
     it("maintains callback order in a queue when execution times vary", async () => {
       for (const l of logz) {
         if (l.includes(`Callback: Reconciling svc-${LOG_RESULTS[LOG_RESULTS.length - 1]}`)) {

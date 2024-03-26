@@ -8,7 +8,7 @@ const trc = new TestRunCfg(__filename);
 
 // KUBECONFIG=$(k3d kubeconfig write pexex-hello-pepr-reconcile-e2e) k9s
 describe("reconcile.ts", () => {
-  beforeAll(async () => await moduleUp({ verbose: true }), mins(2));
+  beforeAll(async () => await moduleUp(), mins(2));
   afterAll(async () => await moduleDown(), mins(2))
 
   const LOG_RESULTS: string[] = ["three", "two", "one"];

@@ -6,7 +6,12 @@ import { fullCreate } from "helpers/src/general";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
 const trc = new TestRunCfg(__filename);
 
-// KUBECONFIG=$(k3d kubeconfig write pexex-hello-pepr-reconcile-e2e) k9s
+/*
+ * The purpose of this test is to demonstrate that the reconcile module
+ * correctly processes resources in the order they are received.
+ */
+
+
 describe("reconcile.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2));
   afterAll(async () => await moduleDown(), mins(2))

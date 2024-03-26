@@ -1,7 +1,7 @@
 import { beforeAll, afterAll, describe, it, jest, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { secs, mins, sleep, timed } from "helpers/src/time";
-import { K8s, kind } from "kubernetes-fluent-client";
+import { mins, timed } from "helpers/src/time";
+import { kind } from "kubernetes-fluent-client";
 import { fullCreate } from "helpers/src/general";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
 const trc = new TestRunCfg(__filename);
@@ -10,7 +10,6 @@ const trc = new TestRunCfg(__filename);
  * The purpose of this test is to demonstrate that the reconcile module
  * correctly processes resources in the order they are received.
  */
-
 
 describe("reconcile.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2));

@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-store
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: observe
+  namespace: hello-pepr-store
+data: {}

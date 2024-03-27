@@ -15,7 +15,7 @@
   "pepr": {
     "uuid": "57067ccd-e94d-416f-a1c5-d57d983f3172",
     "onError": "reject",
-    "webhookTimeout": 20,
+    "webhookTimeout": 30,
     "alwaysIgnore": {
       "namespaces": [],
       "labels": []

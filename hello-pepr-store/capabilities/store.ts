@@ -1,5 +1,6 @@
 import { Capability, a, Log } from "pepr";
-import { untilTrue } from "helpers/src/general"
+import { untilTrue } from "helpers/src/general";
+import { sleep } from "helpers/src/time";
 
 const name = "hello-pepr-store";
 
@@ -10,28 +11,69 @@ export const HelloPeprStore = new Capability({
 });
 const { When, Store } = HelloPeprStore;
 
+const found = key => () => Promise.resolve(!!Store.getItem(key))
+const gone = key => () => Promise.resolve(!Store.getItem(key))
+
+Store.onReady(async () => {
+  const [key, val] = ["onReady", "yep"]
+
+  await Store.setItemAndWait(key, val)
+  let value = Store.getItem(key)
+  Log.info({key, value}, "onReady")
+
+  Store.clear()
+  await untilTrue(gone(key))
+  value = Store.getItem(key)
+  Log.info({key, value}, "onReady")
+})
+
 When(a.ConfigMap)
   .IsCreated()
-  .InNamespace(name)
-  .WithName("setter")
-  .Validate(async function validateSetter(request) {
-    const alphabet = request.Raw.data.alphabet
-    await Store.setItemAndWait("alphabet", alphabet)
-    return request.Approve()
+  .WithName("async")
+  .Mutate(async function asyncMutate() {
+    const [key, val] = ["async", "yep"]
+
+    Store.setItem(key, val)
+    await untilTrue(found(key))
+    Log.info({ key, val}, "setItem")
+
+    const value = Store.getItem(key)
+    Log.info({ key, value }, "getItem")
+
+    Store.removeItem(key)
+    await untilTrue(gone(key))
+    Log.info({ key }, "removeItem")
   });
 
 When(a.ConfigMap)
   .IsCreated()
-  .InNamespace(name)
-  .WithName("getter")
-  .Mutate(async function mutateGetter(request) {
-    let alphabet
-    const found = () => {
-      alphabet = Store.getItem("alphabet")
-      return Promise.resolve(Boolean(alphabet))
-    }
-    await untilTrue(found)
+  .WithName("sync")
+  .Mutate(async function syncMutate() {
+    const [key, val] = ["sync", "yep"]
 
-    request.Raw.data.alphabet = alphabet
-    Log.info({alphabet}, "alphabet copied")
+    await Store.setItemAndWait(key, val)
+    Log.info({ key, val}, "setItemAndWait")
+
+    const value = Store.getItem(key)
+    Log.info({ key, value }, "getItem")
+
+    await Store.removeItemAndWait(key)
+    Log.info({ key }, "removeItemAndWait")
+  });
+
+When(a.ConfigMap)
+  .IsCreated()
+  .WithName("observe")
+  .Mutate(async function observeMutate() {
+    const updates = []
+    const unsubscribe = Store.subscribe(data => updates.push(data))
+
+    Store.setItem("a", "1")
+    Store.setItem("b", "2")
+    Store.setItem("c", "3")
+    await Store.setItemAndWait("observed", "yay")
+
+    unsubscribe()
+
+    Log.info({updates}, "observed")
   });

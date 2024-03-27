@@ -14,9 +14,9 @@ function sift(stdout) {
     .filter(l => l.url !== "/healthz")
     .filter(l => l.msg !== "Pepr Store update")
     .filter(l => l.name !== "/kube-root-ca.crt")
-  
-  parsed.sort((l, r) => l.time > r.time ? 1 : -1)
-    
+
+  parsed.sort((l, r) => l.time - r.time)
+
   return parsed.map(l => JSON.stringify(l))
 }
 

@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-watch
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: one
+  namespace: hello-pepr-watch
+data:
+  name: b25l  # one
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: two
+  namespace: hello-pepr-watch
+data:
+  name: dHdv  # two
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: three
+  namespace: hello-pepr-watch
+data:
+  name: dGhyZWU=  # three
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: four
+  namespace: hello-pepr-watch
+data:
+  name: Zm91cg==  # four
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: five
+  namespace: hello-pepr-watch
+data:
+  name: Zml2ZQ==  # five

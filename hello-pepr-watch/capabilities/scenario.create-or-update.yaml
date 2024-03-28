@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-watch
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: new
+  namespace: hello-pepr-watch
+data:
+  name: bmV3Cg==  # new
+

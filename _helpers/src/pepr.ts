@@ -82,6 +82,7 @@ export async function moduleBuild({version = "", verbose = false} = {}) {
 }
 
 export async function moduleUp({version = "", verbose = false} = {}) {
+  let cmd: string = "";
   // can't have await expressions in default args, so gotta do it here
   if (version === ""){ version = await peprVersion()}
 
@@ -92,7 +93,12 @@ export async function moduleUp({version = "", verbose = false} = {}) {
 
   await moduleBuild({version, verbose})
 
-  let cmd = `npx --yes pepr@${version} deploy --confirm`
+  if (process.env.IMAGE) {
+    cmd = `npx --yes pepr@${version} deploy --image=${process.env.IMAGE}--confirm`
+  } else {
+    cmd = `npx --yes pepr@${version} deploy --confirm`
+  }
+
   console.time(cmd)
   const deploy = await new Cmd({env: pepr, cmd}).run()
   if (verbose) { console.log(deploy) }

@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pepr-demo
+---
+apiVersion: v1
+data:
+  name: b25l
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: one
+  namespace: pepr-demo
+---
+apiVersion: v1
+data:
+  name: dHdv
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: two
+  namespace: pepr-demo
+---
+apiVersion: v1
+data:
+  name: dGhyZWU=
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: three
+  namespace: pepr-demo
+---
+apiVersion: v1
+data:
+  name: Zm91cg==
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: four
+  namespace: pepr-demo
+---
+apiVersion: v1
+data:
+  name: Zml2ZQ==
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: five
+  namespace: pepr-demo

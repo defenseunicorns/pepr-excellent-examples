@@ -94,7 +94,7 @@ export async function moduleUp({version = "", verbose = false} = {}) {
   await moduleBuild({version, verbose})
 
   if (process.env.IMAGE) {
-    cmd = `npx --yes pepr@${version} deploy --image=${process.env.IMAGE}--confirm`
+    cmd = `npx --yes pepr@${version} deploy --image=${process.env.IMAGE} --confirm`
   } else {
     cmd = `npx --yes pepr@${version} deploy --confirm`
   }

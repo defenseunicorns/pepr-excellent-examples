@@ -10,10 +10,10 @@ const trc = new TestRunCfg(__filename);
 
 describe("reconcile.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2));
-  // afterAll(async () => {
-  //   await moduleDown()
-  //   await clean(trc)
-  // }, mins(2))
+  afterAll(async () => {
+    await moduleDown()
+    await clean(trc)
+  }, mins(2))
 
   describe("tests reconcile module", () => {
     let logz: string[]

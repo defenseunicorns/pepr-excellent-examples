@@ -4,7 +4,7 @@ import { mins, secs } from "helpers/src/time";
 import { fullCreate } from "helpers/src/general";
 import { K8s, kind } from "kubernetes-fluent-client";
 import { clean } from "helpers/src/cluster";
-import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
+import { moduleUp, moduleDown, untilLogged } from "helpers/src/pepr";
 
 const trc = new TestRunCfg(__filename);
 
@@ -19,76 +19,45 @@ describe("watch.ts", () => {
     const file = `${trc.root()}/capabilities/scenario.create.yaml`;
     const resources = await trc.load(file);
     await fullCreate(resources, kind);
-    await untilLogged("Observed creation of five");
 
-    const logz = await logs();
-
-    const results = logz.filter(l => l.includes("Observed creation of"));
-    expect(results).toEqual(expect.arrayContaining([
-      expect.stringContaining("one"),
-      expect.stringContaining("two"),
-      expect.stringContaining("three"),
-      expect.stringContaining("four"),
-      expect.stringContaining("five"),
-    ]));
+    // no direct assertion -- test succeeds when message is logged
+    await untilLogged("Watched create-me: create");
   }, secs(10));
 
   it("watches resource create-or-updates", async () => {
     const file = `${trc.root()}/capabilities/scenario.create-or-update.yaml`;
     const resources = await trc.load(file);
     await fullCreate(resources, kind);
-    await updateSecret("two");
-    await untilLogged("Observed MODIFIED of");
+    await untilLogged("Watched create-or-update-me: ADDED");
 
-    const logz = await logs();
-    const observed = logz.filter(l => l.includes("Observed"));
+    const update = {...resources.at(-1), stringData: { k: "v" }};
+    await K8s(kind.Secret).Apply(update);
 
-    expect(observed).toEqual(expect.arrayContaining([
-      expect.stringContaining("Observed ADDED of new"),
-      expect.stringContaining("Observed MODIFIED of two")
-    ]));
+    // no direct assertion -- test succeeds when message is logged
+    await untilLogged("Watched create-or-update-me: MODIFIED");
   }, secs(10));
 
   it("watches resource updates", async () => {
-    await updateSecret("three");
-    await untilLogged("Observed update of three");
+    const file = `${trc.root()}/capabilities/scenario.update.yaml`;
+    const resources = await trc.load(file);
+    await fullCreate(resources, kind);
 
-    const logz = await logs();
+    const update = {...resources.at(-1), stringData: { k: "v" }};
+    await K8s(kind.Secret).Apply(update);
 
-    expect(logz).toEqual(expect.arrayContaining([
-      expect.stringContaining("Observed update of two"),
-      expect.stringContaining("Observed update of three")
-    ]));
+    // no direct assertion -- test succeeds when message is logged
+    await untilLogged("Watched update-me: update");
   }, secs(10));
 
   it("watches resource deletes", async () => {
-    await deleteSecret("four", "hello-pepr-watch");
-    await untilLogged("Observed deletion of four");
+    const file = `${trc.root()}/capabilities/scenario.delete.yaml`;
+    const resources = await trc.load(file);
+    await fullCreate(resources, kind);
 
-    const logz = await logs();
+    const { namespace, name } = resources.at(-1).metadata;
+    await K8s(kind.Secret).InNamespace(namespace).Delete(name);
 
-    expect(logz).toEqual(expect.arrayContaining([
-      expect.stringContaining("Observed deletion of four")
-    ]));
+    // no direct assertion -- test succeeds when message is logged
+    await untilLogged("Watched delete-me: delete");
   }, secs(10));
 });
-
-const updateSecret = async (name: string) => {
-  await K8s(kind.Secret).Apply(
-    {
-      metadata: {
-        name: name,
-        namespace: "hello-pepr-watch",
-      },
-      type: "Opaque",
-      data: {
-        name: Buffer.from(`${name}-updated`).toString("base64"),
-      },
-    },
-    { force: true },
-  );
-};
-
-const deleteSecret = async (name: string, namespace: string) => {
-  await K8s(kind.Secret).InNamespace(namespace).Delete(name);
-};

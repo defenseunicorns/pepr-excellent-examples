@@ -8,6 +8,6 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: create-or-update-me
+  name: update-me
   namespace: hello-pepr-watch
 stringData: {}

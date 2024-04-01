@@ -12,10 +12,15 @@ const { When } = HelloPeprValidate;
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
-  .Validate(function validateAll(request) {
-    const name = request.Raw.metadata.name;
-    if (name === "kube-root-ca.crt") { return request.Approve() }
+  .WithName("yay")
+  .Validate(function createYay(request) {
+    return request.Approve()
+  });
 
-    const pass = request.Raw.data?.pass;
-    return pass === "yep" ? request.Approve() : request.Deny(name)
+  When(a.ConfigMap)
+  .IsCreated()
+  .InNamespace(name)
+  .WithName("oof")
+  .Validate(function createOof(request) {
+    return request.Deny()
   });

@@ -23,8 +23,6 @@ const trc = new TestRunCfg(__filename)
 describe("store.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2))
 
-  // afterEach(async () => await clean(trc), mins(5))
-
   afterAll(async () => {
     await moduleDown()
     await clean(trc)

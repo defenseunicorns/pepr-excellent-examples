@@ -44,7 +44,7 @@ const test = program.command('test')
     )
   )
   .action(async ({suite, passthru, image}) => {
-    if(image) { process.env.IMAGE = image }
+    if (image) { process.env.PEPR_IMAGE = image }
     passthru = passthru || []
     switch (suite) {
       case 'unit':  testUnit(passthru)      ; break

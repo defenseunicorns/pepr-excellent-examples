@@ -20,7 +20,7 @@ export async function up(name: string = 'pexex-helpers-cluster'): Promise<string
 
   if (process.env.PEPR_IMAGE) {
     const inject = await new Cmd({
-      cmd: `k3d image import ${process.env.IMAGE} -c ${name}`,
+      cmd: `k3d image import ${process.env.PEPR_IMAGE} -c ${name}`,
     }).run()
     if (inject.exitcode > 0) { throw inject }
   }

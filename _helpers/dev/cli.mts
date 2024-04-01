@@ -33,11 +33,18 @@ const test = program.command('test')
   )
   .addOption(
     new Option(
+      "-i, --image <image>",
+      "pepr controller image to use. (e.g. --image=\"pepr:dev\")",
+    ),
+  )
+  .addOption(
+    new Option(
       '-p, --passthru [passthru...]',
       'args to pass to test runner (e.g. --passthru=\'--testNamePattern="testName()"\')'
     )
   )
-  .action(async ({suite, passthru}) => {
+  .action(async ({suite, passthru, image}) => {
+    if (image) { process.env.PEPR_IMAGE = image }
     passthru = passthru || []
     switch (suite) {
       case 'unit':  testUnit(passthru)      ; break

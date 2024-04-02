@@ -170,5 +170,22 @@ export async function moduleDown() {
   }
   console.timeEnd(msg)
 
+  msg = "remove pepr webhooks"
+  console.time(msg)
+  try {
+    const name = `pepr-${cfg.pepr.uuid}`
+    const peprVal = await K8s(kind.ValidatingWebhookConfiguration).Get(name)
+    await K8s(kind.ValidatingWebhookConfiguration).Delete(name)
+    await untilTrue(() => gone(kind.ValidatingWebhookConfiguration, peprVal))
+
+    const peprMut = await K8s(kind.MutatingWebhookConfiguration).Get(name)
+    await K8s(kind.MutatingWebhookConfiguration).Delete(name)
+    await untilTrue(() => gone(kind.MutatingWebhookConfiguration, peprMut))
+
+  } catch (e) {
+    if ( ![404].includes(e.status) ) { throw e }
+  }
+  console.timeEnd(msg)
+
   console.timeEnd(summary)
 }

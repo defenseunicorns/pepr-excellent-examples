@@ -8,7 +8,7 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: create-yay
+  name: update-yay
   namespace: hello-pepr-validate
 stringData: {}
 
@@ -16,6 +16,6 @@ stringData: {}
 apiVersion: v1
 kind: Secret
 metadata:
-  name: create-oof
+  name: update-oof
   namespace: hello-pepr-validate
 stringData: {}

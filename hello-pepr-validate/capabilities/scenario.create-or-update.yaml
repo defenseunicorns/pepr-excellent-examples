@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-validate
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cou-create-yay
+  namespace: hello-pepr-validate
+stringData: {}
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cou-create-oof
+  namespace: hello-pepr-validate
+stringData:
+  failWhen: CREATE
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cou-update-yay
+  namespace: hello-pepr-validate
+stringData: {}
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cou-update-oof
+  namespace: hello-pepr-validate
+stringData:
+  failWhen: UPDATE

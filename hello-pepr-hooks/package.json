@@ -19,7 +19,9 @@
     "customLabels": {},
     "alwaysIgnore": {},
     "includedFiles": [],
-    "env": {}
+    "env": {
+      "LOG_LEVEL": "debug"
+    }
   },
   "dependencies": {
     "dotenv": "^16.3.1",

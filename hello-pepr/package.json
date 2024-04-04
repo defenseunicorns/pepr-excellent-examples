@@ -22,7 +22,8 @@
     "includedFiles": []
   },
   "scripts": {
-    "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system"
+    "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system",
+    "test:e2e": "echo 'noop'"
   },
   "dependencies": {
     "pepr": "^0.28.4"

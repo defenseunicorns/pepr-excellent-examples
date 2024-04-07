@@ -1,8 +1,9 @@
-import { K8s, Log } from "pepr";
+import { K8s, Log, sdk } from "pepr";
 
 import Deploy from "./controller/generators";
-import { Phase, Status, WebApp } from "./crd";
+import { Phase, Status, WebApp } from "./crd/generated/webapp-v1alpha1";
 
+const { writeEvent } = sdk;
 /**
  * The reconciler is called from the queue and is responsible for reconciling the state of the instance
  * with the cluster. This includes creating the namespace, network policies and virtual services.
@@ -38,6 +39,8 @@ export async function reconciler(instance: WebApp) {
       phase: Phase.Ready,
       observedGeneration: instance.metadata.generation,
     });
+    await writeEvent(po.Raw, {message: `HIIIII it's me ${po.Raw.metadata.name}`}, "Normal", "PodCreatedOrUpdated", po.Raw.metadata.name, po.Raw.metadata.name);
+    await writeEvent(instance, {phase: Phase.Ready}
   } catch (e) {
     Log.error(e, `Error configuring for ${namespace}/${name}`);
     void updateStatus(instance, {
@@ -54,6 +57,7 @@ export async function reconciler(instance: WebApp) {
  * @param status The new status
  */
 async function updateStatus(instance: WebApp, status: Status) {
+  await writeEvent(instance, {phase: status}, "Normal", "StatusUpdated", instance.metadata.name, instance.metadata.name);
   await K8s(WebApp).PatchStatus({
     metadata: {
       name: instance.metadata!.name,

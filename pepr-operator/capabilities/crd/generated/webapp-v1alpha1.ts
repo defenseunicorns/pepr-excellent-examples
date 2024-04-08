@@ -8,16 +8,31 @@ export class WebApp extends a.GenericKind {
 }
 
 export interface Spec {
+  /**
+   * Language defines the language of the web application, either English (en) or Spanish (es).
+   */
   language: Language;
+  /**
+   * Replicas is the number of desired replicas.
+   */
   replicas: number;
+  /**
+   * Theme defines the theme of the web application, either dark or light.
+   */
   theme: Theme;
 }
 
+/**
+ * Language defines the language of the web application, either English (en) or Spanish (es).
+ */
 export enum Language {
   En = "en",
   Es = "es",
 }
 
+/**
+ * Theme defines the theme of the web application, either dark or light.
+ */
 export enum Theme {
   Dark = "dark",
   Light = "light",

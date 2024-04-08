@@ -1,5 +1,5 @@
 import { Capability, a, Log } from "pepr";
-import { WebApp } from "./crd";
+import { WebApp } from "./crd/generated/webapp-v1alpha1";
 import { validator } from "./crd/validator";
 import { WebAppCRD } from "./crd/source/webapp.crd";
 import { RegisterCRD } from "./crd/register";

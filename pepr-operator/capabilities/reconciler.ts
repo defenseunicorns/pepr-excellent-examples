@@ -1,7 +1,9 @@
-import { K8s, Log } from "pepr";
+import { K8s, Log, sdk } from "pepr";
 
 import Deploy from "./controller/generators";
-import { Phase, Status, WebApp } from "./crd";
+import { Phase, Status, WebApp } from "./crd/generated/webapp-v1alpha1";
+
+const { writeEvent } = sdk;
 
 /**
  * The reconciler is called from the queue and is responsible for reconciling the state of the instance
@@ -54,6 +56,14 @@ export async function reconciler(instance: WebApp) {
  * @param status The new status
  */
 async function updateStatus(instance: WebApp, status: Status) {
+  await writeEvent(
+    instance,
+    { message: status.phase },
+    "Normal",
+    "InstanceCreatedOrUpdated",
+    instance.metadata.name,
+    instance.metadata.name,
+  );
   await K8s(WebApp).PatchStatus({
     metadata: {
       name: instance.metadata!.name,

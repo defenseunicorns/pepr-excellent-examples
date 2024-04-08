@@ -1,6 +1,6 @@
 import { PeprValidateRequest } from "pepr";
 
-import { WebApp } from ".";
+import { WebApp } from "./generated/webapp-v1alpha1";
 
 const invalidNamespaces = [
   "kube-system",

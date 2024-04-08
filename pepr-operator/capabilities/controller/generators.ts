@@ -1,6 +1,7 @@
-import { kind, K8s, Log } from "pepr";
-import { getOwnerRef } from "../crd";
+import { kind, K8s, Log, sdk } from "pepr";
 import { WebApp } from "../crd/generated/webapp-v1alpha1";
+
+const { getOwnerRefFrom } = sdk;
 
 export default async function Deploy(instance: WebApp) {
   try {
@@ -26,7 +27,7 @@ function deployment(instance: WebApp) {
     apiVersion: "apps/v1",
     kind: "Deployment",
     metadata: {
-      ownerReferences: getOwnerRef(instance),
+      ownerReferences: getOwnerRefFrom(instance),
       name,
       namespace,
       labels: {
@@ -42,7 +43,7 @@ function deployment(instance: WebApp) {
       },
       template: {
         metadata: {
-          ownerReferences: getOwnerRef(instance),
+          ownerReferences: getOwnerRefFrom(instance),
           annotations: {
             buildTimestamp: `${Date.now()}`,
           },
@@ -88,7 +89,7 @@ function service(instance: WebApp) {
     apiVersion: "v1",
     kind: "Service",
     metadata: {
-      ownerReferences: getOwnerRef(instance),
+      ownerReferences: getOwnerRefFrom(instance),
       name,
       namespace,
       labels: {
@@ -318,7 +319,7 @@ function configmap(instance: WebApp) {
     apiVersion: "v1",
     kind: "ConfigMap",
     metadata: {
-      ownerReferences: getOwnerRef(instance),
+      ownerReferences: getOwnerRefFrom(instance),
       name: `web-content-${name}`,
       namespace,
       labels: {

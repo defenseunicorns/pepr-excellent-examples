@@ -10,17 +10,6 @@ If any object deployed by the Operator is deleted for any reason, other than thr
 
 _Create an ephemeral cluster. (Kind or k3d will work)_
 
-Make sure Pepr is update to date
-
-```bash
-npx pepr update
-```
-
-Build the Pepr manifests
-
-```bash
-npx pepr build
-```
 
 Deploy the Operator 
 
@@ -105,6 +94,37 @@ kubectl get wa webapp-light-en -n webapps -ojsonpath="{.status}" | jq
   "observedGeneration": 1,
   "phase": "Ready"
 }
+```
+
+Describe the WebApp
+
+```bash
+kubectl  describe wa webapp-light-en -n webapps
+
+# output
+Name:         webapp-light-en
+Namespace:    webapps
+Labels:       <none>
+Annotations:  <none>
+API Version:  pepr.io/v1alpha1
+Kind:         WebApp
+Metadata:
+  Creation Timestamp:  2024-04-08T16:02:31Z
+  Generation:          1
+  Resource Version:    1037
+  UID:                 435c3f0a-3002-48ad-a897-c1fe24903c11
+Spec:
+  Language:  en
+  Replicas:  1
+  Theme:     light
+Status:
+  Observed Generation:  1
+  Phase:                Ready
+Events:
+  Type    Reason                    Age   From             Message
+  ----    ------                    ----  ----             -------
+  Normal  InstanceCreatedOrUpdated  27s   webapp-light-en  Pending
+  Normal  InstanceCreatedOrUpdated  27s   webapp-light-en  Ready
 ```
 
 Port-forward and look at the WebApp in the browser

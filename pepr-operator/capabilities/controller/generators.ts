@@ -1,8 +1,20 @@
-import { kind, K8s, Log, sdk } from "pepr";
+import { kind, K8s, Log, a } from "pepr";
+import { V1OwnerReference } from "@kubernetes/client-node";
 import { WebApp } from "../crd/generated/webapp-v1alpha1";
 
-const { getOwnerRefFrom } = sdk;
+// const { getOwnerRefFrom } = sdk;
+export function getOwnerRefFrom(cr: a.GenericKind): V1OwnerReference[] {
+  const { name, uid } = cr.metadata!;
 
+  return [
+    {
+      apiVersion: cr.apiVersion!,
+      kind: cr.kind!,
+      uid: uid!,
+      name: name!,
+    },
+  ];
+}
 export default async function Deploy(instance: WebApp) {
   try {
     await Promise.all([

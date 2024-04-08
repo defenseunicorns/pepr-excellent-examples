@@ -1,9 +1,41 @@
-import { K8s, Log, sdk } from "pepr";
+import { K8s, Log, a, kind } from "pepr";
 
 import Deploy from "./controller/generators";
 import { Phase, Status, WebApp } from "./crd/generated/webapp-v1alpha1";
 
-const { writeEvent } = sdk;
+// const { writeEvent } = sdk;
+export async function writeEvent(
+  cr: a.GenericKind,
+  event: Partial<kind.CoreEvent>,
+  eventType: string,
+  eventReason: string,
+  reportingComponent: string,
+  reportingInstance: string,
+) {
+  Log.debug(cr.metadata, `Writing event: ${event.message}`);
+
+  await K8s(kind.CoreEvent).Create({
+    type: eventType,
+    reason: eventReason,
+    ...event,
+    // Fixed values
+    metadata: {
+      namespace: cr.metadata!.namespace,
+      generateName: cr.metadata!.name,
+    },
+    involvedObject: {
+      apiVersion: cr.apiVersion,
+      kind: cr.kind,
+      name: cr.metadata!.name,
+      namespace: cr.metadata!.namespace,
+      uid: cr.metadata!.uid,
+    },
+    firstTimestamp: new Date(),
+    reportingComponent: reportingComponent,
+    reportingInstance: reportingInstance,
+  });
+}
+
 /**
  * The reconciler is called from the queue and is responsible for reconciling the state of the instance
  * with the cluster. This includes creating the namespace, network policies and virtual services.
@@ -39,8 +71,6 @@ export async function reconciler(instance: WebApp) {
       phase: Phase.Ready,
       observedGeneration: instance.metadata.generation,
     });
-    await writeEvent(po.Raw, {message: `HIIIII it's me ${po.Raw.metadata.name}`}, "Normal", "PodCreatedOrUpdated", po.Raw.metadata.name, po.Raw.metadata.name);
-    await writeEvent(instance, {phase: Phase.Ready}
   } catch (e) {
     Log.error(e, `Error configuring for ${namespace}/${name}`);
     void updateStatus(instance, {
@@ -57,7 +87,14 @@ export async function reconciler(instance: WebApp) {
  * @param status The new status
  */
 async function updateStatus(instance: WebApp, status: Status) {
-  await writeEvent(instance, {phase: status}, "Normal", "StatusUpdated", instance.metadata.name, instance.metadata.name);
+  await writeEvent(
+    instance,
+    { message: status.phase },
+    "Normal",
+    "InstanceCreatedOrUpdated",
+    instance.metadata.name,
+    instance.metadata.name,
+  );
   await K8s(WebApp).PatchStatus({
     metadata: {
       name: instance.metadata!.name,

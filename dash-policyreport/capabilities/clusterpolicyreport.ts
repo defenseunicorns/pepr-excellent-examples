@@ -149,17 +149,16 @@ When(Exemption)
     return request.Approve()
   });
 
-const asExemptedResource = async (request) => {
+const asExemptedResource = async (instance) => {
   const EXEMPTIONS = "exemptions.uds.dev/v1alpha1"
 
   const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
   delete cpr.metadata.managedFields
 
-  const raw = request.Raw
-  const kind = raw.kind
-  const name = raw.metadata.name
-  const nspc = raw.metadata.namespace
-  const exms = raw.metadata.annotations[EXEMPTIONS].split(" ")
+  const kind = instance.kind
+  const name = instance.metadata.name
+  const nspc = instance.metadata.namespace
+  const exms = instance.metadata.annotations[EXEMPTIONS].split(" ")
 
   const res = [ kind, nspc, name ].join(":")
   Log.info({ resources: res, exemptions: exms }, `Exempt: ${res}`)
@@ -190,12 +189,19 @@ const asExemptedResource = async (request) => {
       : cpr.results.splice(idx, 1, result)
   }
 
+  var failures = 0
+  for (const result of cpr.results) {
+    for (const resource of result.resources) {
+      failures++
+    }
+  }
+
   const applied = await K8s(ClusterPolicyReport).Apply(cpr)
   Log.info(applied, "pepr-report updated")
 
-  return request.Approve()
+  return instance.Approve()
 }
 
 const lbl: [string, string] = [ "exemptions.uds.dev",  "v1alpha1" ]
-When(a.Pod).IsCreatedOrUpdated().WithLabel(...lbl).Validate(asExemptedResource)
-When(a.Service).IsCreatedOrUpdated().WithLabel(...lbl).Validate(asExemptedResource)
+When(a.Pod).IsCreatedOrUpdated().WithLabel(...lbl).Reconcile(asExemptedResource)
+When(a.Service).IsCreatedOrUpdated().WithLabel(...lbl).Reconcile(asExemptedResource)

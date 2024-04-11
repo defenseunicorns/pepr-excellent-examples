@@ -43,7 +43,7 @@ describe("ClusterPolicyReport", () => {
     await timed(`load: ${file}`, async () => {
       const resources = await trc.load(file)
       const resources_applied = await apply(resources)
-
+      console.log(await logs())
       await untilLogged('"msg":"pepr-report updated"')
     })
   }, secs(10))
@@ -63,7 +63,7 @@ describe("ClusterPolicyReport", () => {
     await untilTrue(() => gone(ClusterPolicyReport, { metadata: { name: "pepr-report" } }))
   }, secs(30))
 
-  it("has a result for each UDS Exemption policy", async () => {
+  it("has a result for each UDS Exemption policy", async () => {    
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
     const naughty = {

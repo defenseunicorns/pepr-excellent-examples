@@ -9,6 +9,7 @@ import { K8s, kind } from "kubernetes-fluent-client";
 import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1beta1";
 import { UDSExemptionCRD } from "../types/uds-exemption-crd-v1alpha1";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
+import { StatusFilterElement } from "../types/policyreport-v1beta1";
 
 const trc = new TestRunCfg(__filename);
 
@@ -46,6 +47,7 @@ describe("ClusterPolicyReport", () => {
       await untilLogged('"msg":"pepr-report updated"')
     })
   }, secs(10))
+  
 
   afterEach(async () => { await clean(trc) }, mins(3))
 
@@ -68,21 +70,144 @@ describe("ClusterPolicyReport", () => {
       kind: "Pod", namespace: "pexex-clusterpolicyreport", name: "naughty-pod"
     }
 
-    expect(cpr.results).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          policy: "pexex-clusterpolicyreport:allow-naughtiness:Disallow_Privileged",
-          resources: [ naughty ]
-        }),
-        expect.objectContaining({
-          policy: "pexex-clusterpolicyreport:allow-naughtiness:Drop_All_Capabilities",
-          resources: [ naughty ]
-        }),
-        expect.objectContaining({
-          policy: "pexex-clusterpolicyreport:allow-naughtiness:Restrict_Volume_Types",
-          resources: [ naughty ]
-        }),
-      ])
-    )
+    const peprProperties = {
+      exemptions: [
+        {
+          apiVersion: "v1alpha1",
+          kind: "UDSExemption",
+          namespace: "pexex-clusterpolicyreport",
+          name: "allow-naughtiness"
+        },
+      ]
+    }
+
+    const naughtyPod = {
+      "kind": "Pod",
+      "name": "naughty-pod",
+      "namespace": "pexex-clusterpolicyreport",
+      "apiVersion": "v1",
+    }
+
+    expect(cpr).toMatchObject(({
+      apiVersion: "wgpolicyk8s.io/v1beta1",
+      kind: "ClusterPolicyReport",
+      metadata: {
+        name: "pepr-report",
+        labels: { "policy.kubernetes.io/engine": "pepr" },
+        annotations: {
+          "uds-core.pepr.dev/uds-core-policies": "exemptions"
+        }
+      },
+      summary: {
+        pass: 0, // <-- no exemptions
+        fail: 3, // <-- with exemptions
+        warn: 0, 
+        error: 0,
+        skip: 0,
+      },
+      results: [
+        {
+          policy: "DisallowHostNamespaces",
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {},
+        },
+        {
+          policy: "DisallowNodePortServices",
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {},
+        },
+        {
+          policy: "DisallowPrivileged",
+          result: StatusFilterElement.Pass,
+          resources: [naughtyPod],
+          properties: { peprProperties },
+        },
+        {
+          policy: "DisallowSELinuxOptions",
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {},
+        },
+        {
+          policy: "DropAllCapabilities",
+          result: StatusFilterElement.Pass,
+          resources: [naughtyPod],
+          properties: {peprProperties},
+        },
+        {
+          policy: "RequireNonRootUser",
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {},
+        },
+        {
+          policy: "RestrictCapabilities",
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {},
+        },
+        {
+          policy: "RestrictExternalNames",
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {},
+        },
+        {
+          policy: "RestrictHostPathWrite",
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {},
+        },
+        {
+          policy: "RestrictHostPorts",
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {},
+        },
+        {
+          policy: "RestrictProcMount",
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {},
+        },
+        {
+          policy: "RestrictSELinuxType",
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {},
+        },
+        {
+          policy: "RestrictSeccomp",
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {},
+        },
+        {
+          policy: "RestrictVolumeTypes",
+          result: StatusFilterElement.Pass,
+          resources: [naughtyPod],
+          properties: { peprProperties },
+        },
+      ]
+    }))
+
+    // expect(cpr.results).toEqual(
+    //   expect.arrayContaining([
+    //     expect.objectContaining({
+    //       policy: "pexex-clusterpolicyreport:allow-naughtiness:Disallow_Privileged",
+    //       resources: [ naughty ]
+    //     }),
+    //     expect.objectContaining({
+    //       policy: "pexex-clusterpolicyreport:allow-naughtiness:Drop_All_Capabilities",
+    //       resources: [ naughty ]
+    //     }),
+    //     expect.objectContaining({
+    //       policy: "pexex-clusterpolicyreport:allow-naughtiness:Restrict_Volume_Types",
+    //       resources: [ naughty ]
+    //     }),
+    //   ])
+    // )
   }, secs(10))
 });

@@ -39,9 +39,9 @@ metadata:
     exemptions.uds.dev: v1alpha1
   annotations:
     exemptions.uds.dev/v1alpha1: >-
-      pexex-clusterpolicyreport:allow-naughtiness:Disallow_Privileged
-      pexex-clusterpolicyreport:allow-naughtiness:Drop_All_Capabilities
-      pexex-clusterpolicyreport:allow-naughtiness:Restrict_Volume_Types
+      pexex-clusterpolicyreport:allow-naughtiness:DisallowPrivileged
+      pexex-clusterpolicyreport:allow-naughtiness:DropAllCapabilities
+      pexex-clusterpolicyreport:allow-naughtiness:RestrictVolumeTypes
 spec:
   containers:
     - name: busybox

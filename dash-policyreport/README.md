@@ -19,3 +19,9 @@ Module Root
     ├── example-three.ts
     └── example-two.ts
 ```
+
+## Run specific test
+
+```bash
+npm run test:e2e -- --passthru='--testNamePattern="testPattern"'
+```

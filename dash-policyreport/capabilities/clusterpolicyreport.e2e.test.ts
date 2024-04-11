@@ -68,17 +68,6 @@ describe("ClusterPolicyReport", () => {
 
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
-    const properties = {
-      exemptions: [
-        {
-          apiVersion: "uds.dev/v1alpha1",
-          kind: "Exemption",
-          namespace: "pexex-clusterpolicyreport",
-          name: "allow-naughtiness"
-        },
-      ]
-    }
-
     const naughty = {
       "apiVersion": "v1",
       "kind": "Pod",
@@ -120,7 +109,7 @@ describe("ClusterPolicyReport", () => {
           policy: "DisallowPrivileged",
           result: StatusFilterElement.Fail,
           resources: [naughty],
-          properties
+          properties: { "pexex-clusterpolicyreport:allow-naughtiness": "" }
         },
         {
           policy: "DisallowSELinuxOptions",
@@ -132,7 +121,7 @@ describe("ClusterPolicyReport", () => {
           policy: "DropAllCapabilities",
           result: StatusFilterElement.Fail,
           resources: [naughty],
-          properties
+          properties: { "pexex-clusterpolicyreport:allow-naughtiness": "" }
         },
         {
           policy: "RequireNonRootUser",
@@ -186,7 +175,7 @@ describe("ClusterPolicyReport", () => {
           policy: "RestrictVolumeTypes",
           result: StatusFilterElement.Fail,
           resources: [naughty],
-          properties
+          properties: { "pexex-clusterpolicyreport:allow-naughtiness": "" }
         },
       ]
     }))

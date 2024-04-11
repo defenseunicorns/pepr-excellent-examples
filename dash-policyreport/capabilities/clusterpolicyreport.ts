@@ -151,7 +151,7 @@ When(Exemption)
   });
 
 const asExemptedResource = async (instance) => {
-  const EXEMPTIONS = "exemptions.uds.dev/v1alpha1"
+  const LABEL = "exemptions.uds.dev/v1alpha1"
 
   const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
   delete cpr.metadata.managedFields
@@ -160,27 +160,18 @@ const asExemptedResource = async (instance) => {
   const kind = instance.kind
   const name = instance.metadata.name
   const nspc = instance.metadata.namespace
-  const exms = instance.metadata.annotations[EXEMPTIONS].split(" ")
+  const exms = instance.metadata.annotations[LABEL].split(" ")
 
   const res = [ kind, nspc, name ].join(":")
   Log.info({ resources: res, exemptions: exms }, `Exempt: ${res}`)
 
-  // const properties = {
-  //   exemptions: [
-  //     {
-  //       apiVersion: "uds.dev/v1alpha1",
-  //       kind: "Exemption",
-  //       namespace: "pexex-clusterpolicyreport",
-  //       name: "allow-naughtiness"
-  //     },
-  //   ]
-  // }
-
   // include exempted resources under relevant policies
   for (const exm of exms) {
 
-    // pull exemption/policy from exemption label
-    const [exNpsc, exName, pol] = exm.split(":")
+    // pull exemption locator & policy from exemption label
+    const split = exm.split(":")
+    const pol = split.pop()
+    const exemp = split.join(":")
 
     // locate / create result element
     const results = cpr.results.filter(r => r.policy === pol)
@@ -189,8 +180,12 @@ const asExemptedResource = async (instance) => {
       : {
         policy: pol,
         result: StatusFilterElement.Pass,
-        resources: []
+        resources: [],
+        properties: {}
       }
+
+    // add policy-owning exemption ref to properties
+    result.properties[exemp] = ""
 
     // locate / create resources element
     let found = result.resources.filter(r => (

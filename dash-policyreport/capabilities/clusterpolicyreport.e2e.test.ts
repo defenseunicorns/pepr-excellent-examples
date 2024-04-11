@@ -63,29 +63,27 @@ describe("ClusterPolicyReport", () => {
     await untilTrue(() => gone(ClusterPolicyReport, { metadata: { name: "pepr-report" } }))
   }, secs(30))
 
-  it("has a result for each UDS Exemption policy", async () => {    
+  it("has a result for each UDS Exemption policy", async () => {
+    console.log(await logs())
+
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
-    const naughty = {
-      kind: "Pod", namespace: "pexex-clusterpolicyreport", name: "naughty-pod"
-    }
-
-    const peprProperties = {
+    const properties = {
       exemptions: [
         {
-          apiVersion: "v1alpha1",
-          kind: "UDSExemption",
+          apiVersion: "uds.dev/v1alpha1",
+          kind: "Exemption",
           namespace: "pexex-clusterpolicyreport",
           name: "allow-naughtiness"
         },
       ]
     }
 
-    const naughtyPod = {
-      "kind": "Pod",
-      "name": "naughty-pod",
-      "namespace": "pexex-clusterpolicyreport",
+    const naughty = {
       "apiVersion": "v1",
+      "kind": "Pod",
+      "namespace": "pexex-clusterpolicyreport",
+      "name": "naughty-pod",
     }
 
     expect(cpr).toMatchObject(({
@@ -99,8 +97,8 @@ describe("ClusterPolicyReport", () => {
         }
       },
       summary: {
-        pass: 0, // <-- no exemptions
-        fail: 3, // <-- with exemptions
+        pass: 11,
+        fail: 3,
         warn: 0, 
         error: 0,
         skip: 0,
@@ -120,9 +118,9 @@ describe("ClusterPolicyReport", () => {
         },
         {
           policy: "DisallowPrivileged",
-          result: StatusFilterElement.Pass,
-          resources: [naughtyPod],
-          properties: { peprProperties },
+          result: StatusFilterElement.Fail,
+          resources: [naughty],
+          properties
         },
         {
           policy: "DisallowSELinuxOptions",
@@ -132,9 +130,9 @@ describe("ClusterPolicyReport", () => {
         },
         {
           policy: "DropAllCapabilities",
-          result: StatusFilterElement.Pass,
-          resources: [naughtyPod],
-          properties: {peprProperties},
+          result: StatusFilterElement.Fail,
+          resources: [naughty],
+          properties
         },
         {
           policy: "RequireNonRootUser",
@@ -186,28 +184,11 @@ describe("ClusterPolicyReport", () => {
         },
         {
           policy: "RestrictVolumeTypes",
-          result: StatusFilterElement.Pass,
-          resources: [naughtyPod],
-          properties: { peprProperties },
+          result: StatusFilterElement.Fail,
+          resources: [naughty],
+          properties
         },
       ]
     }))
-
-    // expect(cpr.results).toEqual(
-    //   expect.arrayContaining([
-    //     expect.objectContaining({
-    //       policy: "pexex-clusterpolicyreport:allow-naughtiness:Disallow_Privileged",
-    //       resources: [ naughty ]
-    //     }),
-    //     expect.objectContaining({
-    //       policy: "pexex-clusterpolicyreport:allow-naughtiness:Drop_All_Capabilities",
-    //       resources: [ naughty ]
-    //     }),
-    //     expect.objectContaining({
-    //       policy: "pexex-clusterpolicyreport:allow-naughtiness:Restrict_Volume_Types",
-    //       resources: [ naughty ]
-    //     }),
-    //   ])
-    // )
   }, secs(10))
 });

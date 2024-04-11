@@ -47,3 +47,10 @@ spec:
     - name: busybox
       image: busybox:latest
       command: ['sh', '-c', 'sleep infinity']
+
+# TODO
+# - Add another exemption annotation that covers the same, existing Pod
+# - Add another Pod covered by exemptions
+# - Add another non-Exempted Pod
+# - Add an Exempted Service, etc.
+# - Make sure the Policy Capability registers listening for all types (not just Pod, Service)

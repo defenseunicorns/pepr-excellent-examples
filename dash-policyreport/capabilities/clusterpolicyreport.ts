@@ -1,6 +1,7 @@
 import { a, Capability, K8s, Log } from "pepr";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
 import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1beta1";
+import { StatusFilterElement } from "../types/policyreport-v1beta1";
 
 export const PeprReport = new Capability({
   name: "pepr-report",
@@ -8,21 +9,123 @@ export const PeprReport = new Capability({
   namespaces: [],
 });
 
-const empty: ClusterPolicyReport = {
-  apiVersion: "wgpolicyk8s.io/v1beta1",
-  kind: "ClusterPolicyReport",
-  metadata: {
-    name: "pepr-report",
+const empty: ClusterPolicyReport = {apiVersion: "wgpolicyk8s.io/v1beta1",
+kind: "ClusterPolicyReport",
+metadata: {
+  name: "pepr-report",
+  labels: "policy.kubernetes.io/engine: pepr",
+  annotations: {
+    "uds-core.pepr.dev/uds-core-policies": "exemptions"
+  }
+},
+summary: {
+  pass: 0, // <-- no exemptions
+  fail: 0,
+  warn: 0, // <-- with exemptions
+  error: 0,
+  skip: 0,
+},
+results: [
+  {
+    policy: "DisallowHostNamespaces",
+    result: StatusFilterElement.Pass,
+    resources: [],   
+    properties: {},
+    category: "Pod Security Standards",
+  },  
+  {
+    policy: "DisallowNodePortServices",
+    result: StatusFilterElement.Pass,
+    resources: [],    
+    properties: {},
+    category: "Best Practices",
   },
-  summary: {
-    pass: 0,
-    fail: 0,
-    warn: 0,
-    error: 0,
-    skip: 0,
+  {
+    policy: "DisallowPrivileged",
+    result: StatusFilterElement.Pass,
+    resources: [],
+    properties: {},
+    category: "Pod Security Standards",
+  },  
+  { 
+    policy: "DisallowSELinuxOptions",
+    result: StatusFilterElement.Pass,
+    resources: [],
+    properties: {},
+    category: "Pod Security Standards",
   },
-  results: [],
-};
+  {
+    policy: "DropAllCapabilities",
+    result: StatusFilterElement.Pass,
+    resources: [],
+    properties: {},
+    category: "Pod Security Standards",
+  },
+  {
+    policy: "RequireNonRootUser",
+    result: StatusFilterElement.Pass,
+    resources: [],
+    properties: {},
+    category: "Pod Security Standards",
+  },  
+  {
+    policy: "RestrictCapabilities",
+    result: StatusFilterElement.Pass,
+    resources: [],  
+    properties: {},
+    category: "Pod Security Standards",
+  },
+  {
+  policy: "RestrictExternalNames",
+    result: StatusFilterElement.Pass,
+    resources: [],
+    properties: {},
+    category: "Vulnerability",
+  },
+  {
+    policy: "RestrictHostPathWrite",
+    result: StatusFilterElement.Pass,
+    resources: [],  
+    properties: {},
+    category: "Best Practices",
+  },  
+  {
+    policy: "RestrictHostPorts",
+    result: StatusFilterElement.Pass,
+    resources: [],    
+    properties: {},
+    category: "Pod Security Standards",
+  },  
+  {
+    policy: "RestrictProcMount",
+    result: StatusFilterElement.Pass,
+    resources: [],   
+    properties: {},
+    category: "Pod Security Standards",
+  },
+  {
+    policy: "RestrictSELinuxType",
+    result: StatusFilterElement.Pass,
+    resources: [],    
+    properties: {},
+    category: "Pod Security Standards",
+  },
+  {
+    policy: "RestrictSeccomp",
+    result: StatusFilterElement.Pass,
+    resources: [],    
+    properties: {},
+    category: "Pod Security Standards",
+  },
+  {
+    policy: "RestrictVolumeTypes",
+    result: StatusFilterElement.Pass,
+    resources: [],    
+    properties: {},
+    category: "Pod Security Standards",
+  },
+],
+};  
 
 const { When } = PeprReport;
 
@@ -73,9 +176,9 @@ const asExemptedResource = async (request) => {
   const exms = raw.metadata.annotations[EXEMPTIONS].split(" ")
 
   const res = [ kind, nspc, name ].join(":")
-  Log.info({ resource: res, exemptions: exms }, `Exempt: ${res}`)
+  Log.info({ resources: res, exemptions: exms }, `Exempt: ${res}`)
 
-  // include exempted resource under relevant policies
+  // include exempted resources under relevant policies
   for (const exm of exms) {
 
     // locate / create result element
@@ -84,7 +187,7 @@ const asExemptedResource = async (request) => {
       ? { ...results[0] }
       : { policy: exm, resources: [] }
 
-    // locate / create resource element
+    // locate / create resources element
     let found = result.resources.filter(r => (
       r.kind === kind &&
       r.namespace === nspc &&

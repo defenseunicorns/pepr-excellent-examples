@@ -204,27 +204,25 @@ describe("ClusterPolicyReport", () => {
     const not_nice = {
       "apiVersion": "v1",
       "kind": "Pod",
-      "namespace": "pexex-clusterpolicyreport",
+      "namespace": "default",
       "name": "not-as-nice-pod",
     }
 
-    expect(cpr).toContain({
-      summary: {
+    expect(cpr.summary).toEqual({
         pass: 10,
         fail: 4,
         warn: 0, 
         error: 0,
         skip: 0,
-      }})
+      })
 
-    expect(cpr).toContain({
-      results: [
+    expect(cpr.results).toContainEqual(
         {
           policy: "DisallowPrivileged",
           result: StatusFilterElement.Fail,
           resources: [naughty, not_nice],
           properties: { "pexex-clusterpolicyreport:allow-naughtiness": "" }
-        }]
-    })
+        }
+    )
   }, secs(120))
 });

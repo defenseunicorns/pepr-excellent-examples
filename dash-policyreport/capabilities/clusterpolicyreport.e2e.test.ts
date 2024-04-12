@@ -62,15 +62,6 @@ describe("ClusterPolicyReport", () => {
   }, secs(30))
 
   it("has a result for each UDS Exemption policy", async () => {
-    const file = `${trc.root()}/capabilities/scenario.basic.yaml`
-
-    await timed(`load: ${file}`, async () => {
-      const resources = await trc.load(file)
-      const resources_applied = await apply(resources)
-      console.log(await logs())
-      await untilLogged('"msg":"pepr-report updated"')
-    }), secs(20)
-
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
     const naughty = {
@@ -186,25 +177,19 @@ describe("ClusterPolicyReport", () => {
     }))
   }, secs(10))
 
+  async function applyFile(path) {
+    await timed(`load: ${path}`, async () => {
+      const resources = await trc.load(path)
+      const resources_applied = await apply(resources)
+      console.log(await logs())
+      await untilLogged('"msg":"pepr-report updated"')
+    }), secs(20)
+  }
+
   it("correctly updates report when a new pod with an existing failing policy is created", async () => {
-   
-    const firstExemptPod = `${trc.root()}/capabilities/scenario.basic.yaml`
-
-    await timed(`load: ${firstExemptPod}`, async () => {
-      const resources = await trc.load(firstExemptPod)
-      const resources_applied = await apply(resources)
-      console.log(await logs())
-      await untilLogged('"msg":"pepr-report updated"')
-    }), secs(20)
-
-    const nextExemptPod = `${trc.root()}/capabilities/scenario.new-exemption-same-pod.yaml`
+    const samePod = `${trc.root()}/capabilities/scenario.new-exemption-same-pod.yaml`
     
-    await timed(`load: ${nextExemptPod}`, async () => {
-      const resources = await trc.load(nextExemptPod)
-      const resources_applied = await apply(resources)
-      console.log(await logs())
-      await untilLogged('"msg":"pepr-report updated"')
-    }), secs(20)
+    await applyFile(samePod)
 
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report") 
     

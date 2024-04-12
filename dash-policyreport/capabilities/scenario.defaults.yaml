@@ -1,0 +1,35 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pexex-clusterpolicyreport
+---
+apiVersion: uds.dev/v1alpha1
+kind: Exemption
+metadata:
+  name: allow-naughtiness
+  namespace: pexex-clusterpolicyreport
+spec: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: naughty-pod
+  namespace: pexex-clusterpolicyreport
+  labels:
+    exemptions.uds.dev: v1alpha1
+  annotations:
+    exemptions.uds.dev/v1alpha1: >-
+      pexex-clusterpolicyreport:allow-naughtiness:DisallowPrivileged
+      pexex-clusterpolicyreport:allow-naughtiness:DropAllCapabilities
+      pexex-clusterpolicyreport:allow-naughtiness:RestrictVolumeTypes
+spec:
+  containers:
+    - name: busybox
+      image: busybox:latest
+      command: ['sh', '-c', 'sleep infinity']
+# resource used to:
+# - trigger create / delete of ClusterPolicyReport resource
+# - report missing / outdated resource exemption annotations
+# resource NOT used to:
+# - add exemption annotations to resources (assumes UDS operator will do that)

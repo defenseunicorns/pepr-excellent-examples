@@ -8,24 +8,6 @@ spec:
     - name: busybox
       image: busybox:latest
       command: ['sh', '-c', 'sleep infinity']
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: naughty-pod
-  namespace: pexex-clusterpolicyreport
-  labels:
-    exemptions.uds.dev: v1alpha1
-  annotations:
-    exemptions.uds.dev/v1alpha1: >-
-      pexex-clusterpolicyreport:allow-naughtiness:DisallowPrivileged
-      pexex-clusterpolicyreport:allow-naughtiness:DropAllCapabilities
-      pexex-clusterpolicyreport:allow-naughtiness:RestrictVolumeTypes
-spec:
-  containers:
-    - name: busybox
-      image: busybox:latest
-      command: ['sh', '-c', 'sleep infinity']
 
 # TODO
 # - Add another exemption annotation that covers the same, existing Pod

@@ -37,17 +37,14 @@ describe("ClusterPolicyReport", () => {
     })
 
     await moduleUp()
-  }, mins(3))
 
-  beforeEach(async () => {
-    const file = `${trc.root()}/capabilities/scenario.basic.yaml`
+    const file = `${trc.root()}/capabilities/scenario.defaults.yaml`
     await timed(`load: ${file}`, async () => {
       const resources = await trc.load(file)
-      const resources_applied = await apply(resources)
-      console.log(await logs())
-      await untilLogged('"msg":"pepr-report updated"')
+      await apply(resources)
     })
-  }, secs(20))
+  }, mins(3))
+
   
 
   afterEach(async () => { await clean(trc) }, mins(3))
@@ -65,7 +62,14 @@ describe("ClusterPolicyReport", () => {
   }, secs(30))
 
   it("has a result for each UDS Exemption policy", async () => {
-    console.log(await logs())
+    const file = `${trc.root()}/capabilities/scenario.basic.yaml`
+
+    await timed(`load: ${file}`, async () => {
+      const resources = await trc.load(file)
+      const resources_applied = await apply(resources)
+      console.log(await logs())
+      await untilLogged('"msg":"pepr-report updated"')
+    }), secs(20)
 
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
 
@@ -182,12 +186,21 @@ describe("ClusterPolicyReport", () => {
     }))
   }, secs(10))
 
-  it("correctly updates summary, resources and properties", async () => {
+  it("correctly updates report when a new pod with an existing failing policy is created", async () => {
    
-    const file = `${trc.root()}/capabilities/scenario.new-exemption-same-pod.yaml`
+    const firstExemptPod = `${trc.root()}/capabilities/scenario.basic.yaml`
+
+    await timed(`load: ${firstExemptPod}`, async () => {
+      const resources = await trc.load(firstExemptPod)
+      const resources_applied = await apply(resources)
+      console.log(await logs())
+      await untilLogged('"msg":"pepr-report updated"')
+    }), secs(20)
+
+    const nextExemptPod = `${trc.root()}/capabilities/scenario.new-exemption-same-pod.yaml`
     
-    await timed(`load: ${file}`, async () => {
-      const resources = await trc.load(file)
+    await timed(`load: ${nextExemptPod}`, async () => {
+      const resources = await trc.load(nextExemptPod)
       const resources_applied = await apply(resources)
       console.log(await logs())
       await untilLogged('"msg":"pepr-report updated"')

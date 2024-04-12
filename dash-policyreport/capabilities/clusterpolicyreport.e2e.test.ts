@@ -10,6 +10,7 @@ import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1beta1";
 import { UDSExemptionCRD } from "../types/uds-exemption-crd-v1alpha1";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
 import { StatusFilterElement } from "../types/policyreport-v1beta1";
+import { exemptionResourceProperty } from "./clusterpolicyreport"
 
 const trc = new TestRunCfg(__filename);
 
@@ -109,7 +110,7 @@ describe("ClusterPolicyReport", () => {
           policy: "DisallowPrivileged",
           result: StatusFilterElement.Fail,
           resources: [naughty],
-          properties: { "pexex-clusterpolicyreport:allow-naughtiness": "" }
+          properties: { [exemptionResourceProperty]: "pexex-clusterpolicyreport:allow-naughtiness" }
         },
         {
           policy: "DisallowSELinuxOptions",
@@ -121,7 +122,7 @@ describe("ClusterPolicyReport", () => {
           policy: "DropAllCapabilities",
           result: StatusFilterElement.Fail,
           resources: [naughty],
-          properties: { "pexex-clusterpolicyreport:allow-naughtiness": "" }
+          properties: { [exemptionResourceProperty] : "pexex-clusterpolicyreport:allow-naughtiness" }
         },
         {
           policy: "RequireNonRootUser",
@@ -175,7 +176,7 @@ describe("ClusterPolicyReport", () => {
           policy: "RestrictVolumeTypes",
           result: StatusFilterElement.Fail,
           resources: [naughty],
-          properties: { "pexex-clusterpolicyreport:allow-naughtiness": "" }
+          properties: { [exemptionResourceProperty] : "pexex-clusterpolicyreport:allow-naughtiness"}
         },
       ]
     }))
@@ -221,7 +222,7 @@ describe("ClusterPolicyReport", () => {
           policy: "DisallowPrivileged",
           result: StatusFilterElement.Fail,
           resources: [naughty, not_nice],
-          properties: { "pexex-clusterpolicyreport:allow-naughtiness": "" }
+          properties: { [exemptionResourceProperty] : "pexex-clusterpolicyreport:allow-naughtiness" }
         }
     )
   }, secs(120))

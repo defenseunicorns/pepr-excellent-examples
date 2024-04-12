@@ -150,6 +150,8 @@ When(Exemption)
     return request.Approve()
   });
 
+export const exemptionResourceProperty = "exemptionResource"
+
 const asExemptedResource = async (instance) => {
   const LABEL = "exemptions.uds.dev/v1alpha1"
 
@@ -185,7 +187,7 @@ const asExemptedResource = async (instance) => {
       }
 
     // add policy-owning exemption ref to properties
-    result.properties[exemp] = ""
+    result.properties[exemptionResourceProperty] = exemp
 
     // locate / create resources element
     let found = result.resources.filter(r => (

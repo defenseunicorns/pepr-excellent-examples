@@ -20,6 +20,7 @@
     "hello-pepr-ns-wrong",
     "hello-pepr-reconcile",
     "hello-pepr-validate",
+    "hello-pepr-schedule",
     "hello-pepr-watch"
   ]
 }

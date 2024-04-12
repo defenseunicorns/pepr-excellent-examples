@@ -1,23 +1,23 @@
 import { beforeAll, afterAll, describe, it, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { mins, secs } from "helpers/src/time";
-import { fullCreate,untilTrue } from "helpers/src/general";
+import { mins } from "helpers/src/time";
+import {untilTrue } from "helpers/src/general";
 import { K8s, kind } from "kubernetes-fluent-client";
 import { clean } from "helpers/src/cluster";
 import { live } from "helpers/src/resource";
 import { moduleUp, moduleDown, untilLogged } from "helpers/src/pepr";
 import { CM } from "./schedule"
-const trc = new TestRunCfg(__filename);
+
 
 describe("schedule.ts", () => {
   beforeAll(async () => {
     await moduleUp()
     await untilLogged("Scheduling processed");
-  }, mins(2));
-  afterAll(async () => {
-    await moduleDown();
-    await clean(trc);
-  }, mins(2));
+  }, mins(4));
+  // afterAll(async () => {
+  //   await moduleDown();
+  //   await clean(trc);
+  // }, mins(2));
 
   /*
    * 2 schedules - 1 updating the count var every 10s for 3 completions
@@ -30,5 +30,5 @@ describe("schedule.ts", () => {
     await untilTrue(() => live(kind.ConfigMap, CM))
     const countCM = await K8s(kind.ConfigMap).InNamespace(CM.metadata.namespace).Get(CM.metadata.name);
     expect(countCM.data.count).toBe("4");
-  });
+  }, mins(2));
 });

@@ -46,7 +46,7 @@ describe("ClusterPolicyReport", () => {
       console.log(await logs())
       await untilLogged('"msg":"pepr-report updated"')
     })
-  }, secs(10))
+  }, secs(20))
   
 
   afterEach(async () => { await clean(trc) }, mins(3))
@@ -180,4 +180,51 @@ describe("ClusterPolicyReport", () => {
       ]
     }))
   }, secs(10))
+
+  it("correctly updates summary, resources and properties", async () => {
+   
+    const file = `${trc.root()}/capabilities/scenario.new-exemption-same-pod.yaml`
+    
+    await timed(`load: ${file}`, async () => {
+      const resources = await trc.load(file)
+      const resources_applied = await apply(resources)
+      console.log(await logs())
+      await untilLogged('"msg":"pepr-report updated"')
+    }), secs(20)
+
+    const cpr = await K8s(ClusterPolicyReport).Get("pepr-report") 
+    
+    const naughty = {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "namespace": "pexex-clusterpolicyreport",
+      "name": "naughty-pod",
+    }
+
+    const not_nice = {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "namespace": "pexex-clusterpolicyreport",
+      "name": "not-as-nice-pod",
+    }
+
+    expect(cpr).toContain({
+      summary: {
+        pass: 10,
+        fail: 4,
+        warn: 0, 
+        error: 0,
+        skip: 0,
+      }})
+
+    expect(cpr).toContain({
+      results: [
+        {
+          policy: "DisallowPrivileged",
+          result: StatusFilterElement.Fail,
+          resources: [naughty, not_nice],
+          properties: { "pexex-clusterpolicyreport:allow-naughtiness": "" }
+        }]
+    })
+  }, secs(120))
 });

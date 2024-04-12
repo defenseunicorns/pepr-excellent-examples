@@ -50,7 +50,7 @@ export class TestRunCfg {
 
   async load(manifest) {
     const resources = await this.loadRaw(manifest)
-
+    console.log(resources)
       // add test-specific label to resources
     for (const resource of resources) {
       resource.metadata.labels = resource.metadata.labels || {}

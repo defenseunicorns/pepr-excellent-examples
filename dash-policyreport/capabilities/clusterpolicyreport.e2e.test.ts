@@ -27,29 +27,35 @@ describe("ClusterPolicyReport", () => {
     await timed("load ClusterPolicyReport CRD", async () => {
       const crds = await trc.loadRaw(`${trc.root()}/types/wgpolicyk8s.io_clusterpolicyreports.yaml`)
       const crds_applied = await apply(crds)
-    })
+    }), secs(10)
 
     // assumed to already exist as part of UDS install
     await timed("load UDS Exemption CRD", async () => {
       const exemption_applied = await K8s(kind.CustomResourceDefinition).Apply(
         UDSExemptionCRD,
       )
-    })
+    }), secs(10)
 
     await moduleUp()
-
-    const file = `${trc.root()}/capabilities/scenario.defaults.yaml`
-    await timed(`load: ${file}`, async () => {
-      const resources = await trc.load(file)
-      await apply(resources)
-    })
   }, mins(3))
 
-  
+  beforeEach(async () => {
+    const file = `${trc.root()}/capabilities/scenario.defaults.yaml`
+      applyFile(file)
+    })
 
   afterEach(async () => { await clean(trc) }, mins(3))
 
   afterAll(async () => { await moduleDown() }, mins(2));
+
+  async function applyFile(path) {
+    await timed(`load: ${path}`, async () => {
+      const resources = await trc.load(path)
+      const resources_applied = await apply(resources)
+      console.log(await logs())
+      await untilLogged('"msg":"pepr-report updated"')
+    }), secs(20)
+  }
 
   it("is created when UDS Exemption exists", async () => {
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
@@ -177,15 +183,6 @@ describe("ClusterPolicyReport", () => {
     }))
   }, secs(10))
 
-  async function applyFile(path) {
-    await timed(`load: ${path}`, async () => {
-      const resources = await trc.load(path)
-      const resources_applied = await apply(resources)
-      console.log(await logs())
-      await untilLogged('"msg":"pepr-report updated"')
-    }), secs(20)
-  }
-
   it("correctly updates report when an existing pod has a new exemption", async () => {
     const samePod = `${trc.root()}/capabilities/scenario.new-exemption-same-pod.yaml`
     
@@ -232,6 +229,13 @@ describe("ClusterPolicyReport", () => {
       "name": "not-as-nice-pod",
     }
 
+    const existing = {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "namespace": "pexex-clusterpolicyreport",
+      "name": "naughty-pod",
+    
+    }
     expect(cpr.summary).toEqual({
         pass: 11,
         fail: 3,
@@ -244,7 +248,7 @@ describe("ClusterPolicyReport", () => {
         {
           policy: "DisallowPrivileged",
           result: StatusFilterElement.Fail,
-          resources: [naughty],
+          resources: [existing, naughty],
           properties: { [exemptionResourceProperty] : "pexex-clusterpolicyreport:allow-naughtiness" }
         }
     )

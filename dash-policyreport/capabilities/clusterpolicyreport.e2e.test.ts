@@ -186,7 +186,7 @@ describe("ClusterPolicyReport", () => {
     }), secs(20)
   }
 
-  it("correctly updates report when a new pod with an existing failing policy is created", async () => {
+  it("correctly updates report when an existing pod has a new exemption", async () => {
     const samePod = `${trc.root()}/capabilities/scenario.new-exemption-same-pod.yaml`
     
     await applyFile(samePod)
@@ -198,13 +198,6 @@ describe("ClusterPolicyReport", () => {
       "kind": "Pod",
       "namespace": "pexex-clusterpolicyreport",
       "name": "naughty-pod",
-    }
-
-    const not_nice = {
-      "apiVersion": "v1",
-      "kind": "Pod",
-      "namespace": "default",
-      "name": "not-as-nice-pod",
     }
 
     expect(cpr.summary).toEqual({
@@ -219,9 +212,41 @@ describe("ClusterPolicyReport", () => {
         {
           policy: "DisallowPrivileged",
           result: StatusFilterElement.Fail,
-          resources: [naughty, not_nice],
+          resources: [naughty],
           properties: { [exemptionResourceProperty] : "pexex-clusterpolicyreport:allow-naughtiness" }
         }
     )
-  }, secs(120))
+  }, secs(60))
+
+  it("correctly updates report when a new pod with an existing exemption is created", async () => {
+    const samePod = `${trc.root()}/capabilities/scenario.same-exemption-new-pod.yaml`
+    
+    await applyFile(samePod)
+
+    const cpr = await K8s(ClusterPolicyReport).Get("pepr-report") 
+    
+    const naughty = {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "namespace": "default",
+      "name": "not-as-nice-pod",
+    }
+
+    expect(cpr.summary).toEqual({
+        pass: 11,
+        fail: 3,
+        warn: 0, 
+        error: 0,
+        skip: 0,
+      })
+
+    expect(cpr.results).toContainEqual(
+        {
+          policy: "DisallowPrivileged",
+          result: StatusFilterElement.Fail,
+          resources: [naughty],
+          properties: { [exemptionResourceProperty] : "pexex-clusterpolicyreport:allow-naughtiness" }
+        }
+    )
+  }, secs(60))  
 });

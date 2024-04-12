@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: not-as-nice-pod
+  namespace: default
+  labels:
+    exemptions.uds.dev: v1alpha1
+  annotations:
+    exemptions.uds.dev/v1alpha1: >-
+      pexex-clusterpolicyreport:allow-naughtiness:DisallowPrivileged
+spec:
+  containers:
+    - name: busybox
+      image: busybox:latest
+      command: ['sh', '-c', 'sleep infinity']

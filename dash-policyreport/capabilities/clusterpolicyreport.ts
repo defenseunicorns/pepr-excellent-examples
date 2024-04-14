@@ -1,7 +1,7 @@
 import { a, Capability, K8s, Log } from "pepr";
-import { Exemption } from "../types/uds-exemption-v1alpha1";
-import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1beta1";
+import { ClusterPolicyReport, Resource, ResultObject } from "../types/clusterpolicyreport-v1beta1";
 import { StatusFilterElement } from "../types/policyreport-v1beta1";
+import { Exemption } from "../types/uds-exemption-v1alpha1";
 
 export const PeprReport = new Capability({
   name: "pepr-report",
@@ -14,7 +14,7 @@ const empty: ClusterPolicyReport = {
   kind: "ClusterPolicyReport",
   metadata: {
     name: "pepr-report",
-    labels: {"policy.kubernetes.io/engine": "pepr"},
+    labels: { "policy.kubernetes.io/engine": "pepr" },
     annotations: {
       "uds-core.pepr.dev/uds-core-policies": "exemptions"
     }
@@ -32,7 +32,7 @@ const empty: ClusterPolicyReport = {
       result: StatusFilterElement.Pass,
       resources: [],
       properties: {},
-    },  
+    },
     {
       policy: "DisallowNodePortServices",
       result: StatusFilterElement.Pass,
@@ -44,8 +44,8 @@ const empty: ClusterPolicyReport = {
       result: StatusFilterElement.Pass,
       resources: [],
       properties: {},
-    },  
-    { 
+    },
+    {
       policy: "DisallowSELinuxOptions",
       result: StatusFilterElement.Pass,
       resources: [],
@@ -62,7 +62,7 @@ const empty: ClusterPolicyReport = {
       result: StatusFilterElement.Pass,
       resources: [],
       properties: {},
-    },  
+    },
     {
       policy: "RestrictCapabilities",
       result: StatusFilterElement.Pass,
@@ -70,7 +70,7 @@ const empty: ClusterPolicyReport = {
       properties: {},
     },
     {
-    policy: "RestrictExternalNames",
+      policy: "RestrictExternalNames",
       result: StatusFilterElement.Pass,
       resources: [],
       properties: {},
@@ -120,7 +120,7 @@ When(Exemption)
   .IsCreatedOrUpdated()
   .Validate(async function createCPR(request) {
     try {
-      const cpr = await K8s(ClusterPolicyReport).Get("pepr-report");
+      await K8s(ClusterPolicyReport).Get("pepr-report");
     } catch (e) {
       if (e.status === 404) {
         await K8s(ClusterPolicyReport).Apply(empty);
@@ -150,13 +150,16 @@ When(Exemption)
     return request.Approve()
   });
 
-export const exemptionResourceProperty = "exemptionResource"
+export const exemptionResourceProperty: string = "exemptionResource"
 
-const asExemptedResource = async (instance) => {
+const asExemptedResource = async (instance: any) => {
   const LABEL = "exemptions.uds.dev/v1alpha1"
 
   const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
-  delete cpr.metadata.managedFields
+
+  if (cpr?.metadata?.managedFields) {
+    delete cpr.metadata.managedFields;
+  }
 
   const vers = instance.apiVersion
   const kind = instance.kind
@@ -164,7 +167,7 @@ const asExemptedResource = async (instance) => {
   const nspc = instance.metadata.namespace
   const exms = instance.metadata.annotations[LABEL].split(" ")
 
-  const res = [ kind, nspc, name ].join(":")
+  const res = [kind, nspc, name].join(":")
   Log.info({ resources: res, exemptions: exms }, `Exempt: ${res}`)
 
   // include exempted resources under relevant policies
@@ -176,53 +179,68 @@ const asExemptedResource = async (instance) => {
     const exemp = split.join(":")
 
     // locate / create result element
-    const results = cpr.results.filter(r => r.policy === pol)
-    let result = results.length > 0
-      ? { ...results[0] }
-      : {
-        policy: pol,
-        result: StatusFilterElement.Pass,
-        resources: [],
-        properties: {}
+    if (cpr?.results) {
+      const results = cpr.results.filter(r => r.policy === pol)
+      const result: ResultObject = results.length > 0
+        ? { ...results[0] }
+        : {
+          policy: pol,
+          result: StatusFilterElement.Pass,
+          resources: [],
+          properties: {}
+        }
+
+      if (!result.properties) {
+        result.properties = {} as { [key: string]: string };
       }
 
-    // add policy-owning exemption ref to properties
-    result.properties[exemptionResourceProperty] = exemp
+      // add policy-owning exemption ref to properties
+      (result.properties as { [key: string]: string })[exemptionResourceProperty] = exemp
 
-    // locate / create resources element
-    let found = result.resources.filter(r => (
-      r.apiVersion === vers &&
-      r.kind === kind &&
-      r.namespace === nspc &&
-      r.name === name
-    ))
-    if (found.length === 0) {
-      result.resources.push({ apiVersion: vers, kind, namespace: nspc, name })
+
+      if (result?.resources) {
+        // locate / create resources element
+        let found = result.resources.filter(r => (
+          r.apiVersion === vers &&
+          r.kind === kind &&
+          r.namespace === nspc &&
+          r.name === name
+        ))
+        if (found.length === 0) {
+          const newResource: Resource = {
+            apiVersion: vers, kind: kind, namespace: nspc, name: name
+          }
+          result.resources.push( newResource )
+        }
+
+        // determine pass / fail
+        result.result = result.resources.length === 0
+          ? StatusFilterElement.Pass
+          : StatusFilterElement.Fail
+
+        // update / create result element
+        const idx = cpr.results.findIndex(r => r.policy === pol)
+        idx === -1
+          ? cpr.results.push(result)
+          : cpr.results.splice(idx, 1, result)
+      }
+
+
+      // refresh summary counts
+      cpr.summary = {
+        ...empty.summary,
+        pass: cpr.results.filter(f => f.result === "pass").length,
+        fail: cpr.results.filter(f => f.result === "fail").length,
+      }
     }
 
-    // determine pass / fail
-    result.result = result.resources.length === 0
-      ? StatusFilterElement.Pass
-      : StatusFilterElement.Fail
-
-    // update / create result element
-    const idx = cpr.results.findIndex(r => r.policy === pol)
-    idx === -1
-      ? cpr.results.push(result)
-      : cpr.results.splice(idx, 1, result)
   }
 
-  // refresh summary counts
-  cpr.summary = {
-    ...empty.summary,
-    pass: cpr.results.filter(f => f.result === "pass").length,
-    fail: cpr.results.filter(f => f.result === "fail").length,
-  }
 
   const applied = await K8s(ClusterPolicyReport).Apply(cpr)
   Log.info(applied, "pepr-report updated")
 }
 
-const lbl: [string, string] = [ "exemptions.uds.dev",  "v1alpha1" ]
+const lbl: [string, string] = ["exemptions.uds.dev", "v1alpha1"]
 When(a.Pod).IsCreatedOrUpdated().WithLabel(...lbl).Reconcile(asExemptedResource)
 When(a.Service).IsCreatedOrUpdated().WithLabel(...lbl).Reconcile(asExemptedResource)

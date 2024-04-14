@@ -2,14 +2,15 @@ import { afterEach, beforeEach, beforeAll, afterAll, describe, it, expect } from
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate, untilTrue } from "helpers/src/general";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
-import { secs, mins, timed } from "helpers/src/time";
+import { secs, mins, timed, sleep } from "helpers/src/time";
 import { clean } from "helpers/src/cluster";
 import { gone } from "helpers/src/resource";
 import { K8s, kind } from "kubernetes-fluent-client";
-import { ClusterPolicyReport } from "../types/clusterpolicyreport-v1beta1";
+import { ClusterPolicyReport, Resource, ResultObject } from "../types/clusterpolicyreport-v1beta1";
 import { UDSExemptionCRD } from "../types/uds-exemption-crd-v1alpha1";
 import { Exemption } from "../types/uds-exemption-v1alpha1";
 import { StatusFilterElement } from "../types/policyreport-v1beta1";
+
 import { exemptionResourceProperty } from "./clusterpolicyreport"
 
 const trc = new TestRunCfg(__filename);
@@ -41,7 +42,7 @@ describe("ClusterPolicyReport", () => {
 
   beforeEach(async () => {
     const file = `${trc.root()}/capabilities/scenario.defaults.yaml`
-      applyFile(file)
+      await applyFile(file)
     })
 
   afterEach(async () => { await clean(trc) }, mins(3))
@@ -58,6 +59,7 @@ describe("ClusterPolicyReport", () => {
   }
 
   it("is created when UDS Exemption exists", async () => {
+    await sleep(10)
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
     expect(cpr).not.toBeFalsy();
   }, secs(30))
@@ -220,22 +222,27 @@ describe("ClusterPolicyReport", () => {
     
     await applyFile(samePod)
 
+    // TODO make this not suck
+    // await sleep(5)
+
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report") 
     
-    const naughty = {
+    const naughty: Resource = {
       "apiVersion": "v1",
       "kind": "Pod",
       "namespace": "default",
       "name": "not-as-nice-pod",
     }
 
-    const existing = {
+    const existing: Resource = {
       "apiVersion": "v1",
       "kind": "Pod",
       "namespace": "pexex-clusterpolicyreport",
       "name": "naughty-pod",
-    
     }
+
+    console.log(JSON.stringify(cpr))
+
     expect(cpr.summary).toEqual({
         pass: 11,
         fail: 3,
@@ -244,13 +251,13 @@ describe("ClusterPolicyReport", () => {
         skip: 0,
       })
 
-    expect(cpr.results).toContainEqual(
-        {
-          policy: "DisallowPrivileged",
-          result: StatusFilterElement.Fail,
-          resources: [existing, naughty],
-          properties: { [exemptionResourceProperty] : "pexex-clusterpolicyreport:allow-naughtiness" }
-        }
-    )
+    const result : ResultObject = {
+        policy: "DisallowPrivileged",
+        result: StatusFilterElement.Fail,
+        resources: [existing, naughty],
+        properties: { [exemptionResourceProperty] : "pexex-clusterpolicyreport:allow-naughtiness" }
+    }
+
+    expect(cpr.results).toContainEqual(result)
   }, secs(60))  
 });

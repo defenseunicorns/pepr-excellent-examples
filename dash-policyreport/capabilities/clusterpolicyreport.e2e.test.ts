@@ -2,7 +2,7 @@ import { afterEach, beforeEach, beforeAll, afterAll, describe, it, expect } from
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate, untilTrue } from "helpers/src/general";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
-import { secs, mins, timed, sleep } from "helpers/src/time";
+import { secs, mins, timed } from "helpers/src/time";
 import { clean } from "helpers/src/cluster";
 import { gone } from "helpers/src/resource";
 import { K8s, kind } from "kubernetes-fluent-client";
@@ -59,7 +59,6 @@ describe("ClusterPolicyReport", () => {
   }
 
   it("is created when UDS Exemption exists", async () => {
-    await sleep(10)
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report")
     expect(cpr).not.toBeFalsy();
   }, secs(30))
@@ -221,9 +220,6 @@ describe("ClusterPolicyReport", () => {
     const samePod = `${trc.root()}/capabilities/scenario.same-exemption-new-pod.yaml`
     
     await applyFile(samePod)
-
-    // TODO make this not suck
-    // await sleep(5)
 
     const cpr = await K8s(ClusterPolicyReport).Get("pepr-report") 
     

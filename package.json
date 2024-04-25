@@ -7,20 +7,20 @@
   },
   "workspaces": [
     "_helpers",
-    "hello-pepr",
-    "pepr-operator",
-    "pepr-scheduler",
     "dash-policyreport",
+    "hello-pepr",
     "hello-pepr-config",
     "hello-pepr-hooks",
-    "hello-pepr-store",
     "hello-pepr-mutate",
     "hello-pepr-ns-all",
     "hello-pepr-ns-bounded",
     "hello-pepr-ns-wrong",
+    "hello-pepr-onschedule",
     "hello-pepr-reconcile",
+    "hello-pepr-store",
     "hello-pepr-validate",
-    "hello-pepr-schedule",
-    "hello-pepr-watch"
+    "hello-pepr-watch",
+    "pepr-operator",
+    "pepr-scheduler"
   ]
 }

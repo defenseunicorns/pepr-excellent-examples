@@ -1,7 +1,7 @@
 {
-  "name": "hello-pepr-schedule",
+  "name": "hello-pepr-onschedule",
   "version": "0.0.1",
-  "description": "Pepr feature: Schedule",
+  "description": "Pepr feature: OnSchedule",
   "keywords": [
     "pepr",
     "k8s",

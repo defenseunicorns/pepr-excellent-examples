@@ -505,7 +505,7 @@ helm install kubeshark kubeshark/kubeshark
 
 Port-forward to the UI
 
-```
+```bash
 kubectl port-forward service/kubeshark-front 8899:80
 ```
 

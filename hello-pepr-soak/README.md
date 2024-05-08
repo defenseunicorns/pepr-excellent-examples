@@ -150,11 +150,11 @@ kubectl apply -f dist
 Logs
 
 ```bash
- k logs -n pepr-system -l pepr.dev/controller=watcher -f | jq 'select(.url != "/healthz")'
+kubectl logs -n pepr-system -l pepr.dev/controller=watcher -f | jq 'select(.url != "/healthz")'
 ``` 
 
 
-In another terminal create 10 `CronJob`(s) that produces 10 pods with sidecars every 60 seconds
+Create 10 `CronJob`(s) that produces 10 pods with sidecars every 60 seconds
 
 ```yaml
 kubectl apply -f -<<EOF

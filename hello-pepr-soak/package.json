@@ -1,0 +1,41 @@
+{
+  "name": "hello-pepr-soak",
+  "version": "0.0.1",
+  "description": "soak watch controller",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "pepr-module",
+    "security"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "uuid": "6233c672-7fca-5603-8e90-771828dd30fa",
+    "onError": "reject",
+    "webhookTimeout": 10,
+    "customLabels": {
+      "namespace": {
+        "pepr.dev": ""
+      }
+    },
+    "alwaysIgnore": {
+      "namespaces": []
+    },
+    "includedFiles": [],
+    "env": {
+      "LOG_LEVEL": "debug"
+    }
+  },
+  "scripts": {
+    "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system"
+  },
+  "dependencies": {
+    "pepr": "^0.30.2"
+  },
+  "devDependencies": {
+    "typescript": "5.3.3"
+  }
+}

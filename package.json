@@ -18,6 +18,7 @@
     "hello-pepr-onschedule",
     "hello-pepr-reconcile",
     "hello-pepr-store",
+    "kfc-logs",
     "hello-pepr-validate",
     "hello-pepr-watch",
     "pepr-operator",

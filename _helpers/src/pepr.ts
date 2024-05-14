@@ -104,10 +104,7 @@ export async function moduleUp({version = "", verbose = false} = {}) {
   if (verbose) { console.log(deploy) }
   console.timeEnd(cmd)
 
-  console.time('controller scheduling')
   await untilLogged('✅ Scheduling processed', 2)
-  console.timeEnd('controller scheduling')
-
   console.timeEnd(`pepr@${version} ready (total time)`)
 }
 

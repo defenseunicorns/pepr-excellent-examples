@@ -43,7 +43,7 @@
     "pepr": "pepr",
     "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
     "test": "npm run cli -- test --suite all",
-    "test:e2e": "npm run cli -- test --suite e2e",
+    "test:xe2e": "npm run cli -- test --suite e2e",
     "test:unit": "npm run cli -- test --suite unit"
   }
 }

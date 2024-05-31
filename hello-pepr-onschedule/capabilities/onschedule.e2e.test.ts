@@ -5,8 +5,11 @@ import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
 
 const trc = new TestRunCfg(__filename);
 
-const delta = (startup, run, firstRunDelay = secs(10)) => {
-  const duration = run - startup;
+const delta = (one, two, firstRunDelay = secs(10)) => {
+  // firstRunDelay --> { every: 10, unit: "seconds" }
+  //  because schedule waits "every" period before firing first time
+
+  const duration = two - one;
   const milliseconds = duration - firstRunDelay
   const seconds = milliseconds / 1000
   return { milliseconds, seconds }
@@ -63,19 +66,11 @@ describe("schedule.ts", () => {
     await untilLogged(needle)
 
     const logz = await logs()
-    const { hostname: host, time: run } = JSON.parse(
+    const { time: got, want } = JSON.parse(
       logz.filter(f => f.includes(needle))[0]
     )
-    const { time: startup } = JSON.parse(
-      logz.filter(f => (
-        f.includes(`"msg":"✅ Scheduling processed"`) &&
-        f.includes(`"hostname":"${host}"`)
-      ))[0]
-    )
-    const { seconds } = delta(startup, run)
 
-    // scheduled for ~10 secs after watch controller startup
-    expect(seconds).toBeGreaterThan(5)
-    expect(seconds).toBeLessThan(15)
+    const { seconds } = delta(want, got)
+    expect(seconds).toBeLessThan(5)
   }, secs(30));
 })

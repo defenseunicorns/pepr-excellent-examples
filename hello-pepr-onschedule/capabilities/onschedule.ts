@@ -36,12 +36,17 @@ OnSchedule({
   }
 });
 
+let want = new Date(Date.now())
+
 OnSchedule({
   name: "once-delayed",
   every: 10, unit: "seconds",
-  startTime: new Date(Date.now() + 10 * 1000), // startup + 10 seconds
+  startTime: want,
   completions: 1,
   run: async () => {
-    Log.info({schedule: "once-delayed"})
+    Log.info({
+      schedule: "once-delayed",
+      want: want.valueOf(),
+    })
   }
 });

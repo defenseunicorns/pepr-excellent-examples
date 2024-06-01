@@ -11,7 +11,7 @@ import {
 import { existsSync } from 'node:fs';
 import { K8s, kind, RegisterKind } from "kubernetes-fluent-client";
 import { secs, mins } from './time';
-import { gone } from './resource';
+import { gone, live } from './resource';
 import { TestRunCfg } from './TestRunCfg';
 import { clean, up, down } from './cluster'
 import { Cmd } from './Cmd';
@@ -126,6 +126,7 @@ describe("clean()", () => {
       }
     }
     const applied_crd = await K8s(kind.CustomResourceDefinition).Apply(crd)
+    await live(kind.CustomResourceDefinition, applied_crd)
 
     const cr = {
       apiVersion: `${crd.spec.group}/${crd.spec.versions[0].name}`,

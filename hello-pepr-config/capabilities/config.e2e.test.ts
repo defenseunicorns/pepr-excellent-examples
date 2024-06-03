@@ -44,8 +44,6 @@ describe("config.ts", () => {
 
     const moduleName = `pepr-${cfg.pepr.uuid}`
 
-    // will pass once release a is cut to include fix:
-    //  https://github.com/defenseunicorns/pepr/pull/616
     it("webhookTimeout", async () => {
       const mwc = await K8s(kind.MutatingWebhookConfiguration).Get(moduleName)
       const vwc = await K8s(kind.ValidatingWebhookConfiguration).Get(moduleName)

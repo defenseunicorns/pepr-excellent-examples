@@ -69,6 +69,7 @@ function testUnit(passthru) {
   spawnSync(
     // eslint-disable-next-line no-useless-escape
     "jest", [
+      "--passWithNoTests",
       "--testPathPattern", ".*\.unit\.test\.ts",
       "--verbose",
       ...passthru
@@ -95,6 +96,7 @@ async function testE2e(passthru) {
     // run tests that create & destroy their own clusters
     let result = spawnSync(
       "jest", [
+        "--passWithNoTests",
         "--testPathPattern", "src/cluster\.e2e\.test\.ts",
         "--runInBand",
         "--verbose",
@@ -112,6 +114,7 @@ async function testE2e(passthru) {
       // run tests that require a pre-existing cluster (and/or don't care)
       let result = spawnSync(
         "jest", [
+          "--passWithNoTests",
           "--testPathIgnorePatterns", "src/cluster\.e2e\.test\.ts",
           "--testPathPattern", ".*\.e2e\.test\.ts",
           "--runInBand",
@@ -135,6 +138,7 @@ async function testE2e(passthru) {
       // run tests that require a pre-existing cluster (and/or don't care)
       const result = spawnSync(
         "jest", [
+          "--passWithNoTests",
           // eslint-disable-next-line no-useless-escape
           "--testPathPattern", ".*\.e2e\.test\.ts",
           "--runInBand",

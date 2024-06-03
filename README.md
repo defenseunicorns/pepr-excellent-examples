@@ -1,31 +1,31 @@
 # Pepr Excellent Examples
 
-Welcome to the "Pepr Excellent Examples" repository! This repository is a collection of examples showcasing the capabilities of Pepr. Here, you'll find practical implementations that demonstrate the use of Pepr in various scenarios. Whether you're new to Pepr or an experienced user, these examples will help you understand how to build and deploy applications effectively using Pepr.
+This repository is a collection of examples exercising the capabilities of Pepr.
 
-## Examples
+Here, you'll find practical implementations that demonstrate the use of Pepr in various scenarios. Whether you're new to Pepr or an experienced user, these examples will help you understand how to build and deploy applications effectively.
 
-### 1. Schedule
+## Exercising the Examples
 
-The `schedule` example demonstrates how to use Pepr for scheduling tasks. It's a perfect starting point to understand how Pepr can manage time-based activities in your applications.
+Most examples are designed around a test suite that demonstrates / verifies how they work.
 
-[View Schedule Example](./schedule)
+To run all example suites in a single command:
 
-### 2. Hello Pepr
+```sh
+npm run test:e2e
+```
 
-The `hello-pepr` example is a simple, introductory application that gets you started with Pepr. It's the "Hello World" of Pepr, ideal for understanding the basics.
+To run only a single example suite instead, specify which using `-w` flag:
 
-[View Hello Pepr Example](./hello-pepr)
+```sh
+# npm run test:e2e -w <npm module name>
 
-### 3. Operator
+npm run test:e2e -w hello-pepr-validate 
+```
 
-The `operator` example illustrates how to create and use a custom operator with Pepr. It's useful for advanced users who want to extend Pepr's functionality to suit specific requirements.
+To get even more targeted, you can select spec tests to run using some `-- --passthru` magic:
 
-[View Operator Example](./operator)
+```sh
+# npm run test:e2e -w <npm module name> -- --passthru="<jest flags>"
 
-## Getting Started
-
-To get started with these examples, clone this repository:
-
-```bash
-git clone https://github.com/defenseunicorns/pepr-excellent-examples.git
-
+npm run test:e2e -w hello-pepr-validate -- --passthru="--testNamePattern='validate creates'"
+```

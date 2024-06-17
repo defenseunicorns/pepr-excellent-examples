@@ -1,20 +1,18 @@
 import {
   beforeAll,
   afterAll,
-  afterEach,
   describe,
   it,
   expect,
 } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { halfCreate, fullCreate } from "helpers/src/general";
+import { fullCreate } from "helpers/src/general";
 import { gone } from "helpers/src/resource";
 import { secs, mins, sleep } from 'helpers/src/time';
-import { moduleUp, moduleDown, untilLogged, logs } from 'helpers/src/pepr';
+import { moduleUp, moduleDown, untilLogged } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
 import { K8s, kind } from 'pepr';
 import cfg from "../package.json";
-import { Secret } from "kubernetes-fluent-client/dist/upstream";
 
 
 const trc = new TestRunCfg(__filename)

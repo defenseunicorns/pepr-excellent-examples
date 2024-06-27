@@ -61,7 +61,10 @@ describe("store.ts", () => {
     //     expect(values[5]).toBe(null)
     //   }, secs(10))
     // })
-
+    function base64Encode(data: string) {
+      return Buffer.from(data).toString("base64");
+    }
+    
     describe("asynchronous interaction", () => {
       let logz
 
@@ -140,7 +143,7 @@ describe("store.ts", () => {
         // multiple setItems batch into single store update!
         expect(update).toHaveLength(1)
         expect(update[0]).toEqual(
-          expect.objectContaining({ a: "1", b: "2", c: "3", observed: "yay"})
+          expect.objectContaining({ [base64Encode("a")]: "1", [base64Encode("b")]: "2", [base64Encode("c")]: "3", [base64Encode("observed")]: "yay"})
         )
       }, secs(10))
     })

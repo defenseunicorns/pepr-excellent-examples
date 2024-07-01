@@ -42,8 +42,6 @@ When(a.ConfigMap)
 
     Store.removeItem(key)
     await untilTrue(gone(key))
-    const k = Store.getItem(key)
-    Log.info(k)
     Log.info({ key }, "removeItem")
   });
 

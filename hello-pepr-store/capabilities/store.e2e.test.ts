@@ -27,40 +27,40 @@ describe("store.ts", () => {
   }, mins(5))
 
   describe("module default store", () => {
-    // describe("data injection", () => {
-    //   let logz
+    describe("data injection", () => {
+      let logz
 
-    //   beforeAll(async () => {
-    //     await timed("load+clear: default store data", async () => {
-    //       await untilLogged('"msg":"onReady"', 4) // 2 actions * 2 controllers = 4 msgs
-    //       logz = await logs()
-    //     })
-    //   }, mins(1))
+      beforeAll(async () => {
+        await timed("load+clear: default store data", async () => {
+          await untilLogged('"msg":"onReady"', 4) // 2 actions * 2 controllers = 4 msgs
+          logz = await logs()
+        })
+      }, mins(1))
 
-    //   it("can insert in onReady hook", async () => {
-    //     const values = logz
-    //       .filter(l => l.includes('"key":"onReady"'))
-    //       .map(l => JSON.parse(l))
-    //       .map(o => o.value)
+      it("can insert in onReady hook", async () => {
+        const values = logz
+          .filter(l => l.includes('"key":"onReady"'))
+          .map(l => JSON.parse(l))
+          .map(o => o.value)
 
-    //     // both controller pods + watcher pod run onReady!
-    //     expect(values[0]).toBe("yep")
-    //     expect(values[1]).toBe("yep")
-    //     expect(values[2]).toBe("yep")
-    //   }, secs(10))
+        // both controller pods + watcher pod run onReady!
+        expect(values[0]).toBe("yep")
+        expect(values[1]).toBe("yep")
+        expect(values[2]).toBe("yep")
+      }, secs(10))
 
-    //   it("can clear in onReady hook", async () => {
-    //     const values = logz
-    //       .filter(l => l.includes('"key":"onReady"'))
-    //       .map(l => JSON.parse(l))
-    //       .map(o => o.value)
+      it("can clear in onReady hook", async () => {
+        const values = logz
+          .filter(l => l.includes('"key":"onReady"'))
+          .map(l => JSON.parse(l))
+          .map(o => o.value)
 
-    //     // both controller pods + watcher pod run onReady!
-    //     expect(values[3]).toBe(null)
-    //     expect(values[4]).toBe(null)
-    //     expect(values[5]).toBe(null)
-    //   }, secs(10))
-    // })
+        // both controller pods + watcher pod run onReady!
+        expect(values[3]).toBe(null)
+        expect(values[4]).toBe(null)
+        expect(values[5]).toBe(null)
+      }, secs(10))
+    })
 
     describe("asynchronous interaction", () => {
       let logz

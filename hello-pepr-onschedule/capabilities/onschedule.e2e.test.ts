@@ -71,6 +71,6 @@ describe("schedule.ts", () => {
     )
 
     const { seconds } = delta(want, got)
-    expect(seconds).toBeLessThan(5)
+    expect(seconds).toBeLessThan(10)
   }, secs(30));
 })

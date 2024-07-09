@@ -97,12 +97,9 @@ describe("store.ts", () => {
           const applied = await apply(resources)
 
           await untilLogged('"msg":"removeItemAndWait"')
-          // await sleep(240)
           logz = await logs()
-          // await writeFileSync('./logz.json', JSON.stringify(logz))
         })
       }, mins(2))
-      // }, mins(5))
 
       it("key can be written, read, and removed", async () => {
         const messages = logz

@@ -137,7 +137,7 @@ describe("store.ts", () => {
         // multiple setItems batch into single store update!
         expect(update).toHaveLength(1)
         expect(update[0]).toEqual(
-          expect.objectContaining({ a: "1", b: "2", c: "3", observed: "yay"})
+          expect.objectContaining({ "v2-a": "1", "v2-b": "2", "v2-c": "3", "v2-observed": "yay" })
         )
       }, secs(10))
     })

@@ -132,7 +132,7 @@ describe("store.ts", () => {
           .filter(l => l.includes('"msg":"observed"'))
           .map(l => JSON.parse(l))
           .flatMap(o => o.updates)
-          .filter(o => o.hasOwnProperty("observed"))
+          .filter(o => o.hasOwnProperty("v2-observed"))
 
         // multiple setItems batch into single store update!
         expect(update).toHaveLength(1)

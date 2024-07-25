@@ -144,7 +144,83 @@ istioctl install --set profile=demo -y
 Deploy the module and watch logs in one terminal
 
 ```yaml
+istioctl install --set profile=demo -y
 kubectl apply -f dist
+k label ns pepr-system istio-injection=enabled
+kubectl apply -f -<<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: pepr-demo
+  labels:
+    istio-injection: enabled
+spec: {}
+status: {}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  creationTimestamp: null
+  name: podgen0
+  namespace: pepr-demo
+spec:
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: podgen
+    spec:
+      ttlSecondsAfterFinished: 5
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            "zarf.dev/agent": "ignore"
+            bug: "reproduce"
+            api: "call"
+        spec:
+          containers:
+          - image: ubuntu
+            command: ["sh","-c","sleep 10"]
+            name: sleepanddie
+            resources: {}
+          restartPolicy: Never
+  schedule: 0/1 * * * *
+status: {}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  creationTimestamp: null
+  name: podgen1
+  namespace: pepr-demo
+spec:
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: podgen
+    spec:
+      ttlSecondsAfterFinished: 5
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            bug: "reproduce"
+            api: "call"
+            "zarf.dev/agent": "ignore"
+        spec:
+          containers:
+          - image: ubuntu
+            command: ["sh","-c","sleep 10"]
+            name: sleepanddie
+            resources: {}
+          restartPolicy: Never
+  schedule: 0/1 * * * *
+status: {}
+EOF
+k delete po -n pepr-system --all --force
+k run curler -n pepr-system --image=nginx
+k exec -it curler -n pepr-system -- curl -k https://pepr-6233c672-7fca-5603-8e90-771828dd30fa-watcher/metrics
 ```
 
 Logs

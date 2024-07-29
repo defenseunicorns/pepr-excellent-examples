@@ -146,7 +146,6 @@ Deploy the module and watch logs in one terminal
 ```yaml
 istioctl install --set profile=demo -y
 kubectl apply -f dist
-k label ns pepr-system istio-injection=enabled
 kubectl apply -f -<<EOF
 apiVersion: v1
 kind: Namespace
@@ -218,8 +217,10 @@ spec:
   schedule: 0/1 * * * *
 status: {}
 EOF
+k label ns pepr-system istio-injection=enabled
 k delete po -n pepr-system --all --force
 k run curler -n pepr-system --image=nginx
+sleep 10;
 k exec -it curler -n pepr-system -- curl -k https://pepr-6233c672-7fca-5603-8e90-771828dd30fa-watcher/metrics
 ```
 

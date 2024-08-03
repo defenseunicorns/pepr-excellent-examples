@@ -19,7 +19,7 @@ To run only a single example suite instead, specify which using `-w` flag:
 ```sh
 # npm run test:e2e -w <npm module name>
 
-npm run test:e2e -w hello-pepr-validate 
+npm run test:e2e -w hello-pepr-validate -- --image pepr:dev
 ```
 
 To get even more targeted, you can select spec tests to run using some `-- --passthru` magic:
@@ -29,3 +29,9 @@ To get even more targeted, you can select spec tests to run using some `-- --pas
 
 npm run test:e2e -w hello-pepr-validate -- --passthru="--testNamePattern='validate creates'"
 ```
+
+## Using k9s
+
+```sh
+KUBECONFIG=$(k3d kubeconfig write pexex-hello-pepr-reconcile-e2e) k9s
+``` 

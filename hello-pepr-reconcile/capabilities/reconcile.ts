@@ -27,3 +27,21 @@ When(a.ConfigMap)
       });
     }
   });
+
+const logPod = (name: string, color: string) => {
+  Log.info(`Pod with name ${name} has color ${color}.`);
+};
+When(a.Pod)
+  .IsCreatedOrUpdated()
+  .Reconcile(po => {
+    const { labels, name } = po.metadata;
+
+    switch (name) {
+      case "a":
+        setTimeout(() => logPod(name, labels.color), 1000);
+        break;
+      case "b":
+        setTimeout(() => logPod(name, labels.color), 10000);
+        break;
+    }
+  });

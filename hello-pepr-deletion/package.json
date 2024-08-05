@@ -1,7 +1,7 @@
 {
   "name": "hello-pepr-deletion",
   "version": "0.0.1",
-  "description": "Test the .WithDeletionTimestamp filter",
+  "description": "Pepr feature: WithDeletionTimestamp",
   "keywords": [
     "pepr",
     "k8s",
@@ -13,7 +13,7 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "uuid": "0a646b44-c6af-5fea-b346-cd83b101889d",
+    "uuid": "hello-pepr-deletion",
     "onError": "reject",
     "webhookTimeout": 10,
     "customLabels": {
@@ -27,13 +27,21 @@
     "includedFiles": [],
     "env": {}
   },
-  "scripts": {
-    "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system"
-  },
   "dependencies": {
-    "pepr": "0.31.1"
+    "pepr": "^0.31.1"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/node": "^20.13.0",
+    "jest": "^29.7.0",
+    "kubernetes-fluent-client": "^2.6.1",
     "typescript": "5.3.3"
+  },
+  "scripts": {
+    "pepr": "pepr",
+    "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
+    "test": "npm run cli -- test --suite all",
+    "test:e2e": "npm run cli -- test --suite e2e",
+    "test:unit": "npm run cli -- test --suite unit"
   }
 }

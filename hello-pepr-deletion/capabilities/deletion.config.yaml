@@ -6,6 +6,7 @@ metadata:
 apiVersion: v1
 kind: Pod
 metadata:
+  creationTimestamp: null
   labels:
     run: owner-pod
   name: owner-pod
@@ -14,7 +15,9 @@ spec:
   containers:
   - image: nginx
     name: owner-pod
+    resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 status: {}
+
 ---

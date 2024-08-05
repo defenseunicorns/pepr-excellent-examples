@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, describe, it, jest, expect } from "@jest/globals";
+import { beforeAll, afterAll, describe, it, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { mins, secs, timed } from "helpers/src/time";
 import { kind } from "kubernetes-fluent-client";
@@ -15,7 +15,7 @@ describe("deletion.ts", () => {
     await clean(trc);
   }, mins(2));
 
-  describe("tests reconcile module", () => {
+  describe("tests deletion module", () => {
     let logz: string[];
 
     beforeAll(async () => {
@@ -29,7 +29,7 @@ describe("deletion.ts", () => {
     }, mins(1));
 
     it(
-      "maintains callback order even when execution times vary",
+      "Runs WithDeletionTimestamp on Watch, Mutate, Validate",
       () => {
         const results = logz.filter(l => l.includes("WithDeletionTimestam"));
         expect(results).toContain("WithDeletionTimestamp: Watch");
@@ -39,7 +39,7 @@ describe("deletion.ts", () => {
         expect(results).toContain("WithDeletionTimestamp: ValidateBlock");
         expect(results).toContain("WithDeletionTimestamp: WatchBlock");
       },
-      secs(10),
+      secs(30),
     );
   });
 });

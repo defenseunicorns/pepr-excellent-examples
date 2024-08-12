@@ -11,18 +11,3 @@ metadata:
   name: async
   namespace: hello-pepr-store
 data: {}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: sync
-  namespace: hello-pepr-store
-data: {}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: observe
-  namespace: hello-pepr-store
-data: {}
-

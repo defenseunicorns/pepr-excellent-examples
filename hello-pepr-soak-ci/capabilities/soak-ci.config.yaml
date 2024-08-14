@@ -1,16 +1,31 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: pepr-demo
-  labels:
-    istio-injection: enabled
+  creationTimestamp: null
+  name: istio-system
+spec: {}
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: watch-auditor
+  labels:
+    istio-injection: enabled
 spec: {}
-status: {}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pepr-demo
+  labels:
+    istio-injection: enabled
+spec: {}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: watch-auditor
+  namespace: watch-auditor
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -32,8 +47,8 @@ spec:
     spec:
       serviceAccountName: watch-auditor
       containers:
-      - image: watch-auditor:dev
-        name: cmwylie19/watch-auditor:amd64 
+      - image: cmwylie19/watch-auditor:dev
+        name: watch-auditor 
         imagePullPolicy: IfNotPresent
         args: ["serve", "--namespace=pepr-demo"]
         ports:
@@ -55,12 +70,6 @@ spec:
     targetPort: 8080
   selector:
     app: watch-auditor
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: watch-auditor
-  namespace: watch-auditor
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole

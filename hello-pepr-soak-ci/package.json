@@ -1,0 +1,48 @@
+{
+  "name": "hello-pepr-soak-ci",
+  "version": "0.0.1",
+  "description": "soak test for watch controller",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "pepr-module",
+    "security",
+    "informer"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "uuid": "soak-ci",
+    "onError": "reject",
+    "webhookTimeout": 10,
+    "customLabels": {
+      "namespace": {
+        "pepr.dev": "",
+        "istio-injection": "enabled"
+      }
+    },
+    "alwaysIgnore": {
+      "namespaces": []
+    },
+    "includedFiles": [],
+    "env": {
+      "LOG_LEVEL": "debug"
+    }
+  },
+  "dependencies": {
+    "pepr": "^0.33.0"
+  },
+  "devDependencies": {
+    "typescript": "5.3.3"
+  },
+  "scripts": {
+    "pepr": "pepr",
+    "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system",
+    "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
+    "test": "npm run cli -- test --suite all",
+    "test:e2e": "npm run cli -- test --suite e2e",
+    "test:unit": "npm run cli -- test --suite unit"
+  }
+}

@@ -19,7 +19,7 @@ To run only a single example suite instead, specify which using `-w` flag:
 ```sh
 # npm run test:e2e -w <npm module name>
 
-npm run test:e2e -w hello-pepr-validate 
+npm run test:e2e -w hello-pepr-store -- -i pepr:dev
 ```
 
 To get even more targeted, you can select spec tests to run using some `-- --passthru` magic:

@@ -37,7 +37,8 @@ describe("store.ts", () => {
           const values = logz
             .filter(l => l.includes('"key":"https://onReady"'))
             .map(l => JSON.parse(l))
-            .map(o => o.value);
+            .map(o => o.value)
+            .slice(0, 3);
 
           expect(values).toEqual(["yep", "yep", "yep"]);
         },

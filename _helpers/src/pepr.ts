@@ -9,8 +9,19 @@ import { readFile } from 'node:fs/promises';
 
 function sift(stdout) {
   const parsed = stdout
-    .filter(l => l !== '')
-    .map(l => JSON.parse(l))
+    .filter(l => l !== '' && l !== null && l !== undefined)
+    .map(l => {
+      try {
+        const parsed = JSON.parse(l)
+        if (Object.hasOwnProperty.call(parsed, 'url') &&
+          Object.hasOwnProperty.call(parsed, 'msg') &&
+          Object.hasOwnProperty.call(parsed, 'name')) {
+          return parsed
+        }
+
+      } catch  {}
+    })
+    .filter(l => l !== null && l !== undefined)
     .filter(l => l.url !== "/healthz")
     .filter(l => l.msg !== "Pepr Store update")
     .filter(l => l.name !== "/kube-root-ca.crt")
@@ -45,7 +56,7 @@ export async function untilLogged(needle: String | Function, count = 1) {
     const logz = await logs()
 
     let found = []
-    if (typeof needle === 'string'){
+    if (typeof needle === 'string') {
       found = logz.filter(l => l.includes(needle))
     }
     else if (typeof needle === 'function') {
@@ -59,39 +70,39 @@ export async function untilLogged(needle: String | Function, count = 1) {
 
 export async function peprVersion() {
   // determine npx pepr@version from workspace root
-  const root = (await new Cmd({cmd: `npm root`}).run()).stdout[0]
+  const root = (await new Cmd({ cmd: `npm root` }).run()).stdout[0]
   const workspace = dirname(root)
-  const version = (await new Cmd({cwd: workspace, cmd: `npm run pepr -- --version`}).run())
+  const version = (await new Cmd({ cwd: workspace, cmd: `npm run pepr -- --version` }).run())
     .stdout.filter(l => l !== '').slice(-1)[0]
 
   return version
 }
 
-export async function moduleBuild({version = "", verbose = false} = {}) {
+export async function moduleBuild({ version = "", verbose = false } = {}) {
   // can't have await expressions in default args, so gotta do it here
-  if (version === ""){ version = await peprVersion()}
+  if (version === "") { version = await peprVersion() }
 
   // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
   const pepr = { TS_NODE_PROJECT: "" }
 
   let cmd = `npx --yes pepr@${version} build`
   console.time(cmd)
-  const build = await new Cmd({env: pepr, cmd}).run()
+  const build = await new Cmd({ env: pepr, cmd }).run()
   if (verbose) { console.log(build) }
   console.timeEnd(cmd)
 }
 
-export async function moduleUp({version = "", verbose = false} = {}) {
+export async function moduleUp({ version = "", verbose = false } = {}) {
   let cmd: string = "";
   // can't have await expressions in default args, so gotta do it here
-  if (version === ""){ version = await peprVersion()}
+  if (version === "") { version = await peprVersion() }
 
   console.time(`pepr@${version} ready (total time)`)
 
   // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
   const pepr = { TS_NODE_PROJECT: "" }
 
-  await moduleBuild({version, verbose})
+  await moduleBuild({ version, verbose })
 
   if (process.env.PEPR_IMAGE) {
     cmd = `npx --yes pepr@${version} deploy --image=${process.env.PEPR_IMAGE} --confirm`
@@ -100,7 +111,7 @@ export async function moduleUp({version = "", verbose = false} = {}) {
   }
 
   console.time(cmd)
-  const deploy = await new Cmd({env: pepr, cmd}).run()
+  const deploy = await new Cmd({ env: pepr, cmd }).run()
   if (verbose) { console.log(deploy) }
   console.timeEnd(cmd)
 
@@ -110,7 +121,7 @@ export async function moduleUp({version = "", verbose = false} = {}) {
 
 export async function moduleDown() {
   const modPkg = `${cwd()}/package.json`
-  const cfg = JSON.parse( (await readFile(modPkg)).toString() )
+  const cfg = JSON.parse((await readFile(modPkg)).toString())
 
   const summary = "pepr module removed (total time)"
   console.time(summary)
@@ -124,7 +135,7 @@ export async function moduleDown() {
     await untilTrue(() => gone(kind.Namespace, peprSystem))
 
   } catch (e) {
-    if ( ![404].includes(e.status) ) { throw e }
+    if (![404].includes(e.status)) { throw e }
   }
   console.timeEnd(msg)
 
@@ -137,7 +148,7 @@ export async function moduleDown() {
     await untilTrue(() => gone(kind.CustomResourceDefinition, peprStore))
 
   } catch (e) {
-    if ( ![404].includes(e.status) ) { throw e }
+    if (![404].includes(e.status)) { throw e }
   }
   console.timeEnd(msg)
 
@@ -150,7 +161,7 @@ export async function moduleDown() {
     await untilTrue(() => gone(kind.ClusterRoleBinding, peprBinding))
 
   } catch (e) {
-    if ( ![404].includes(e.status) ) { throw e }
+    if (![404].includes(e.status)) { throw e }
   }
   console.timeEnd(msg)
 
@@ -163,7 +174,7 @@ export async function moduleDown() {
     await untilTrue(() => gone(kind.ClusterRole, peprRole))
 
   } catch (e) {
-    if ( ![404].includes(e.status) ) { throw e }
+    if (![404].includes(e.status)) { throw e }
   }
   console.timeEnd(msg)
 
@@ -180,7 +191,7 @@ export async function moduleDown() {
     await untilTrue(() => gone(kind.MutatingWebhookConfiguration, peprMut))
 
   } catch (e) {
-    if ( ![404].includes(e.status) ) { throw e }
+    if (![404].includes(e.status)) { throw e }
   }
   console.timeEnd(msg)
 

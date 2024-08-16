@@ -66,7 +66,19 @@ describe("soak-ci.ts", () => {
         `kubectl apply -f ${trc.root()}/capabilities/soak-ci.config.yaml`,
       );
       execSync(
-        "kubectl run metrics-collector -n watch-auditor --image=nginx --restart=Never",
+        `sleep 20`,
+      );
+      execSync(
+        `kubectl wait --for=condition=ready -n istio-system pod -l istio=pilot --timeout=300s`,
+      );
+      execSync(
+        `kubectl wait --for=condition=ready -n istio-system pod -l app=istio-ingressgateway --timeout=300s`,
+      );
+      execSync(
+        `kubectl wait --for=condition=ready -n watch-auditor pod -l app=watch-auditor --timeout=300s`,
+      );
+      execSync(
+        "kubectl run metrics-collector -n watch-auditor --image=nginx --restart=Never --timeout=300s",
       );
     } catch (error) {
       console.log(error);

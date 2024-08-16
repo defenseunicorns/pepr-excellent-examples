@@ -48,11 +48,11 @@ const triggerTest = async (): Promise<void> => {
 setInterval(
   () => {
     execSync(
-      "kubectl exec -it metrics-collector -n watch-auditor -- curl watch-auditor:8080/metrics >> logs/auditor-log.txt",
+      "kubectl exec -it metrics-collector -n watch-auditor -- curl watch-auditor:8080/metrics  | grep watch_controller_failures_total > logs/auditor-log.txt",
     );
     execSync("cat logs/auditor-log.txt");
     execSync(
-      "kubectl exec -it metrics-collector -n watch-auditor -- curl -k https://pepr-soak-ci-watcher.pepr-system.svc.cluster.local/metrics >> logs/informer-log.txt",
+      "kubectl exec -it metrics-collector -n watch-auditor -- curl -k https://pepr-soak-ci-watcher.pepr-system.svc.cluster.local/metrics  |  egrep -E \"pepr_cache_miss|pepr_resync_failure_count\" > logs/informer-log.txt",
     );
     execSync("cat logs/informer-log.txt");
   },

@@ -9,19 +9,7 @@ import { readFile } from 'node:fs/promises';
 
 function sift(stdout) {
   const parsed = stdout
-    .filter(l => l !== '' && l !== null && l !== undefined)
-    .map(l => {
-      try {
-        const parsed = JSON.parse(l)
-        if (Object.hasOwnProperty.call(parsed, 'url') &&
-          Object.hasOwnProperty.call(parsed, 'msg') &&
-          Object.hasOwnProperty.call(parsed, 'name')) {
-          return parsed
-        }
-
-      } catch  {}
-    })
-    .filter(l => l !== null && l !== undefined)
+    .filter(l => l !== '')
     .filter(l => l.url !== "/healthz")
     .filter(l => l.msg !== "Pepr Store update")
     .filter(l => l.name !== "/kube-root-ca.crt")

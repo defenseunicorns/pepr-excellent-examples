@@ -42,7 +42,7 @@
     "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system",
     "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
     "test": "npm run cli -- test --suite all",
-    "test:e2e": "npm run cli -- test --suite e2e",
+    "test:soak": "npm run cli -- test --suite e2e",
     "test:unit": "npm run cli -- test --suite unit"
   }
 }

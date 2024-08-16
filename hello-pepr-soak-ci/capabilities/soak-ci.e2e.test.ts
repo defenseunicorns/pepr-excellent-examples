@@ -45,14 +45,33 @@ const triggerTest = async (): Promise<void> => {
   testMap(PodMap);
 };
 
+setInterval(
+  () => {
+    execSync(
+      "kubectl exec -it metrics-collector -n watch-auditor -- curl watch-auditor:8080/metrics >> logs/auditor-log.txt",
+    );
+    execSync("cat logs/auditor-log.txt");
+    execSync(
+      "kubectl exec -it metrics-collector -n watch-auditor -- curl -k https://pepr-soak-ci-watcher.pepr-system.svc.cluster.local/metrics >> logs/informer-log.txt",
+    );
+    execSync("cat logs/informer-log.txt");
+  },
+  5 * 60 * 1000,
+);
+
 describe("soak-ci.ts", () => {
   beforeAll(async () => {
     try {
-      execSync(`kubectl apply -f ${trc.root()}/capabilities/soak-ci.config.yaml`);
+      execSync(
+        `kubectl apply -f ${trc.root()}/capabilities/soak-ci.config.yaml`,
+      );
+      execSync(
+        "kubectl run metrics-collector -n watch-auditor --image=nginx --restart=Never",
+      );
     } catch (error) {
       console.log(error);
     }
-    
+
     await moduleUp();
   }, mins(4));
   afterAll(async () => {
@@ -60,19 +79,19 @@ describe("soak-ci.ts", () => {
     await clean(trc);
   }, mins(4));
 
-  it("initial test to satisfy Jest", () => {
-    expect(true).toBe(true); // You MUST do this in order to not get hit with "Your test suite must contain at least one test."
-  });
+  // it("initial test to satisfy Jest", () => {
+  //   expect(true).toBe(true); // You MUST do this in order to not get hit with "Your test suite must contain at least one test."
+  // });
 
-  describe("soak test the informer", () => {
-    setTimeout(async () => {
-      // first test immediately after 15 mins
-      await triggerTest();
+  // describe("soak test the informer", () => {
+  setTimeout(async () => {
+    // first test immediately after 15 mins
+    await triggerTest();
 
-      // 4 mmore tests every 30 mins
-      Array.from({ length: 4 }).forEach((_, index) => {
-        setTimeout(async () => await triggerTest(), mins(30) * (index + 1));
-      });
-    }, mins(15));
-  });
+    // 4 mmore tests every 30 mins
+    Array.from({ length: 4 }).forEach((_, index) => {
+      setTimeout(async () => await triggerTest(), mins(30));
+    });
+  }, mins(15));
+  // });
 });

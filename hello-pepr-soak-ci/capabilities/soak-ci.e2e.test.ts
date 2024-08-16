@@ -79,9 +79,9 @@ describe("soak-ci.ts", () => {
     await clean(trc);
   }, mins(4));
 
-  // it("initial test to satisfy Jest", () => {
-  //   expect(true).toBe(true); // You MUST do this in order to not get hit with "Your test suite must contain at least one test."
-  // });
+  it("initial test to satisfy Jest", () => {
+    expect(true).toBe(true); // You MUST do this in order to not get hit with "Your test suite must contain at least one test."
+  });
 
   // describe("soak test the informer", () => {
   setTimeout(async () => {

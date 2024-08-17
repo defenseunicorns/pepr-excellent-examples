@@ -62,9 +62,10 @@ setInterval(
 describe("soak-ci.ts", () => {
   beforeAll(async () => {
     try {
-      execSync(
-        `kubectl apply -f ${trc.root()}/capabilities/soak-ci.config.yaml`,
+      const output = execSync(
+        `kubectl apply -f ${trc.root()}/capabilities/soak-ci.config.yaml`, { stdio: 'inherit' }
       );
+      console.log('Command executed successfully:', output.toString());
       execSync(
         `sleep 20`,
       );
@@ -81,7 +82,9 @@ describe("soak-ci.ts", () => {
         "kubectl run metrics-collector -n watch-auditor --image=nginx --restart=Never --timeout=300s",
       );
     } catch (error) {
-      console.log(error);
+      console.error('Error executing command:', error.message);
+      console.error('Error code:', error.status);
+      console.error('Standard Error output:', error.stderr.toString());
     }
 
     await moduleUp();

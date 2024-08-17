@@ -50,10 +50,12 @@ setInterval(
     const output = execSync(
       "kubectl exec -it metrics-collector -n watch-auditor -- curl watch-auditor:8080/metrics  | grep watch_controller_failures_total",
       { stdio: 'inherit' });
+    console.log('Command executed successfully:', output.toString());
     // execSync("cat logs/auditor-log.txt");
-    execSync(
+    const output2 = execSync(
       "kubectl exec -it metrics-collector -n watch-auditor -- curl -k https://pepr-soak-ci-watcher.pepr-system.svc.cluster.local/metrics  |  egrep -E \"pepr_cache_miss|pepr_resync_failure_count\"",
       { stdio: 'inherit' });
+    console.log('Command executed successfully:', output2.toString());
     // execSync("cat logs/informer-log.txt");
   },
   5 * 60 * 1000,

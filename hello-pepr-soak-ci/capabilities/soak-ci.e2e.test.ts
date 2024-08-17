@@ -70,6 +70,9 @@ describe("soak-ci.ts", () => {
         `sleep 20`,
       );
       execSync(
+        `kubectl get po -n pepr-system watch-auditor`,
+      );
+      execSync(
         `kubectl wait --for=condition=ready -n istio-system pod -l istio=pilot --timeout=300s`,
       );
       execSync(

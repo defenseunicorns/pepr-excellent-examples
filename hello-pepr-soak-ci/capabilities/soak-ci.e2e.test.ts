@@ -47,14 +47,14 @@ const triggerTest = async (): Promise<void> => {
 
 setInterval(
   () => {
+    const output = execSync(
+      "kubectl exec -it metrics-collector -n watch-auditor -- curl watch-auditor:8080/metrics  | grep watch_controller_failures_total",
+      { stdio: 'inherit' });
+    // execSync("cat logs/auditor-log.txt");
     execSync(
-      "kubectl exec -it metrics-collector -n watch-auditor -- curl watch-auditor:8080/metrics  | grep watch_controller_failures_total > logs/auditor-log.txt",
-    );
-    execSync("cat logs/auditor-log.txt");
-    execSync(
-      "kubectl exec -it metrics-collector -n watch-auditor -- curl -k https://pepr-soak-ci-watcher.pepr-system.svc.cluster.local/metrics  |  egrep -E \"pepr_cache_miss|pepr_resync_failure_count\" > logs/informer-log.txt",
-    );
-    execSync("cat logs/informer-log.txt");
+      "kubectl exec -it metrics-collector -n watch-auditor -- curl -k https://pepr-soak-ci-watcher.pepr-system.svc.cluster.local/metrics  |  egrep -E \"pepr_cache_miss|pepr_resync_failure_count\"",
+      { stdio: 'inherit' });
+    // execSync("cat logs/informer-log.txt");
   },
   5 * 60 * 1000,
 );
@@ -86,8 +86,6 @@ describe("soak-ci.ts", () => {
       );
     } catch (error) {
       console.error('Error executing command:', error.message);
-      console.error('Error code:', error.status);
-      console.error('Standard Error output:', error.stderr.toString());
     }
 
     await moduleUp();

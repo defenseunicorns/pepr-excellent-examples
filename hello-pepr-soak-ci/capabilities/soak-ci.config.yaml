@@ -47,7 +47,7 @@ spec:
     spec:
       serviceAccountName: watch-auditor
       containers:
-        - image: watch-auditor:prod
+        - image: cmwylie19/watch-auditor:prod
           name: watch-auditor
           imagePullPolicy: IfNotPresent
           args: ["serve", "--namespace=pepr-demo"]

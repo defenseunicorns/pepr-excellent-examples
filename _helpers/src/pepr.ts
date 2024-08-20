@@ -13,12 +13,10 @@ function sift(stdout) {
     .map(l => {
       try {
         const parsed = JSON.parse(l)
-        if (parsed.hasOwnProperty("url") && parsed.hasOwnProperty("msg") && parsed.hasOwnPropert("name")) {
+        if (parsed.url && parsed.msg && parsed.name) {
           return parsed;
         }
-      } catch (e){
-        console.error(e, l)
-       }
+      } catch (e){ }
     })
     .filter(l => l.url !== "/healthz")
     .filter(l => l.msg !== "Pepr Store update")

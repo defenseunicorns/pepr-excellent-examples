@@ -16,7 +16,9 @@ function sift(stdout) {
         if (parsed.url && parsed.msg && parsed.name) {
           return parsed;
         }
-      } catch { }
+      } catch (e){
+        console.error(e, l)
+       }
     })
     .filter(l => l.url !== "/healthz")
     .filter(l => l.msg !== "Pepr Store update")

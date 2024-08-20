@@ -43,12 +43,12 @@ describe("soak-ci.ts", () => {
         `kubectl apply -f ${trc.root()}/capabilities/soak-ci.config.yaml`,
       );
       execSync(`sleep 20`);
-      runCommand(
-        `kubectl wait --for=condition=ready -n istio-system pod -l istio=pilot`,
-      );
-      runCommand(
-        `kubectl wait --for=condition=ready -n istio-system pod -l app=istio-ingressgateway`,
-      );
+      // runCommand(
+      //   `kubectl wait --for=condition=ready -n istio-system pod -l istio=pilot`,
+      // );
+      // runCommand(
+      //   `kubectl wait --for=condition=ready -n istio-system pod -l app=istio-ingressgateway`,
+      // );
       runCommand(
         `kubectl wait --for=condition=ready -n watch-auditor pod -l app=watch-auditor`,
       );

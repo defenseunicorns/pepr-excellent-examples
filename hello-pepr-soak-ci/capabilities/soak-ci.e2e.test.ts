@@ -27,87 +27,72 @@ const updateMap = (
   return podMap;
 };
 
-const testMap = (podMap: Map<string, number>) => {
-  it("stuck pod should never live beyond the relist window of 30 mins", () => {
-    console.log(JSON.stringify(podMap));
-    podMap.forEach(value => {
-      expect(value).toBeLessThan(2);
-      if (value >= 2) {
-        process.exit(1);
-      }
-    });
-  });
+const runCommand = (command: string) => {
+  try {
+    const output = execSync(command, { stdio: "inherit" });
+    console.log("Command executed successfully:", output);
+  } catch (error) {
+    console.error("Error executing command:", error.message);
+  }
 };
-
-const triggerTest = async (): Promise<void> => {
-  const podList = await getPodsInPeprDemo();
-  updateMap(PodMap, podList);
-  testMap(PodMap);
-};
-
-setInterval(
-  () => {
-    const output = execSync(
-      "kubectl exec -it metrics-collector -n watch-auditor -- curl watch-auditor:8080/metrics  | grep watch_controller_failures_total",
-      { stdio: 'inherit' });
-    console.log('Command executed successfully:', output);
-    execSync("cat logs/auditor-log.txt");
-    const output2 = execSync(
-      "kubectl exec -it metrics-collector -n watch-auditor -- curl -k https://pepr-soak-ci-watcher.pepr-system.svc.cluster.local/metrics  |  egrep -E \"pepr_cache_miss|pepr_resync_failure_count\"",
-      { stdio: 'inherit' });
-    console.log('Command executed successfully:', output2);
-    execSync("cat logs/informer-log.txt");
-  }, 10000
-  // 5 * 60 * 1000,
-);
 
 describe("soak-ci.ts", () => {
   beforeAll(async () => {
     try {
-      const output = execSync(
-        `kubectl apply -f ${trc.root()}/capabilities/soak-ci.config.yaml`, { stdio: 'inherit' }
+      runCommand(
+        `kubectl apply -f ${trc.root()}/capabilities/soak-ci.config.yaml`,
       );
-      console.log('Command executed successfully:', output);
-      execSync(
-        `sleep 20`,
-      );
-      execSync(
+      execSync(`sleep 20`);
+      runCommand(
         `kubectl wait --for=condition=ready -n istio-system pod -l istio=pilot --timeout=300s`,
       );
-      execSync(
+      runCommand(
         `kubectl wait --for=condition=ready -n istio-system pod -l app=istio-ingressgateway --timeout=300s`,
       );
-      execSync(
+      runCommand(
         `kubectl wait --for=condition=ready -n watch-auditor pod -l app=watch-auditor --timeout=300s`,
       );
-      execSync(
+      runCommand(
         "kubectl run metrics-collector -n watch-auditor --image=nginx --restart=Never --timeout=300s",
       );
     } catch (error) {
-      console.error('Error executing command:', error.message);
+      console.error("Error during setup:", error.message);
     }
 
     await moduleUp();
   }, mins(5));
+
   afterAll(async () => {
     await moduleDown();
     await clean(trc);
   }, mins(4));
 
   it("initial test to satisfy Jest", () => {
-    expect(true).toBe(true); // You MUST do this in order to not get hit with "Your test suite must contain at least one test."
+    expect(true).toBe(true);
   });
 
-  // describe("soak test the informer", () => {
-  setTimeout(async () => {
-    // first test immediately after 15 mins
-    await triggerTest();
+  const testIntervals = [1, 30, 60, 90, 120]; // times in minutes
+  testIntervals.forEach((interval, index) => {
+    it(`test run ${index + 1} after ${interval} minutes`, async () => {
+      await new Promise(resolve => setTimeout(resolve, mins(interval)));
 
-    // 4 mmore tests every 30 mins
-    Array.from({ length: 4 }).forEach((_, index) => {
-      setTimeout(async () => await triggerTest(), mins(1));
+      const podList = await getPodsInPeprDemo();
+      updateMap(PodMap, podList);
+
+      PodMap.forEach(value => {
+        expect(value).toBeLessThan(2);
+      });
+
+      // Run additional commands
+      runCommand(
+        "kubectl exec -it metrics-collector -n watch-auditor -- curl watch-auditor:8080/metrics  | grep watch_controller_failures_total >> logs/auditor-log.txt",
+      );
+      runCommand("cat logs/auditor-log.txt");
+
+      runCommand(
+        'kubectl exec -it metrics-collector -n watch-auditor -- curl -k https://pepr-soak-ci-watcher.pepr-system.svc.cluster.local/metrics  | egrep -E "pepr_cache_miss|pepr_resync_failure_count" >> logs/informer-log.txt',
+      );
+      runCommand("cat logs/informer-log.txt");
     });
-  }, mins(1));
-  // mins(15));
-  // });
+  });
 });

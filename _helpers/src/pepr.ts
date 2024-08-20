@@ -12,7 +12,10 @@ function sift(stdout) {
     .filter(l => l !== '')
     .map(l => {
       try {
-        return JSON.parse(l)
+        const parsed = JSON.parse(l)
+        if (parsed.url && parsed.msg && parsed.name) {
+          return parsed;
+        }
       } catch { }
     })
     .filter(l => l.url !== "/healthz")

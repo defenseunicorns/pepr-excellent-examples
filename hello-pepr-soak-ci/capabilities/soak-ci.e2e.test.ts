@@ -44,25 +44,16 @@ describe("soak-ci.ts", () => {
       );
       execSync(`sleep 20`);
       runCommand(
-        `kubectl wait --for=condition=ready -n istio-system pod -l istio=pilot --timeout=300s`,
+        `kubectl wait --for=condition=ready -n istio-system pod -l istio=pilot`,
       );
       runCommand(
-        `kubectl wait --for=condition=ready -n istio-system pod -l app=istio-ingressgateway --timeout=300s`,
+        `kubectl wait --for=condition=ready -n istio-system pod -l app=istio-ingressgateway`,
       );
       runCommand(
-        `kubectl get ev -n watch-auditor --sort-by='.metadata.creationTimestamp'`,
+        `kubectl wait --for=condition=ready -n watch-auditor pod -l app=watch-auditor`,
       );
       runCommand(
-        `kubectl get po -n watch-auditor`,
-      );
-      runCommand(
-        `kubectl get deploy -n watch-auditor`,
-      );
-      runCommand(
-        `kubectl wait --for=condition=ready -n watch-auditor pod -l app=watch-auditor --timeout=300s`,
-      );
-      runCommand(
-        "kubectl run metrics-collector -n watch-auditor --image=nginx --restart=Never --timeout=300s",
+        "kubectl run metrics-collector -n watch-auditor --image=nginx --restart=Never",
       );
     } catch (error) {
       console.error("Error during setup:", error.message);

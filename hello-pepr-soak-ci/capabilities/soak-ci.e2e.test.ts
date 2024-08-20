@@ -50,6 +50,15 @@ describe("soak-ci.ts", () => {
         `kubectl wait --for=condition=ready -n istio-system pod -l app=istio-ingressgateway --timeout=300s`,
       );
       runCommand(
+        `kubectl get ev -n watch-auditor --sort-by='.metadata.creationTimestamp'`,
+      );
+      runCommand(
+        `kubectl get po -n watch-auditor`,
+      );
+      runCommand(
+        `kubectl get deploy -n watch-auditor`,
+      );
+      runCommand(
         `kubectl wait --for=condition=ready -n watch-auditor pod -l app=watch-auditor --timeout=300s`,
       );
       runCommand(

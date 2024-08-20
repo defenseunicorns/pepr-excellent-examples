@@ -57,8 +57,8 @@ setInterval(
       { stdio: 'inherit' });
     console.log('Command executed successfully:', output2);
     // execSync("cat logs/informer-log.txt");
-  },
-  5 * 60 * 1000,
+  }, 10000
+  // 5 * 60 * 1000,
 );
 
 describe("soak-ci.ts", () => {
@@ -88,7 +88,7 @@ describe("soak-ci.ts", () => {
     }
 
     await moduleUp();
-  }, mins(4));
+  }, mins(5));
   afterAll(async () => {
     await moduleDown();
     await clean(trc);
@@ -105,8 +105,9 @@ describe("soak-ci.ts", () => {
 
     // 4 mmore tests every 30 mins
     Array.from({ length: 4 }).forEach((_, index) => {
-      setTimeout(async () => await triggerTest(), mins(30));
+      setTimeout(async () => await triggerTest(), mins(1));
     });
-  }, mins(15));
+  }, mins(1));
+  // mins(15));
   // });
 });

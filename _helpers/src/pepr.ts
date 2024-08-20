@@ -13,7 +13,7 @@ function sift(stdout) {
     .map(l => {
       try {
         const parsed = JSON.parse(l)
-        if (parsed.url && parsed.msg && parsed.name) {
+        if (parsed.hasOwnProperty("url") && parsed.hasOwnProperty("msg") && parsed.hasOwnPropert("name")) {
           return parsed;
         }
       } catch (e){

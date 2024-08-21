@@ -18,6 +18,7 @@ function sift(stdout) {
         }
       } catch (e){ }
     })
+    .filter(l => l)
     .filter(l => l.url !== "/healthz")
     .filter(l => l.msg !== "Pepr Store update")
     .filter(l => l.name !== "/kube-root-ca.crt")

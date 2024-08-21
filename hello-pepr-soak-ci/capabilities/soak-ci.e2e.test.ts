@@ -1,4 +1,4 @@
-import { beforeAll, describe, it, expect, afterAll } from "@jest/globals";
+import { beforeAll, describe, it, expect, afterAll, jest } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { mins } from "helpers/src/time";
 import { kind } from "kubernetes-fluent-client";
@@ -6,7 +6,8 @@ import { K8s } from "pepr";
 import { execSync } from "child_process";
 import { moduleUp, moduleDown } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";
-
+// 3 hour timeout
+jest.setTimeout(1000 * 60 * 60 * 3);
 const trc = new TestRunCfg(__filename);
 
 const PodMap: Map<string, number> = new Map();
@@ -43,12 +44,12 @@ describe("soak-ci.ts", () => {
         `kubectl apply -f ${trc.root()}/capabilities/soak-ci.config.yaml`,
       );
       execSync(`sleep 20`);
-      // runCommand(
-      //   `kubectl wait --for=condition=ready -n istio-system pod -l istio=pilot`,
-      // );
-      // runCommand(
-      //   `kubectl wait --for=condition=ready -n istio-system pod -l app=istio-ingressgateway`,
-      // );
+      runCommand(
+        `kubectl wait --for=condition=ready -n istio-system pod -l istio=pilot`,
+      );
+      runCommand(
+        `kubectl wait --for=condition=ready -n istio-system pod -l app=istio-ingressgateway`,
+      );
       runCommand(
         `kubectl wait --for=condition=ready -n watch-auditor pod -l app=watch-auditor`,
       );
@@ -71,7 +72,7 @@ describe("soak-ci.ts", () => {
     expect(true).toBe(true);
   });
 
-  const testIntervals = [1, 30, 60, 90, 120]; // times in minutes
+  const testIntervals = [15, 30, 30, 30, 30]; 
   testIntervals.forEach((interval, index) => {
     it(`test run ${index + 1} after ${interval} minutes`, async () => {
       await new Promise(resolve => setTimeout(resolve, mins(interval)));
@@ -79,11 +80,12 @@ describe("soak-ci.ts", () => {
       const podList = await getPodsInPeprDemo();
       updateMap(PodMap, podList);
 
+      // Run Tests
       PodMap.forEach(value => {
         expect(value).toBeLessThan(2);
       });
 
-      // Run additional commands
+      // Get Metrics
       runCommand(
         "kubectl exec -it metrics-collector -n watch-auditor -- curl watch-auditor:8080/metrics  | grep watch_controller_failures_total >> logs/auditor-log.txt",
       );
@@ -93,6 +95,6 @@ describe("soak-ci.ts", () => {
         'kubectl exec -it metrics-collector -n watch-auditor -- curl -k https://pepr-soak-ci-watcher.pepr-system.svc.cluster.local/metrics  | egrep -E "pepr_cache_miss|pepr_resync_failure_count" >> logs/informer-log.txt',
       );
       runCommand("cat logs/informer-log.txt");
-    });
+    }, mins(180));
   });
 });

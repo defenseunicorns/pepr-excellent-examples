@@ -10,14 +10,7 @@ import { readFile } from 'node:fs/promises';
 function sift(stdout) {
   const parsed = stdout
     .filter(l => l !== '')
-    .map(l => {
-      try {
-        const parsed = JSON.parse(l)
-        if (parsed.url && parsed.msg && parsed.name) {
-          return parsed;
-        }
-      } catch (e){ }
-    })
+    .map(l => JSON.parse(l))
     .filter(l => l)
     .filter(l => l.url !== "/healthz")
     .filter(l => l.msg !== "Pepr Store update")

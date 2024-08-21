@@ -61,7 +61,7 @@ describe("soak-ci.ts", () => {
     }
 
     await moduleUp();
-  }, mins(5));
+  }, mins(180));
 
   afterAll(async () => {
     await moduleDown();

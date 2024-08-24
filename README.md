@@ -36,7 +36,7 @@ To run a subset of tests, give Jest the specifics via the `--passthru` flag:
 npm run test:e2e -w hello-pepr-validate -- --passthru="--testNamePattern='validate creates'"
 ```
 
-## Troubleshooting
+## Digging In
 
 ### Viewing the Example Cluster (via K9s)
 

@@ -14,7 +14,7 @@ To run all example suites:
 npm run test:e2e
 ```
 
-To run all example suites against a custom version of Pepr, specify which using the `--image` flag:
+To run all example suites against a custom version of Pepr, specify an image tag using the `--image` flag:
 
 ```sh
 npm run test:e2e -- --image pepr:dev

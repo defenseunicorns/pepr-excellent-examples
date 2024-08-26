@@ -18,6 +18,7 @@
     "hello-pepr-onschedule",
     "hello-pepr-reconcile",
     "hello-pepr-soak",
+    "hello-pepr-soak-ci",
     "hello-pepr-store",
     "hello-pepr-validate",
     "hello-pepr-watch",

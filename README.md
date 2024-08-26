@@ -8,24 +8,40 @@ Here, you'll find practical implementations that demonstrate the use of Pepr in 
 
 Most examples are designed around a test suite that demonstrates / verifies how they work.
 
-To run all example suites in a single command:
+To run all example suites:
 
 ```sh
 npm run test:e2e
 ```
 
-To run only a single example suite instead, specify which using `-w` flag:
+To run all example suites against a custom version of Pepr, specify an image tag using the `--image` flag:
+
+```sh
+npm run test:e2e -- --image pepr:dev
+```
+
+To run a single example suite, specify which to run using `-w` flag:
 
 ```sh
 # npm run test:e2e -w <npm module name>
 
-npm run test:e2e -w hello-pepr-store -- -i pepr:dev
+npm run test:e2e -w hello-pepr-validate
 ```
 
-To get even more targeted, you can select spec tests to run using some `-- --passthru` magic:
+To run a subset of tests, give Jest the specifics via the `--passthru` flag:
 
 ```sh
 # npm run test:e2e -w <npm module name> -- --passthru="<jest flags>"
 
 npm run test:e2e -w hello-pepr-validate -- --passthru="--testNamePattern='validate creates'"
 ```
+
+## Digging In
+
+### Viewing the Example Cluster (via K9s)
+
+```sh
+# KUBECONFIG=$(k3d kubeconfig write pexex-<npm module name>-e2e) k9s
+
+KUBECONFIG=$(k3d kubeconfig write pexex-hello-pepr-reconcile-e2e) k9s
+``` 

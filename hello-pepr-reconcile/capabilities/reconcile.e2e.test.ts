@@ -1,10 +1,10 @@
 import { beforeAll, afterAll, describe, it, jest, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { mins, secs, timed } from "helpers/src/time";
-import { kind } from "kubernetes-fluent-client";
 import { fullCreate } from "helpers/src/general";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
-import { clean } from "helpers/src/cluster"
+import { clean } from "helpers/src/cluster";
+import { K8s, kind } from "pepr";
 
 const trc = new TestRunCfg(__filename);
 
@@ -18,21 +18,48 @@ describe("reconcile.ts", () => {
   describe("tests reconcile module", () => {
     let logz: string[]
 
-    beforeAll(async () => {
-      const file = `${trc.root()}/capabilities/reconcile.config.yaml`;
+     beforeAll(async () => {
+      const file = `${trc.root()}/capabilities/scenario.resources.yaml`;
       await timed(`load: ${file}`, async () => {
-        const resources = await trc.load(file);
-        await fullCreate(resources, kind);
-        await untilLogged("Callback: Reconciling cm-three");
+        let [ ns, slow, fast ] = await trc.load(file)
+
+        await fullCreate([ns, slow, fast])  // slow = A, fast = X
+
+        await K8s(kind[slow.kind]).Apply({...slow, data: { note: "B"}})
+        await K8s(kind[slow.kind]).Apply({...slow, data: { note: "C"}})
+
+        await K8s(kind[fast.kind]).Apply({...fast, data: { note: "Y"}})
+        await K8s(kind[fast.kind]).Apply({...fast, data: { note: "Z"}})
+
+        await untilLogged("Callback: Reconciling cm-slow C-")
+        await untilLogged("Callback: Reconciling cm-fast Z-")
         logz = await logs();
       });
-    }, mins(1));
+    }, mins(2));
 
-    it("maintains callback order even when execution times vary", () => {
+    it("maintains callback order within a queue, paralellizes across queues", () => {
+      //          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+      // cm-slow  |+ A          -|+ B          -|+ C         - |
+      // cm-fast  |+ X    -|+ Y    -|+ Z    -|
       const results = logz.filter(l => l.includes("Callback: Reconciling"))
-      expect(results[0]).toContain("cm-one")
-      expect(results[1]).toContain("cm-two")
-      expect(results[2]).toContain("cm-three")
+      let wants = [
+        "cm-slow A+",
+        "cm-fast X+",
+        "cm-fast X-",
+        "cm-fast Y+",
+        "cm-slow A-",
+        "cm-slow B+",
+        "cm-fast Y-",
+        "cm-fast Z+",
+        "cm-fast Z-",
+        "cm-slow B-",
+        "cm-slow C+",
+        "cm-slow C-"
+      ]
+      wants.forEach((wanted, atIndex) => {
+        expect(results[atIndex]).toContain(wanted)
+      })
+
     }, secs(10));
   });
 });

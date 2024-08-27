@@ -2,7 +2,7 @@
   "name": "pepr-excellent-examples",
   "license": "Apache-2.0",
   "scripts": {
-    "pepr": "npx pepr@0.31.1",
+    "pepr": "npx pepr@0.34.1",
     "test:e2e": "npm run --workspaces test:e2e"
   },
   "workspaces": [
@@ -16,7 +16,8 @@
     "hello-pepr-ns-bounded",
     "hello-pepr-ns-wrong",
     "hello-pepr-onschedule",
-    "hello-pepr-reconcile",
+    "hello-pepr-reconcile-sharded",
+    "hello-pepr-reconcile-singular",
     "hello-pepr-soak",
     "hello-pepr-soak-ci",
     "hello-pepr-store",

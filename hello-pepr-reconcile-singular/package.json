@@ -1,5 +1,5 @@
 {
-  "name": "hello-pepr-reconcile",
+  "name": "hello-pepr-reconcile-singular",
   "version": "0.0.1",
   "description": "Pepr feature: Reconcile",
   "keywords": [
@@ -25,10 +25,12 @@
       "namespaces": []
     },
     "includedFiles": [],
-    "env": {}
+    "env": {
+      "PEPR_RECONCILE_STRATEGY": "singular"
+    }
   },
   "dependencies": {
-    "pepr": "^0.31.1"
+    "pepr": "^0.34.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

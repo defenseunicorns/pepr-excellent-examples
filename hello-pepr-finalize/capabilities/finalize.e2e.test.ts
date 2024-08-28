@@ -37,29 +37,16 @@ describe("finalize.ts", () => {
       });
     }, mins(2));
 
-    it.skip("is still TODO", () => {
+    it.skip("cm-watch", () => {
       console.log("TODO")
-    })
-    // it("executes callbacks in update order", () => {
-    //   const results = logz.filter(l => l.includes("Callback: Reconciling"))
-    //   let wants = [
-    //     "cm-slow A+",
-    //     "cm-slow A-",
-    //     "cm-fast X+",
-    //     "cm-fast X-",
-    //     "cm-slow B+",
-    //     "cm-slow B-",
-    //     "cm-slow C+",
-    //     "cm-slow C-",
-    //     "cm-fast Y+",
-    //     "cm-fast Y-",
-    //     "cm-fast Z+",
-    //     "cm-fast Z-"
-    //   ]
-    //   wants.forEach((wanted, atIndex) => {
-    //     expect(results[atIndex]).toContain(wanted)
-    //   })
 
-    // }, secs(10));
+      // verify that only Watch OR Finalize callbacks are called -- not both
+    }, secs(10));
+
+    it.skip("cm-reconcile", () => {
+      console.log("TODO")
+
+      // verify that only Reconcile OR Finalize callbacks are called -- not both
+    }, secs(10));
   });
 });

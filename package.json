@@ -10,6 +10,7 @@
     "dash-policyreport",
     "hello-pepr",
     "hello-pepr-config",
+    "hello-pepr-finalize",
     "hello-pepr-hooks",
     "hello-pepr-mutate",
     "hello-pepr-ns-all",

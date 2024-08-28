@@ -57,6 +57,6 @@ describe("finalize.ts", () => {
     //     expect(results[atIndex]).toContain(wanted)
     //   })
 
-    }, secs(10));
+    // }, secs(10));
   });
 });

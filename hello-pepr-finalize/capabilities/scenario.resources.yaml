@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-finalize
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-slow
+  namespace: hello-pepr-finalize
+data:
+  note: A
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-fast
+  namespace: hello-pepr-finalize
+data:
+  note: X

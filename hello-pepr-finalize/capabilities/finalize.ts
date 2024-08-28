@@ -15,7 +15,7 @@ When(a.ConfigMap)
     Log.info(cm)
     Log.info("TODO: external (mock) api call: create")
   })
-  .Finalize(function deleteApi(cm) {
-    Log.info(cm)
-    Log.info("TODO: external (mock) api call: create")
-  });
+  // .Finalize(function deleteApi(cm) {
+  //   Log.info(cm)
+  //   Log.info("TODO: external (mock) api call: create")
+  // });

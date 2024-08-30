@@ -67,3 +67,20 @@ spec:
     resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ns2-delete
+  name: ns2-delete
+  namespace: hello-pepr-deletion-timestamp2
+spec:
+  containers:
+  - image: nginx
+    name: ns2-delete
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}

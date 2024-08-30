@@ -110,9 +110,9 @@ When(a.Pod)
     logSeen(po.Raw.metadata.name);
   });
 
-// /*
-//  * Description: Test WithDeletionTimestamp Filter for a Watch/Reconcile Processor
-//  */
+/*
+ * Description: Test WithDeletionTimestamp Filter for a Watch/Reconcile Processor
+ */
 When(a.Pod)
   .IsUpdated()
   .InNamespace(namespace1)
@@ -120,10 +120,10 @@ When(a.Pod)
   .WithDeletionTimestamp()
   .Watch(po => logSeen(po.metadata.name));
 
-// /*
-//  * Namespace 2 - Tests
-//  * Description: Trigger an update and without trigger withDeletionTimestamp.
-//  */
+/*
+ * Namespace 2 - Tests
+ * Description: Trigger an update and without trigger withDeletionTimestamp.
+ */
 When(a.Pod)
   .IsCreated()
   .InNamespace(namespace1)
@@ -136,9 +136,9 @@ When(a.Pod)
   .WithName("ns2-watch")
   .Watch(updateObj);
 
-// /*
-//  * Description: Deletion WithDeletionTimestamp Filter should not be called - Admission Processor
-//  */
+/*
+ * Description WithDeletionTimestamp Filter should not be called - Admission Processor
+ */
 When(a.Pod)
   .IsUpdated()
   .InNamespace(namespace2)
@@ -146,12 +146,22 @@ When(a.Pod)
   .WithDeletionTimestamp()
   .Mutate(po => logSeen(po.Raw.metadata.name));
 
-// /*
-//  * Description: Deletion WithDeletionTimestamp Filter should not be called - Watch/Reconcile Processor
-//  */
+/*
+ * Description: WithDeletionTimestamp Filter should not be called - Watch/Reconcile Processor
+ */
 When(a.Pod)
   .IsUpdated()
   .InNamespace(namespace2)
   .WithName("ns2-watch")
+  .WithDeletionTimestamp()
+  .Watch(po => logSeen(po.metadata.name));
+
+/*
+ * Description: WithDeletionTimestamp Filter should  be called - Watch/Reconcile Processor
+ */
+When(a.Pod)
+  .IsDeleted()
+  .InNamespace(namespace2)
+  .WithName("ns2-delete")
   .WithDeletionTimestamp()
   .Watch(po => logSeen(po.metadata.name));

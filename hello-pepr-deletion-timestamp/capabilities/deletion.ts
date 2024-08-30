@@ -32,7 +32,7 @@ const addFinalizer = async (name: string) => {
   try {
     await K8s(a.Pod, { name, namespace: namespace1 }).Patch(patchOperations);
   } catch (e) {
-    Log.error(`DTS: Error adding finalizer to pod ${name}: ${e}`);
+    Log.error(`DTS: Error adding finalizer to pod ${name}: ${JSON.stringify(e)}`);
   }
 };
 
@@ -43,30 +43,30 @@ const removeFinalizer = async (name: string) => {
   try {
     await K8s(a.Pod, { name, namespace: namespace1 }).Patch(patchOperations);
   } catch (e) {
-    Log.error(`DTS: Error adding finalizer to pod ${name}: ${e}`);
+    Log.error(`DTS: Error removing finalizer from pod ${name}: ${JSON.stringify(e)}`);
   }
 };
 
-const updateObj = (obj: GenericKind) => {
+const updateObj = async (obj: GenericKind) => {
+
+  const patchOperations: Operation[] = [
+    {
+      op: "add",
+      path: "/metadata/labels/app",
+      value: "testing",
+    },
+  ];
   try {
-    void K8s(a.Pod).Apply({
-      metadata: {
-        name: obj.metadata.name,
-        namespace: namespace2,
-        labels: {
-          hi: "there",
-        },
-      },
-    });
+    await K8s(a.Pod, { name: obj.metadata.name, namespace: namespace2 }).Patch(patchOperations);
   } catch (e) {
-    Log.error(`DTS: Error updating pod ${obj.metadata.name}: ${e}`);
+    Log.error(`DTS: Error updating pod ${obj.metadata.name}: ${JSON.stringify(e)}`);
   }
 };
 const deleteObj = async (obj: GenericKind) => {
   try {
     await K8s(a.Pod).InNamespace(namespace1).Delete(obj.metadata.name);
   } catch (e) {
-    Log.error(`DTS: Error deleting pod ${obj.metadata.name}: ${e}`);
+    Log.error(`DTS: Error deleting pod ${obj.metadata.name}: ${JSON.stringify(e)}`);
   }
 };
 
@@ -126,15 +126,15 @@ When(a.Pod)
  */
 When(a.Pod)
   .IsCreated()
-  .InNamespace(namespace1)
+  .InNamespace(namespace2)
   .WithName("ns2-admission")
-  .Watch(updateObj);
+  .Watch(async(po) => await updateObj(po));
 
 When(a.Pod)
   .IsCreated()
-  .InNamespace(namespace1)
+  .InNamespace(namespace2)
   .WithName("ns2-watch")
-  .Watch(updateObj);
+  .Watch(async(po) => await updateObj(po));
 
 /*
  * Description WithDeletionTimestamp Filter should not be called - Admission Processor

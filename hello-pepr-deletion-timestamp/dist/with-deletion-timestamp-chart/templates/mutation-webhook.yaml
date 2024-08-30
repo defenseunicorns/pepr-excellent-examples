@@ -1,0 +1,53 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ .Values.uuid }}
+webhooks:
+  - name: {{ .Values.uuid }}.pepr.dev
+    admissionReviewVersions:
+      - v1
+      - v1beta1
+    clientConfig:
+      caBundle: >-
+        LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlDdERDQ0FaeWdBd0lCQWdJQkFUQU5CZ2txaGtpRzl3MEJBUXNGQURBY01Sb3dHQVlEVlFRREV4RlFaWEJ5DQpJRVZ3YUdWdFpYSmhiQ0JEUVRBZUZ3MHlOREE0TXpBeE56RXhNVFZhRncweU5UQTRNekF4TnpFeE1UVmFNQUF3DQpnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDNTFXVTZpM0M0ckF0RVoyRERsdEs1DQpHWkErbU1tOGYxb2hQa1dJRGRvVFdoNmg4RWJVRDErck1ZcnlaSUpINDU3MGVJSmdEYUlybkFtaXhibDl6eC9XDQowNkR1TWVjZ0JKblhqT0RpRUlMQnU1aTZmMUFmWDFYU1RhNzlMK2RTL0Y5bHdwejBqU0I0RmMwQTQ4cU15eEZiDQp4MzlhUFlvMmZjSHR6LzlneUwvTzFIM21oTTZUdUsrcWFNQTY0NElQM0xvcmthVGRjQ3NUYStVZThwZ0IxMkV0DQpFOEI5RzVtdFFLRFkybmR0UldteVBKeUJlMDhJd25kRDVEYVVoQjhNRytjZ1pvWk4yTWtrMXVwNkNBUW1UNGJlDQpSN0FJWVJhOWZlMUwxUWtSWWtmaTdsUEdqTVA1SlpFZDVnOStvUWduL3hVTmc0S0U5anFVeFJuelUvOXZJaUVYDQpBZ01CQUFHakhUQWJNQXdHQTFVZEV3UUZNQU1CQWY4d0N3WURWUjBQQkFRREFnTDBNQTBHQ1NxR1NJYjNEUUVCDQpDd1VBQTRJQkFRQVdDTVA2WDZockR2VW1LUXZUTitCcE94NzE4QVFyQVhKTlNHN1BYWlZnaTlZM2ZKbnRDTkl0DQpQaEZzRlBDL0crQ1NVVG5DNW9QYTNBeEhVMEV2RU02L1ZpdGU4WUdMRVR6Y1RRaFBIQVgwRm1XZ2krU1ZNY0xCDQo0bytKYnhHY25DK0RaQjg5TDJycUxGdzZoWW1FK2E2K3pkZzFDVWNtL3NPeVdabkZYek1SdXlTMGQ0MDc5dWwxDQphSTVRV3ZNSDBSeVVtNmNKWWlnd0Z5QUIxZ09FRWZpWmNHVkxMOXBvdGM3UEJobkk5SnNkZG5Cbk44N0VTNzdyDQpzNUtIMEV3ZFk3WjMvMDV5VFlKQlg5SUprV2VDT292UnVPMmRiUzM3YkRtNzFtbmIwa0JiQXZVdkE2a1k3R1JRDQprSFJqN2hMbFBKNmphWVBOSFl1bys2MVJuWUY5TDQ0aw0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ0K
+      service:
+        name: {{ .Values.uuid }}
+        namespace: pepr-system
+        path: >-
+          /mutate/285af554242ea6c3e0d6d8a1d3c8a727c6c8edd5820686be0e6766bc5e088f52
+    failurePolicy: {{ .Values.admission.failurePolicy }}
+    matchPolicy: Equivalent
+    timeoutSeconds: {{ .Values.admission.webhookTimeout }}
+    namespaceSelector:
+      matchExpressions:
+        - key: pepr.dev
+          operator: NotIn
+          values:
+            - ignore
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - kube-system
+            - pepr-system
+    objectSelector:
+      matchExpressions:
+        - key: pepr.dev
+          operator: NotIn
+          values:
+            - ignore
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - kube-system
+            - pepr-system
+    rules:
+      - apiGroups:
+          - ''
+        apiVersions:
+          - v1
+        operations:
+          - UPDATE
+        resources:
+          - pods
+          - pods/ephemeralcontainers
+    sideEffects: None

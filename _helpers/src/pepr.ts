@@ -10,7 +10,7 @@ import { readFile } from 'node:fs/promises';
 function sift(stdout) {
   try {
     const parsed = stdout
-      .filter(l => l !== '')
+      .filter(l => l !== '' && !l.includes('DEP0040')  && !l.includes('--trace-deprecation'))
       .map(l => JSON.parse(l))
       .filter(l => l)
       .filter(l => l.url !== "/healthz")

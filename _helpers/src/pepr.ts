@@ -8,17 +8,23 @@ import { cwd } from 'node:process';
 import { readFile } from 'node:fs/promises';
 
 function sift(stdout) {
-  const parsed = stdout
-    .filter(l => l !== '')
-    .map(l => JSON.parse(l))
-    .filter(l => l)
-    .filter(l => l.url !== "/healthz")
-    .filter(l => l.msg !== "Pepr Store update")
-    .filter(l => l.name !== "/kube-root-ca.crt")
+  try {
+    const parsed = stdout
+      .filter(l => l !== '')
+      .map(l => JSON.parse(l))
+      .filter(l => l)
+      .filter(l => l.url !== "/healthz")
+      .filter(l => l.msg !== "Pepr Store update")
+      .filter(l => l.name !== "/kube-root-ca.crt")
 
-  parsed.sort((l, r) => l.time - r.time)
+    parsed.sort((l, r) => l.time - r.time)
 
-  return parsed.map(l => JSON.stringify(l))
+    return parsed.map(l => JSON.stringify(l))
+
+  } catch (e) {
+    console.log(stdout);
+    console.error(e);
+  }
 }
 
 export async function logs() {

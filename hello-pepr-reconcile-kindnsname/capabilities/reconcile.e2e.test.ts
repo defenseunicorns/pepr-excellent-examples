@@ -39,9 +39,10 @@ describe("reconcile.ts", () => {
         await K8s(kind[seSlow.kind]).Apply({...seSlow, stringData: { note: "S"}})
         await K8s(kind[seFast.kind]).Apply({...seFast, stringData: { note: "V"}})
 
-        await untilLogged("Callback: Reconciling se-fast V-")
-        await untilLogged("Callback: Reconciling se-slow S-")
         await untilLogged("Callback: Reconciling cm-fast F-")
+        await untilLogged("Callback: Reconciling se-fast V-")
+        await untilLogged("Callback: Reconciling cm-slow C-")
+        await untilLogged("Callback: Reconciling se-slow S-")
         logz = await logs();
       });
     }, mins(2));
@@ -49,10 +50,10 @@ describe("reconcile.ts", () => {
     it("maintains callback order within a queue, paralellizes across queues", () => {
       // Queue - Resource - 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
       // 
-      // 1     - cm-slow  - |+ A          -|        |+ B          -|        |+ C         - |
-      // 1     - cm-fast  -                |+ D    -|              |+ E    -|              |+ F    -|
-      // 2     - se-slow  - |+ Q          -|+ R          -|+ S         - |
-      // 3     - se-fast  - |+ T    -|+ U    -|+ V    -|
+      // 1     - cm-slow  - |+ A          -|+ B          -|+ C         - |
+      // 2     - cm-fast  - |+ D    -|+ E    -|+ F    -|
+      // 3     - se-slow  - |+ Q          -|+ R          -|+ S         - |
+      // 4     - se-fast  - |+ T    -|+ U    -|+ V    -|
       //
       // ^-- read: l-to-r (time), t-to-b (event @ time)
       //     remember: within a queue events complete (-) before subsequents start (+)
@@ -60,29 +61,29 @@ describe("reconcile.ts", () => {
 
       let wants = [
         "cm-slow A+",
+        "cm-fast D+",
         "se-slow Q+",
         "se-fast T+",
+        "cm-fast D-",
+        "cm-fast E+",
         "se-fast T-",
         "se-fast U+",
         "cm-slow A-",
-        "cm-fast D+",
+        "cm-slow B+",
         "se-slow Q-",
         "se-slow R+",
+        "cm-fast E-",
+        "cm-fast F+",
         "se-fast U-",
         "se-fast V+",
-        "cm-fast D-",
-        "cm-slow B+",
+        "cm-fast F-",
         "se-fast V-",
+        "cm-slow B-",
+        "cm-slow C+",
         "se-slow R-",
         "se-slow S+",
-        "cm-slow B-",
-        "cm-fast E+",
-        "se-slow S-",
-        "cm-fast E-",
-        "cm-slow C+",
         "cm-slow C-",
-        "cm-fast F+",
-        "cm-fast F-",
+        "se-slow S-",
       ]
       wants.forEach((wanted, atIndex) => {
         expect(results[atIndex]).toContain(wanted)

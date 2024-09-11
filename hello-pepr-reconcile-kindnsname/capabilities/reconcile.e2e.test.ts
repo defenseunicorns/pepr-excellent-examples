@@ -48,15 +48,17 @@ describe("reconcile.ts", () => {
     }, mins(2));
 
     it("maintains callback order within a queue, paralellizes across queues", () => {
-      // Queue - Resource - 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+      /* eslint-disable */
+      // Queue : Resource : 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
       // 
-      // 1     - cm-slow  - |+ A          -|+ B          -|+ C         - |
-      // 2     - cm-fast  - |+ D    -|+ E    -|+ F    -|
-      // 3     - se-slow  - |+ Q          -|+ R          -|+ S         - |
-      // 4     - se-fast  - |+ T    -|+ U    -|+ V    -|
+      // 1     : cm-slow  : |+ A          -|+ B          -|+ C         - |
+      // 2     : cm-fast  : |+ D    -|+ E    -|+ F    -|
+      // 3     : se-slow  : |+ Q          -|+ R          -|+ S         - |
+      // 4     : se-fast  : |+ T    -|+ U    -|+ V    -|
       //
       // ^-- read: l-to-r (time), t-to-b (event @ time)
       //     remember: within a queue events complete (-) before subsequents start (+)
+      /* eslint-enable */
       const results = logz.filter(l => l.includes("Callback: Reconciling"))
 
       let wants = [

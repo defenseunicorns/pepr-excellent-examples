@@ -1,5 +1,5 @@
 {
-  "name": "hello-pepr-reconcile-kindns",
+  "name": "hello-pepr-reconcile-global",
   "version": "0.0.1",
   "description": "Pepr feature: Reconcile",
   "keywords": [
@@ -13,7 +13,7 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "uuid": "ba470436-aa20-4e7c-8ec9-2ff2f0eda4c9",
+    "uuid": "474c06b2-91c7-45e7-bf2f-13eac20ba229",
     "onError": "reject",
     "webhookTimeout": 10,
     "customLabels": {
@@ -26,7 +26,7 @@
     },
     "includedFiles": [],
     "env": {
-      "PEPR_RECONCILE_STRATEGY": "kindNs"
+      "PEPR_RECONCILE_STRATEGY": "global"
     }
   },
   "dependencies": {

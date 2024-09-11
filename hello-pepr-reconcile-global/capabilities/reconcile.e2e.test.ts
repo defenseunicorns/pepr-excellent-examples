@@ -21,8 +21,8 @@ describe("reconcile.ts", () => {
     beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.resources.yaml`;
       await timed(`load: ${file}`, async () => {
-        let [ ns, cmSlow, cmFast, seSlow, seFast ] = await trc.load(file)
-        await fullCreate(ns)
+        let [ nsOne, nsTwo, cmSlow, cmFast, seSlow, seFast ] = await trc.load(file)
+        await fullCreate([nsOne, nsTwo])
 
         await K8s(kind[cmSlow.kind]).Apply({...cmSlow }) // note "A"
         await K8s(kind[cmFast.kind]).Apply({...cmFast }) // note "D"
@@ -39,7 +39,9 @@ describe("reconcile.ts", () => {
         await K8s(kind[seSlow.kind]).Apply({...seSlow, stringData: { note: "S"}})
         await K8s(kind[seFast.kind]).Apply({...seFast, stringData: { note: "V"}})
 
+        await untilLogged("Callback: Reconciling cm-slow C-")
         await untilLogged("Callback: Reconciling cm-fast F-")
+        await untilLogged("Callback: Reconciling se-slow S-")
         await untilLogged("Callback: Reconciling se-fast V-")
         logz = await logs();
       });
@@ -47,12 +49,12 @@ describe("reconcile.ts", () => {
 
     it("maintains callback order within a queue, paralellizes across queues", () => {
       /* eslint-disable */
-      // Queue : Resource : 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+      // Queue : Resource : 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
       // 
-      // 1     : cm-slow  : |+ A          -|        |+ B          -|        |+ C         - |
-      // 1     : cm-fast  :                |+ D    -|              |+ E    -|              |+ F    -|
-      // 2     : se-slow  : |+ Q          -|        |+ R          -|        |+ S         - |
-      // 2     : se-fast  :                |+ T    -|              |+ U    -|              |+ V    -|
+      // 1     : cm-slow  : |+ A          -|                                |+ B          -|                                |+ C         - |
+      // 1     : cm-fast  :                |+ D    -|                                      |+ E    -|                                      |+ F    -|
+      // 1     : se-slow  :                         |+ Q          -|                                |+ R          -|                                |+ S         - |
+      // 1     : se-fast  :                                        |+ T    -|                                      |+ U    -|                                      |+ V    -|
       //
       // ^-- read: l-to-r (time), t-to-b (event @ time)
       //     remember: within a queue events complete (-) before subsequents start (+)
@@ -61,28 +63,28 @@ describe("reconcile.ts", () => {
 
       let wants = [
         "cm-slow A+",
-        "se-slow Q+",
         "cm-slow A-",
         "cm-fast D+",
+        "cm-fast D-",
+        "se-slow Q+",
         "se-slow Q-",
         "se-fast T+",
-        "cm-fast D-",
-        "cm-slow B+",
         "se-fast T-",
-        "se-slow R+",
+        "cm-slow B+",
         "cm-slow B-",
         "cm-fast E+",
+        "cm-fast E-",
+        "se-slow R+",
         "se-slow R-",
         "se-fast U+",
-        "cm-fast E-",
-        "cm-slow C+",
         "se-fast U-",
-        "se-slow S+",
+        "cm-slow C+",
         "cm-slow C-",
         "cm-fast F+",
+        "cm-fast F-",
+        "se-slow S+",
         "se-slow S-",
         "se-fast V+",
-        "cm-fast F-",
         "se-fast V-",
       ]
       wants.forEach((wanted, atIndex) => {

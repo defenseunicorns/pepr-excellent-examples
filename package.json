@@ -16,6 +16,7 @@
     "hello-pepr-ns-bounded",
     "hello-pepr-ns-wrong",
     "hello-pepr-onschedule",
+    "hello-pepr-reconcile-global",
     "hello-pepr-reconcile-kind",
     "hello-pepr-reconcile-kindns",
     "hello-pepr-reconcile-kindnsname",

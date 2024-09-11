@@ -1,6 +1,6 @@
 import { beforeAll, afterAll, describe, it, jest, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { mins, secs, timed } from "helpers/src/time";
+import { mins, secs, timed, sleep } from "helpers/src/time";
 import { fullCreate } from "helpers/src/general";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";
@@ -21,8 +21,8 @@ describe("reconcile.ts", () => {
     beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.resources.yaml`;
       await timed(`load: ${file}`, async () => {
-        let [ ns, cmSlow, cmFast, seSlow, seFast ] = await trc.load(file)
-        await fullCreate(ns)
+        let [ nsOne, nsTwo, cmSlow, cmFast, seSlow, seFast ] = await trc.load(file)
+        await fullCreate([nsOne, nsTwo])
 
         await K8s(kind[cmSlow.kind]).Apply({...cmSlow }) // note "A"
         await K8s(kind[cmFast.kind]).Apply({...cmFast }) // note "D"
@@ -39,8 +39,9 @@ describe("reconcile.ts", () => {
         await K8s(kind[seSlow.kind]).Apply({...seSlow, stringData: { note: "S"}})
         await K8s(kind[seFast.kind]).Apply({...seFast, stringData: { note: "V"}})
 
-        await untilLogged("Callback: Reconciling cm-fast F-")
         await untilLogged("Callback: Reconciling se-fast V-")
+        await untilLogged("Callback: Reconciling se-slow S-")
+        await untilLogged("Callback: Reconciling cm-fast F-")
         logz = await logs();
       });
     }, mins(2));
@@ -50,8 +51,8 @@ describe("reconcile.ts", () => {
       // 
       // 1     - cm-slow  - |+ A          -|        |+ B          -|        |+ C         - |
       // 1     - cm-fast  -                |+ D    -|              |+ E    -|              |+ F    -|
-      // 2     - se-slow  - |+ Q          -|        |+ R          -|        |+ S         - |
-      // 2     - se-fast  -                |+ T    -|              |+ U    -|              |+ V    -|
+      // 2     - se-slow  - |+ Q          -|+ R          -|+ S         - |
+      // 3     - se-fast  - |+ T    -|+ U    -|+ V    -|
       //
       // ^-- read: l-to-r (time), t-to-b (event @ time)
       //     remember: within a queue events complete (-) before subsequents start (+)
@@ -60,28 +61,28 @@ describe("reconcile.ts", () => {
       let wants = [
         "cm-slow A+",
         "se-slow Q+",
+        "se-fast T+",
+        "se-fast T-",
+        "se-fast U+",
         "cm-slow A-",
         "cm-fast D+",
         "se-slow Q-",
-        "se-fast T+",
+        "se-slow R+",
+        "se-fast U-",
+        "se-fast V+",
         "cm-fast D-",
         "cm-slow B+",
-        "se-fast T-",
-        "se-slow R+",
+        "se-fast V-",
+        "se-slow R-",
+        "se-slow S+",
         "cm-slow B-",
         "cm-fast E+",
-        "se-slow R-",
-        "se-fast U+",
+        "se-slow S-",
         "cm-fast E-",
         "cm-slow C+",
-        "se-fast U-",
-        "se-slow S+",
         "cm-slow C-",
         "cm-fast F+",
-        "se-slow S-",
-        "se-fast V+",
         "cm-fast F-",
-        "se-fast V-",
       ]
       wants.forEach((wanted, atIndex) => {
         expect(results[atIndex]).toContain(wanted)

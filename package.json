@@ -17,6 +17,7 @@
     "hello-pepr-ns-wrong",
     "hello-pepr-onschedule",
     "hello-pepr-reconcile-kind",
+    "hello-pepr-reconcile-kindns",
     "hello-pepr-soak",
     "hello-pepr-soak-ci",
     "hello-pepr-store",

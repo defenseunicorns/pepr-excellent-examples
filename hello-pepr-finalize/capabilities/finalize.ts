@@ -13,23 +13,19 @@ When(a.ConfigMap)
   .InNamespace("hello-pepr-finalize")
   .WithName("cm-watch")
   .Watch(function createApi(cm) {
-    Log.info(cm)
-    Log.info("TODO: external (mock) api call: create")
+    Log.info(cm, "TODO: external (mock) api call: watch/create")
   })
-  // .Finalize(function deleteApi(cm) {
-  //   Log.info(cm)
-  //   Log.info("TODO: external (mock) api call: create")
-  // });
+  .Finalize(function deleteApi(cm) {
+    Log.info(cm, "TODO: external (mock) api call: watch/delete")
+  });
 
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace("hello-pepr-finalize")
   .WithName("cm-reconcile")
   .Reconcile(function createApi(cm) {
-    Log.info(cm)
-    Log.info("TODO: external (mock) api call: create")
+    Log.info(cm, "TODO: external (mock) api call: reconcile/create")
   })
-  // .Finalize(function deleteApi(cm) {
-  //   Log.info(cm)
-  //   Log.info("TODO: external (mock) api call: create")
-  // });
+  .Finalize(function deleteApi(cm) {
+    Log.info(cm, "TODO: external (mock) api call: reconcile/delete")
+  });

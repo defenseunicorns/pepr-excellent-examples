@@ -8,13 +8,11 @@ kind: ConfigMap
 metadata:
   name: cm-watch
   namespace: hello-pepr-finalize
-data:
-  note: A
+data: {}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cm-reconcile
   namespace: hello-pepr-finalize
-data:
-  note: X
+data: {}

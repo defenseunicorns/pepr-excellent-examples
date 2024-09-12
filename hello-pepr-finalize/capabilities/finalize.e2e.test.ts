@@ -1,6 +1,6 @@
 import { beforeAll, afterAll, describe, it, jest, expect } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { mins, secs, timed } from "helpers/src/time";
+import { mins, secs, timed, sleep } from "helpers/src/time";
 import { fullCreate } from "helpers/src/general";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";
@@ -21,32 +21,28 @@ describe("finalize.ts", () => {
      beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.resources.yaml`;
       await timed(`load: ${file}`, async () => {
-        // let [ ns, slow, fast ] = await trc.load(file)
+        let [ ns, cmWatch, cmReconcile ] = await trc.load(file)
+        await fullCreate([ns, cmWatch, cmReconcile])
 
-        // await fullCreate([ns, slow, fast])  // slow = A, fast = X
+        // await K8s(kind[cmWatch.kind]).InNamespace(cmWatch.metadata.namespace).Delete(cmWatch.metadata.name)
+        // await K8s(kind[cmReconcile.kind]).InNamespace(cmReconcile.metadata.namespace).Delete(cmReconcile.metadata.name)
 
-        // await K8s(kind[slow.kind]).Apply({...slow, data: { note: "B"}})
-        // await K8s(kind[slow.kind]).Apply({...slow, data: { note: "C"}})
-
-        // await K8s(kind[fast.kind]).Apply({...fast, data: { note: "Y"}})
-        // await K8s(kind[fast.kind]).Apply({...fast, data: { note: "Z"}})
-
-        // await untilLogged("Callback: Reconciling cm-slow C-")
-        // await untilLogged("Callback: Reconciling cm-fast Z-")
+        await sleep(110);
+        // await untilLogged("Removed finalizer: ", 2)
         logz = await logs();
       });
     }, mins(2));
 
-    it.skip("cm-watch", () => {
-      console.log("TODO")
-
-      // verify that only Watch OR Finalize callbacks are called -- not both
-    }, secs(10));
+    it("cm-watch", async () => {
+      let results = logz.filter(l => l.includes('TODO: '))
+      console.log(results)
+      await sleep(mins(9))
+      expect(true).toBe(false);
+    }, mins(10));
+    // }, secs(10));
 
     it.skip("cm-reconcile", () => {
       console.log("TODO")
-
-      // verify that only Reconcile OR Finalize callbacks are called -- not both
     }, secs(10));
   });
 });

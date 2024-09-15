@@ -13,10 +13,10 @@ When(a.ConfigMap)
   .InNamespace("hello-pepr-finalize")
   .WithName("cm-watch")
   .Watch(function createApi(cm) {
-    Log.info(cm, "TODO: external (mock) api call: watch/create")
+    Log.info(cm, "external api call: watch/create")
   })
   .Finalize(function deleteApi(cm) {
-    Log.info(cm, "TODO: external (mock) api call: watch/delete")
+    Log.info(cm, "external api call: watch/delete")
   });
 
 When(a.ConfigMap)
@@ -24,8 +24,18 @@ When(a.ConfigMap)
   .InNamespace("hello-pepr-finalize")
   .WithName("cm-reconcile")
   .Reconcile(function createApi(cm) {
-    Log.info(cm, "TODO: external (mock) api call: reconcile/create")
+    Log.info(cm, "external api call: reconcile/create")
   })
   .Finalize(function deleteApi(cm) {
-    Log.info(cm, "TODO: external (mock) api call: reconcile/delete")
+    Log.info(cm, "external api call: reconcile/delete")
   });
+
+  //TODO:
+  // When(a.ConfigMap)
+  // .IsCreatedOrUpdated()
+
+  // When(a.ConfigMap)
+  // .IsUpdated()
+
+  // When(a.ConfigMap)
+  // .IsDeleted()

@@ -24,25 +24,27 @@ describe("finalize.ts", () => {
         let [ ns, cmWatch, cmReconcile ] = await trc.load(file)
         await fullCreate([ns, cmWatch, cmReconcile])
 
-        // await K8s(kind[cmWatch.kind]).InNamespace(cmWatch.metadata.namespace).Delete(cmWatch.metadata.name)
-        // await K8s(kind[cmReconcile.kind]).InNamespace(cmReconcile.metadata.namespace).Delete(cmReconcile.metadata.name)
+        await K8s(kind[cmWatch.kind]).Delete(cmWatch)
+        await K8s(kind[cmReconcile.kind]).Delete(cmReconcile)
 
-        await sleep(110);
-        // await untilLogged("Removed finalizer: ", 2)
+        await untilLogged("Removed finalizer: ", 2)
         logz = await logs();
       });
     }, mins(2));
 
-    it("cm-watch", async () => {
-      let results = logz.filter(l => l.includes('TODO: '))
+    it("create", async () => {
+      let results = logz.filter(l => l.includes('"msg":"external api call:'))
       console.log(results)
-      await sleep(mins(9))
-      expect(true).toBe(false);
-    }, mins(10));
-    // }, secs(10));
 
-    it.skip("cm-reconcile", () => {
-      console.log("TODO")
+      let wants = [
+        "watch/create",
+        "reconcile/create",
+        "watch/delete",
+        "reconcile/delete"
+      ]
+      wants.forEach((wanted, atIndex) => {
+        expect(results[atIndex]).toContain(wanted)
+      })
     }, secs(10));
   });
 });

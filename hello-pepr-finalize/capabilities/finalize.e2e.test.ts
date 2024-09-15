@@ -19,7 +19,7 @@ describe("finalize.ts", () => {
     let logz: string[]
 
      beforeAll(async () => {
-      const file = `${trc.root()}/capabilities/scenario.resources.yaml`;
+      const file = `${trc.root()}/capabilities/scenario.create.yaml`;
       await timed(`load: ${file}`, async () => {
         let [ ns, cmWatch, cmReconcile ] = await trc.load(file)
         await fullCreate([ns, cmWatch, cmReconcile])
@@ -34,17 +34,13 @@ describe("finalize.ts", () => {
 
     it("create", async () => {
       let results = logz.filter(l => l.includes('"msg":"external api call:'))
-      console.log(results)
 
-      let wants = [
-        "watch/create",
-        "reconcile/create",
-        "watch/delete",
-        "reconcile/delete"
-      ]
-      wants.forEach((wanted, atIndex) => {
-        expect(results[atIndex]).toContain(wanted)
-      })
+      expect(results).toEqual(expect.arrayContaining([
+        expect.stringMatching("watch/create"),
+        expect.stringMatching("reconcile/create"),
+        expect.stringMatching("watch/delete"),
+        expect.stringMatching("reconcile/delete")
+      ]))
     }, secs(10));
   });
 });

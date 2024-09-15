@@ -6,13 +6,13 @@ metadata:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cm-watch
+  name: cm-watch-create
   namespace: hello-pepr-finalize
 data: {}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cm-reconcile
+  name: cm-reconcile-create
   namespace: hello-pepr-finalize
 data: {}

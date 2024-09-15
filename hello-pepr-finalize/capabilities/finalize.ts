@@ -11,7 +11,7 @@ const { When } = HelloPeprFinalize;
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace("hello-pepr-finalize")
-  .WithName("cm-watch")
+  .WithName("cm-watch-create")
   .Watch(function createApi(cm) {
     Log.info(cm, "external api call: watch/create")
   })
@@ -22,7 +22,7 @@ When(a.ConfigMap)
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace("hello-pepr-finalize")
-  .WithName("cm-reconcile")
+  .WithName("cm-reconcile-create")
   .Reconcile(function createApi(cm) {
     Log.info(cm, "external api call: reconcile/create")
   })

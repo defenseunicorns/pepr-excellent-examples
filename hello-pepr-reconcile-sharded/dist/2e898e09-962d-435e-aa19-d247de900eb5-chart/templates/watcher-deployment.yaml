@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.uuid }}-watcher
+  namespace: pepr-system
+  annotations:
+    {{- toYaml .Values.watcher.annotations | nindent 4 }}
+  labels:
+    {{- toYaml .Values.watcher.labels | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.uuid }}-watcher
+      pepr.dev/controller: watcher
+  template:
+    metadata:
+      annotations: 
+        buildTimestamp: "1726493859556"
+        {{- if .Values.watcher.podAnnotations }}
+        {{- toYaml .Values.watcher.podAnnotations | nindent 8 }}
+        {{- end }}
+      labels:
+        app: {{ .Values.uuid }}-watcher
+        pepr.dev/controller: watcher
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.watcher.terminationGracePeriodSeconds }}
+      serviceAccountName: {{ .Values.uuid }}
+      securityContext:
+        {{- toYaml .Values.admission.securityContext | nindent 8 }}
+      containers:
+        - name: watcher
+          image: {{ .Values.watcher.image }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - node
+            - /app/node_modules/pepr/dist/controller.js
+            - {{ .Values.hash }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+              scheme: HTTPS
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+              scheme: HTTPS
+          ports:
+            - containerPort: 3000
+          resources:
+            {{- toYaml .Values.watcher.resources | nindent 12 }}
+          env:
+            {{- toYaml .Values.watcher.env | nindent 12 }}
+            - name: PEPR_WATCH_MODE
+              value: "true"
+          envFrom:
+            {{- toYaml .Values.watcher.envFrom | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.watcher.containerSecurityContext | nindent 12 }}
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /etc/certs
+              readOnly: true
+            - name: module
+              mountPath: /app/load
+              readOnly: true
+            {{- if .Values.watcher.extraVolumeMounts }}
+            {{- toYaml .Values.watcher.extraVolumeMounts | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: {{ .Values.uuid }}-tls
+        - name: module
+          secret:
+            secretName: {{ .Values.uuid }}-module
+        {{- if .Values.watcher.extraVolumes }}
+        {{- toYaml .Values.watcher.extraVolumes | nindent 8 }}
+        {{- end }}
+    

@@ -1,0 +1,328 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pepr-system
+  labels:
+    pepr.dev: ''
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+rules:
+  - apiGroups:
+      - '*'
+    resources:
+      - '*'
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+subjects:
+  - kind: ServiceAccount
+    name: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+    namespace: pepr-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+  namespace: pepr-system
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5-api-token
+  namespace: pepr-system
+type: Opaque
+data:
+  value: >-
+    ZmJmYTliOTM0ZGVhMzk5MmQxYmE5MGNjYWI0NWVmMTA4ZTRmZWFlNzliMjBmZWQ3NjBhY2E5NzMzOWIyNTA2Yg==
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5-tls
+  namespace: pepr-system
+type: kubernetes.io/tls
+data:
+  tls.crt: >-
+    LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlDd3pDQ0FhdWdBd0lCQWdJQkFUQU5CZ2txaGtpRzl3MEJBUXNGQURBQU1CNFhEVEkwTURreE5qRXpNemMwDQpNRm9YRFRJMU1Ea3hOakV6TXpjME1Gb3dBRENDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DDQpnZ0VCQUtwdlB5dTlKRHhZSXM1eWhvbmh6NG04bEppak5IQytJcFlHK3FSUnFhL0t4Z2VTOFp4dTlnb214UHlPDQpSZXVwOCtkRm9ndzhKRmVqbzRCbDBTcllrYzNTNmtmTXBSMFRKc0xnUzZUZnpXMnhJT0NoSGdtZjBxbjlJQVBnDQpuSVFFMU5yWDRjQjVRUnZuZEUwZWUrS0ZocWl1aGUvbi9VSnE0dkxPdjI1WkZuMlpYWlBlWE5DbmFtR3RDTERwDQpwT1lORDUyR1B6cGdKdUpPY2pwL0NEdEUvQnF6RUhldFM3eTkyYmozMDN4TTArR2FubmpGVWpiSEc1YlUyRTJGDQpQZUxJWTlFNEpmTUxLVkkwaUwxd250SGx3NkMxR2l2eW5iUndXS0lCMzg3bkx4aVlBTExnYWY3WVIyOCtjUG0yDQpmK2hjZklUNTVxNTJCVmROMWIzbE5KRm5pNjBDQXdFQUFhTklNRVl3UkFZRFZSMFJCRDB3TzRJNWNHVndjaTB5DQpaVGc1T0dVd09TMDVOakprTFRRek5XVXRZV0V4T1Mxa01qUTNaR1U1TURCbFlqVXVjR1Z3Y2kxemVYTjBaVzB1DQpjM1pqTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFCRFlVanVib2pUdUN0UTE1Y3VvcENHVzF3a1RCbkwycU8xDQpPNXRWOUlaNzBzb01wQWJMRXVIUjJLb3lxNVE3UzB2QVFqSDhaZURoT2VaK2Fid205WVp6RTdEc1ZnL0lyL0V1DQp2TEVjcEEyaW9OdmhaWnBpWlNhaExhWEVvOThHSVF3R243NWwySzY5RnlHeHFhRGlObGhDcW9ES2ZXTmw4bHA5DQorS0gveHhMNnF4ZlB3WXJOSzMxUFh3UVR1NnlGN1cyUHROUG1CaVorYmdDNnVpNUVwK3NYRnQ4R3cwZVYzb1FHDQpaT08zTkFVamd4VGNYTit3ZjJIWkZlY1MxeE9ueWpMSm51NXR6T2JSdjdIWTRvZUppOWZMSkJxTHhiTDE0b1BDDQp0UTJDZUFIbzFlOTVPT2RHNnc2T3NvdFFHNlBHOERNYUhaQ1pQWlNNOHgvcURSZmdvVGRwDQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tDQo=
+  tls.key: >-
+    LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQ0KTUlJRW93SUJBQUtDQVFFQXFtOC9LNzBrUEZnaXpuS0dpZUhQaWJ5VW1LTTBjTDRpbGdiNnBGR3ByOHJHQjVMeA0Kbkc3MkNpYkUvSTVGNjZuejUwV2lERHdrVjZPamdHWFJLdGlSemRMcVI4eWxIUk1td3VCTHBOL05iYkVnNEtFZQ0KQ1ovU3FmMGdBK0NjaEFUVTJ0Zmh3SGxCRytkMFRSNTc0b1dHcUs2RjcrZjlRbXJpOHM2L2Jsa1dmWmxkazk1Yw0KMEtkcVlhMElzT21rNWcwUG5ZWS9PbUFtNGs1eU9uOElPMFQ4R3JNUWQ2MUx2TDNadVBmVGZFelQ0WnFlZU1WUw0KTnNjYmx0VFlUWVU5NHNoajBUZ2w4d3NwVWpTSXZYQ2UwZVhEb0xVYUsvS2R0SEJZb2dIZnp1Y3ZHSmdBc3VCcA0KL3RoSGJ6NXcrYlovNkZ4OGhQbm1ybllGVjAzVnZlVTBrV2VMclFJREFRQUJBb0lCQUFEdThOZEtKWFB3M01RZw0KTU9sNTBzVmdrZWw0MStod1A5Y0FUYnhUeHgwMm9JdXI0ZWs2K2NNei9rc2c3T2ZjOXUzN0toSXFPWlM1MjdEWA0Kc3p4Q3lTeExQazdVaXhPRFFkeGUzN1JSMzRwR1N0MHVpVVdITEgzV2ZwdVVpdVBYSml2V3ZIREMrVHZJbWY2WA0KcGVnNXQ2UVNGWTd1RWJHRWJBeUQ0bU1SYWJ4QzBYVnIyOFpoejJHMSswcXVISVo2dUlJd1F3dEM2YktpSmY5aA0KK3d3RnRBL1l0dThPU1hqNkh1QnRXdE5lZXpMWXFKYTR5RVNFdkkvSWljVDVvYWtlSnJuakRKWm9wTno3WmZscg0KTXFjWFc5bjlsbmd2elRJN3lLWEVJRlBiaDNDYW9IVFpJKzFPK2xUUEh4bStzTm5MZnJwRzBIazR1cTFFUXJ3TA0KQUFUQmpZMENnWUVBNFY5a2kwSG5nVDlSc0xhcURvUjVaMDlyV2pUZXRGaCtEbytnZmpSdTMyWE9nc1FXeDlBSw0KZTVJNHpLWUF1NmZPbVkrTjVjci9JMzVNRU92eWFEbW1OK0w5S3QzMlVXWDVZbENnb3dHaHRqSkJOSVljSTlIUQ0KeHJucDdiRGU0aW5uM3pQV2tIVldLM3N2Q1k1TlNhdk9RYWtFSlFXQy8wNHQ1UDBZeUQrQVhqc0NnWUVBd1ppVg0Kb2ViaGtjYTYwZEQyMG5QcG9pZHlLQnF5ZElhN0hrVW9SeTRUT1hUK0pvcWFoU0QrRDVyN1Z1TTVIRVdWUXdBMw0KNkJSaVdyT0VUd09UZDlLQWliZUFnbzBFN0YxOWU0RUFUTWtYUWlzNkVKc0RZSitvTnRObVg3UFNZM1ZxcVdUbQ0KbFhTTkloNEdURFRYUnhPbTQ5VDc2YVZmeVZkK2tYZGlUZHRVRnpjQ2dZQlBON1NqcmxxdGQ1QkRTVEdsUUxOYg0KdVBMSEZtWmhoZWxwUE5yeEFZVW5TU1c1bVN0WXVLdTJtOE1UVEJaZDM3SWpEKzZVb3pIalMvVjR6VGE3bytmbA0KSlFoUUZRMEx0NGhkSW5JVVdmSjVsRmlQR2NTeVlvRzhHSVU5WXpvMHpQNFAycXpFd2ptenR1emxzdnMvdGdBZA0KM0ViMHJHZExUak9ibGNzc09BWHJHUUtCZ1FDNmhpL05BSzFlamJHYnpCQ3pMZmp4UWI0c1E2U2l2dGowVGorRA0KYlRJYWpzejhCMWpmWWExSERkU1JuM1Y3OXRMYjdnN3ZiUXhpUlVuNTh3RVhWbHAvMWF4Y25GQWRCK3FKbnYzUg0KL1lHS1FDbStyQXV5QWNISnFSNmVvSnZaTmR6aGZwVG5kSmN5UXVsZ2JSenBuMWFSZHJpTUljakxMYUNGdVJlZQ0KMmU0SU93S0JnRjE5UkNuTnFkblRjZ1NJbjB0MTI5UjlvOTFqbXkwYTNNakJJSzYvOFl5MU5ianQ2NVI4TFdOdw0KVm1QWU5FL0pVdytjU3pKbmNwUlJNRkloenFTaCt5dXR4YUhDTzcwcGsvbFUxNk1lUEd2T3pxcUV2K1lUTTZJeQ0KNUg1cEx4eGVjeXBRV2RJOE5Hc0tLUDVndlNDTzErRE5QM0VXbzNBTWZjTC84aUsvNUVpRQ0KLS0tLS1FTkQgUlNBIFBSSVZBVEUgS0VZLS0tLS0NCg==
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+  namespace: pepr-system
+  annotations:
+    pepr.dev/description: 'Pepr feature: Reconcile'
+  labels:
+    app: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+    pepr.dev/controller: admission
+    pepr.dev/uuid: 2e898e09-962d-435e-aa19-d247de900eb5
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+      pepr.dev/controller: admission
+  template:
+    metadata:
+      annotations:
+        buildTimestamp: '1726493859556'
+      labels:
+        app: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+        pepr.dev/controller: admission
+    spec:
+      terminationGracePeriodSeconds: 5
+      priorityClassName: system-node-critical
+      serviceAccountName: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+      securityContext:
+        runAsUser: 65532
+        runAsGroup: 65532
+        runAsNonRoot: true
+        fsGroup: 65532
+      containers:
+        - name: server
+          image: ghcr.io/defenseunicorns/pepr/controller:v0.34.1
+          imagePullPolicy: IfNotPresent
+          command:
+            - node
+            - /app/node_modules/pepr/dist/controller.js
+            - 4c363fa0380fd5929f5ecfd2b50d4de3cd112fd26297de9b68b85739aa543eb2
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+              scheme: HTTPS
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+              scheme: HTTPS
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: 500m
+          env:
+            - name: PEPR_WATCH_MODE
+              value: 'false'
+            - name: PEPR_PRETTY_LOG
+              value: 'false'
+            - name: LOG_LEVEL
+              value: info
+            - name: PEPR_RECONCILE_STRATEGY
+              value: sharded
+          securityContext:
+            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /etc/certs
+              readOnly: true
+            - name: api-token
+              mountPath: /app/api-token
+              readOnly: true
+            - name: module
+              mountPath: /app/load
+              readOnly: true
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: pepr-2e898e09-962d-435e-aa19-d247de900eb5-tls
+        - name: api-token
+          secret:
+            secretName: pepr-2e898e09-962d-435e-aa19-d247de900eb5-api-token
+        - name: module
+          secret:
+            secretName: pepr-2e898e09-962d-435e-aa19-d247de900eb5-module
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+  namespace: pepr-system
+  labels:
+    pepr.dev/controller: admission
+spec:
+  selector:
+    app: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+    pepr.dev/controller: admission
+  ports:
+    - port: 443
+      targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5-watcher
+  namespace: pepr-system
+  labels:
+    pepr.dev/controller: watcher
+spec:
+  selector:
+    app: pepr-2e898e09-962d-435e-aa19-d247de900eb5-watcher
+    pepr.dev/controller: watcher
+  ports:
+    - port: 443
+      targetPort: 3000
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5-module
+  namespace: pepr-system
+type: Opaque
+data:
+  module-4c363fa0380fd5929f5ecfd2b50d4de3cd112fd26297de9b68b85739aa543eb2.js.gz: >-
+    H4sIAAAAAAAAE41UYW/bNhD93l+h3vKBxChGiZM2liG3gZcNwZImyFIUQ5A2tHS2GVMkR1I2DEH/faDspNkQdPsmvntH3nunu5VwSV1cTR+xDLzCmdR47YxFFzajlXBJKAgyTYtxTZCBFjUCa1dCNZhrVho9k/PGianC/G3W0T6lKhz+1UiHBCxaB1tUFm3MzmGBSpk0RlKHpdGlVJj6hXAVVsBW6Lw0OoeMZ/wAWIW+dNKGHrtG65IZitA4zJObp2xgS9ysjat8frd9ksHyxAMDa5QsNynqudQYz/HV2lRNTAKPZeNk2MA92zJ83mpTYQ7j4uCEZzyDjsWUvG0aWeVwiCfDE8yG6fDdYZUeDY4xFeJgmFaHR+8rHGYZTo+BGX3mnHE5OIyuAlvjdGHM8lbWaJqQH2SsbHww9YWYoopvihq9FSXmbV8hr3AFOUDXMaHWYuPP59o4fEH0+d19x6QuVVNh9atUPcJQr/L2+uz65tvN2eTq0+T84uzbH7c3p7dnv/2Zw5PHXccqtKgr1KWMmnuJ8DXjgyN+ADG6+uUfBPj4iD7sz5WZCuUhh6+HQ/6eZ8DgY9hY9PvRth7P+MEgBmLCS96ymaLTGNCnM9WgDmmpJOrQJ/F3sdX9TX2zczjmAz6Ajm3PzzVum1sqmYO2deIanaTp2rhl70qyQGXR+aRUMknTJN21utgjdl1RYKEv6ilzx4pgkqa+kQEToRQw6Hl4GBX9iBwZO3KjZfgPdk/pun4Y3Ksj4guN68TxibBiKpUMG/KDmfnXbJwmvz9bnFxZdCIYl4SFCEkttJijT77g9NRaD+zlf/T63fcdZe2XBep81hWeiSKQuAeYocW4dfzCzLnUM0MeJkKpqSiX38dR6nmy12KX7LW622tN90A7BsrMgTK1u4cW4yj12plaeiSmGLcKQ2IL5DUGUYkgeCySlQXy7ckEHAliWcngZ6DMY9jNEyGxpl0oBcoMoR3TtKMMgvBLoGxRBILFWBFkgyyjDGbCB6Bs/R0/7nGvzBoom27xNiycWT8YY33eS3roGMQT0NGMOC74pF+Al8JSfu4nDkXA6sp9tlX8IJSf609PVpPXjab8eY2RQGaNLmM7iabRkG33TVfoZ1tGckbM26LoByp1xoS0FLx0AajD0DidmKIooKzTXsuHNdE0f4J62R8WEZoSHduyRLT+ylXogNJR7EnF45a97AeHSHbn7+nozf7+T4k3jSvxUlgr9fzzzUXRK/k/K5E/el4L++ZvG3Jlb2wGAAA=
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5-store
+  namespace: pepr-system
+rules:
+  - apiGroups:
+      - pepr.dev
+    resources:
+      - peprstores
+    resourceNames:
+      - ''
+    verbs:
+      - create
+      - get
+      - patch
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5-store
+  namespace: pepr-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5-store
+subjects:
+  - kind: ServiceAccount
+    name: pepr-2e898e09-962d-435e-aa19-d247de900eb5-store
+    namespace: pepr-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pepr-2e898e09-962d-435e-aa19-d247de900eb5-watcher
+  namespace: pepr-system
+  annotations:
+    pepr.dev/description: 'Pepr feature: Reconcile'
+  labels:
+    app: pepr-2e898e09-962d-435e-aa19-d247de900eb5-watcher
+    pepr.dev/controller: watcher
+    pepr.dev/uuid: 2e898e09-962d-435e-aa19-d247de900eb5
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: pepr-2e898e09-962d-435e-aa19-d247de900eb5-watcher
+      pepr.dev/controller: watcher
+  template:
+    metadata:
+      annotations:
+        buildTimestamp: '1726493859556'
+      labels:
+        app: pepr-2e898e09-962d-435e-aa19-d247de900eb5-watcher
+        pepr.dev/controller: watcher
+    spec:
+      terminationGracePeriodSeconds: 5
+      serviceAccountName: pepr-2e898e09-962d-435e-aa19-d247de900eb5
+      securityContext:
+        runAsUser: 65532
+        runAsGroup: 65532
+        runAsNonRoot: true
+        fsGroup: 65532
+      containers:
+        - name: watcher
+          image: ghcr.io/defenseunicorns/pepr/controller:v0.34.1
+          imagePullPolicy: IfNotPresent
+          command:
+            - node
+            - /app/node_modules/pepr/dist/controller.js
+            - 4c363fa0380fd5929f5ecfd2b50d4de3cd112fd26297de9b68b85739aa543eb2
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+              scheme: HTTPS
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+              scheme: HTTPS
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: 500m
+          securityContext:
+            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /etc/certs
+              readOnly: true
+            - name: module
+              mountPath: /app/load
+              readOnly: true
+          env:
+            - name: PEPR_WATCH_MODE
+              value: 'true'
+            - name: PEPR_PRETTY_LOG
+              value: 'false'
+            - name: LOG_LEVEL
+              value: info
+            - name: PEPR_RECONCILE_STRATEGY
+              value: sharded
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: pepr-2e898e09-962d-435e-aa19-d247de900eb5-tls
+        - name: module
+          secret:
+            secretName: pepr-2e898e09-962d-435e-aa19-d247de900eb5-module

@@ -1,0 +1,49 @@
+{
+  "name": "hello-pepr-deletion-timestamp",
+  "version": "0.0.1",
+  "description": "Pepr feature: with-deletion-timestamp",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "pepr-module",
+    "security"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "uuid": "deletion-timestamp",
+    "onError": "reject",
+    "webhookTimeout": 10,
+    "customLabels": {
+      "namespace": {
+        "pepr.dev": ""
+      }
+    },
+    "alwaysIgnore": {
+      "namespaces": []
+    },
+    "includedFiles": [],
+    "env": {
+      "PEPR_RECONCILE_STRATEGY": "singular"
+    }
+  },
+  "dependencies": {
+    "pepr": "0.36.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/node": "^20.13.0",
+    "jest": "^29.7.0",
+    "kubernetes-fluent-client": "^2.6.1",
+    "typescript": "5.3.3"
+  },
+  "scripts": {
+    "pepr": "pepr",
+    "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
+    "test": "npm run cli -- test --suite all",
+    "test:e2e": "npm run cli -- test --suite e2e",
+    "test:unit": "npm run cli -- test --suite unit"
+  }
+}

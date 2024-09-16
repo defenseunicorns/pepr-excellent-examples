@@ -1,0 +1,16 @@
+kind: ZarfPackageConfig
+metadata:
+  name: pepr-1cb07e57-a069-58c6-88d6-7e037e3a1814
+  description: 'Pepr Module: Pepr feature: Reconcile'
+  url: https://github.com/defenseunicorns/pepr
+  version: 0.0.1
+components:
+  - name: module
+    required: true
+    manifests:
+      - name: module
+        namespace: pepr-system
+        files:
+          - pepr-module-1cb07e57-a069-58c6-88d6-7e037e3a1814.yaml
+    images:
+      - ghcr.io/defenseunicorns/pepr/controller:v0.34.1

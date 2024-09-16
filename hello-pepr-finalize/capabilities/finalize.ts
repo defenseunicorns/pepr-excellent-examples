@@ -54,7 +54,7 @@ When(a.ConfigMap)
   .InNamespace("hello-pepr-finalize-update")
   .WithName("cm-watch-update")
   .Watch(function watchUpdate(cm) {
-    // delete with finalizer causes an UPDATE with deletionTimestamp; ignore it
+    // delete with finalizer triggers an UPDATE to add deletionTimestamp; ignore it
     if (cm.metadata?.deletionTimestamp) { return }
 
     Log.info(cm, "external api call (update): watch/callback")

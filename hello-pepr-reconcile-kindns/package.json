@@ -1,5 +1,5 @@
 {
-  "name": "hello-pepr-reconcile-singular",
+  "name": "hello-pepr-reconcile-kindns",
   "version": "0.0.1",
   "description": "Pepr feature: Reconcile",
   "keywords": [
@@ -13,7 +13,7 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "uuid": "1cb07e57-a069-58c6-88d6-7e037e3a1814",
+    "uuid": "ba470436-aa20-4e7c-8ec9-2ff2f0eda4c9",
     "onError": "reject",
     "webhookTimeout": 10,
     "customLabels": {
@@ -26,11 +26,11 @@
     },
     "includedFiles": [],
     "env": {
-      "PEPR_RECONCILE_STRATEGY": "singular"
+      "PEPR_RECONCILE_STRATEGY": "kindNs"
     }
   },
   "dependencies": {
-    "pepr": "^0.34.1"
+    "pepr": "^0.31.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

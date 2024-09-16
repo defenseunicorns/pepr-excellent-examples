@@ -17,4 +17,20 @@ metadata:
   name: cm-fast
   namespace: hello-pepr-reconcile
 data:
-  note: X
+  note: D
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: se-slow
+  namespace: hello-pepr-reconcile
+stringData:
+  note: Q
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: se-fast
+  namespace: hello-pepr-reconcile
+stringData:
+  note: T

@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-reconcile-one
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-reconcile-two
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-slow
+  namespace: hello-pepr-reconcile-one
+data:
+  note: A
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-fast
+  namespace: hello-pepr-reconcile-one
+data:
+  note: D
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: se-slow
+  namespace: hello-pepr-reconcile-one
+stringData:
+  note: Q
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: se-fast
+  namespace: hello-pepr-reconcile-two
+stringData:
+  note: T

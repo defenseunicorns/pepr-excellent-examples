@@ -2,7 +2,7 @@ import { Capability, Log, a } from "pepr";
 
 export const HelloPeprReconcile = new Capability({
   name: "hello-pepr-reconcile",
-  description: "A Kubernetes Operator that manages WebApps",
+  description: "hello-pepr-reconcile",
   namespaces: ["hello-pepr-reconcile"],
 });
 
@@ -12,15 +12,15 @@ const log = (name, note, tag) => {
   Log.info(`Callback: Reconciling ${name} ${note}${tag}`);
 }
 
-const task = (cm, durationMs) => new Promise<void>(resolve => {
-  const name = cm.metadata.name
-  const note = cm.data.note
+const task = (res, durationMs) => new Promise<void>(resolve => {
+  const name = res.metadata.name
+  const note = res.kind === "ConfigMap" ? res.data.note : atob(res.data.note)
   log(name, note, "+")
   setTimeout(() => { log(name, note, "-") ; resolve() }, durationMs)
 });
-const fast = (cm) => task(cm, 300)
-const slow = (cm) => task(cm, 500)
-const oops = (cm) => { throw `oops: ${cm}` }
+const fast = (res) => task(res, 300)
+const slow = (res) => task(res, 500)
+const oops = (res) => { throw `oops: ${res}` }
 
 When(a.ConfigMap)
   .IsCreatedOrUpdated()
@@ -34,5 +34,18 @@ When(a.ConfigMap)
       name === "cm-slow" ? slow(cm) :
       name === "cm-fast" ? fast(cm) :
       oops(cm)
+    )
+  });
+
+When(a.Secret)
+  .IsCreatedOrUpdated()
+  .InNamespace("hello-pepr-reconcile")
+  .Reconcile(function keepsOrder(se) {
+    const { name } = se.metadata;
+
+    return (
+      name === "se-slow" ? slow(se) :
+      name === "se-fast" ? fast(se) :
+      oops(se)
     )
   });

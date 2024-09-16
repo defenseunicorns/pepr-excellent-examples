@@ -3,39 +3,78 @@ import { Capability, Log, a } from "pepr";
 export const HelloPeprFinalize = new Capability({
   name: "hello-pepr-finalize",
   description: "hello-pepr-finalize",
-  namespaces: ["hello-pepr-finalize"],
+  namespaces: [
+    "hello-pepr-finalize-create",
+    "hello-pepr-finalize-createorupdate",
+    "hello-pepr-finalize-update",
+    "hello-pepr-finalize-delete",
+  ],
 });
 
 const { When } = HelloPeprFinalize;
 
 When(a.ConfigMap)
   .IsCreated()
-  .InNamespace("hello-pepr-finalize")
-  .WithName("cm-watch-create")
-  .Watch(function createApi(cm) {
-    Log.info(cm, "external api call: watch/create")
+  .InNamespace("hello-pepr-finalize-create")
+  .WithName("cm-reconcile-create")
+  .Reconcile(function reconcileCreate(cm) {
+    Log.info(cm, "external api call (create): reconcile/callback")
   })
-  .Finalize(function deleteApi(cm) {
-    Log.info(cm, "external api call: watch/delete")
+  .Finalize(function finalizeCreate(cm) {
+    Log.info(cm, "external api call (create): reconcile/finalize")
   });
 
 When(a.ConfigMap)
   .IsCreated()
-  .InNamespace("hello-pepr-finalize")
-  .WithName("cm-reconcile-create")
-  .Reconcile(function createApi(cm) {
-    Log.info(cm, "external api call: reconcile/create")
+  .InNamespace("hello-pepr-finalize-create")
+  .WithName("cm-watch-create")
+  .Watch(function watchCreate(cm) {
+    Log.info(cm, "external api call (create): watch/callback")
   })
-  .Finalize(function deleteApi(cm) {
-    Log.info(cm, "external api call: reconcile/delete")
+  .Finalize(function finalizeCreate(cm) {
+    Log.info(cm, "external api call (create): watch/finalize")
   });
 
-  //TODO:
-  // When(a.ConfigMap)
-  // .IsCreatedOrUpdated()
+When(a.ConfigMap)
+  .IsCreatedOrUpdated()
+  .InNamespace("hello-pepr-finalize-createorupdate")
+  .WithName("cm-watch-createorupdate")
+  .Watch(function watchCreateOrUpdate(cm) {
+    // delete with finalizer causes an UPDATE with deletionTimestamp; ignore it
+    if (cm.metadata?.deletionTimestamp) { return }
 
-  // When(a.ConfigMap)
-  // .IsUpdated()
+    Log.info(cm, "external api call (createorupdate): watch/callback")
+  })
+  .Finalize(function finalizeCreateOrUpdate(cm) {
+    Log.info(cm, "external api call (createorupdate): watch/finalize")
+  });
 
-  // When(a.ConfigMap)
-  // .IsDeleted()
+When(a.ConfigMap)
+  .IsUpdated()
+  .InNamespace("hello-pepr-finalize-update")
+  .WithName("cm-watch-update")
+  .Watch(function watchUpdate(cm) {
+    // delete with finalizer causes an UPDATE with deletionTimestamp; ignore it
+    if (cm.metadata?.deletionTimestamp) { return }
+
+    Log.info(cm, "external api call (update): watch/callback")
+  })
+  .Finalize(function finalizeUpdate(cm) {
+    Log.info(cm, "external api call (update): watch/finalize")
+  });
+
+  When(a.ConfigMap)
+  .IsDeleted()
+  .InNamespace("hello-pepr-finalize-delete")
+  .WithName("cm-watch-delete")
+  .Watch(function watchDelete(cm) {
+    // Here be dragons!
+    //
+    // Due to the way kubernetes finalizers work, this deletion callback will fire
+    //  AFTER the finalizer callback fires -- be sure to expect & code for this!
+    //  (see: https://kubernetes.io/docs/concepts/overview/working-with-objects/finalizers/#how-finalizers-work )
+    Log.info(cm, "external api call (delete): watch/callback")
+  })
+  .Finalize(function finalizeDelete(cm) {
+    Log.info(cm, "external api call (delete): watch/finalize")
+  });

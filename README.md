@@ -30,7 +30,6 @@ To run a subset of tests, give Jest the specifics via the `--passthru` flag:
 npm run test:e2e -w hello-pepr-validate -- --passthru="--testNamePattern='validate creates'"
 ```
 
-
 ## Digging In
 
 ### Viewing an Example Cluster (via K9s)
@@ -38,7 +37,7 @@ npm run test:e2e -w hello-pepr-validate -- --passthru="--testNamePattern='valida
 ```sh
 # KUBECONFIG=$(k3d kubeconfig write pexex-<npm module name>-e2e) k9s
 
-KUBECONFIG=$(k3d kubeconfig write pexex-hello-pepr-watch-e2e) k9s
+KUBECONFIG=$(k3d kubeconfig write pexex-hello-pepr-reconcile-e2e) k9s
 ``` 
  Note: the tests will _automatically_ clean these clusters up when they complete, so be sure to Ctrl+C-out of a running suite if you wanna poke around!
 
@@ -55,7 +54,7 @@ npm run test:e2e -- --image pepr:dev
 
 ### Testing with a development version of the Pepr lib
 
-You can use the symbolic linking to swap-in a development version of the `pepr` package when building the excellent examples -- a particularly useful ability when co-developing new Pepr features + associated examples.
+You can use the symbolic linking to swap-in a development version of the `pepr` package when building the excellent examples -- a particularly useful function when co-developing new Pepr features + associated examples.
 
 #### Setup
 

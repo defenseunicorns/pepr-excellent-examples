@@ -1,7 +1,7 @@
 {
-  "name": "hello-pepr-deletion-timestamp",
+  "name": "hello-pepr-finalize",
   "version": "0.0.1",
-  "description": "Pepr feature: with-deletion-timestamp",
+  "description": "Pepr feature: Finalize",
   "keywords": [
     "pepr",
     "k8s",
@@ -13,7 +13,7 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "uuid": "deletion-timestamp",
+    "uuid": "6b7cfad2-722b-47f8-99ed-f3cbf65ab5b1",
     "onError": "reject",
     "webhookTimeout": 10,
     "customLabels": {
@@ -26,7 +26,7 @@
     },
     "includedFiles": [],
     "env": {
-      "PEPR_RECONCILE_STRATEGY": "singular"
+      "LOG_LEVEL": "debug"
     }
   },
   "dependencies": {

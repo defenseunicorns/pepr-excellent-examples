@@ -47,15 +47,9 @@ describe('version tests', () => {
     })
   })
   describe('when pepr is a local dev copy', () => { 
+    const peprAlias = "file:../../pepr-0.0.0-development.tgz"
     beforeAll(() =>{
-      const installPath = execSync('pwd').toString().trim().concat('/..')
-      execSync('npm install', {cwd: installPath})
-      //TODO: Not necessary?
-      execSync('rm -rf node_modules/pepr', {cwd: installPath})
-      execSync(`ln -s ${installPath}/../pepr ${installPath}/node_modules/pepr`)
-      //TODO: We do this twice, just to be safe. Can probably just do it in the module under test.
-      execSync('rm -rf node_modules/pepr')
-      execSync(`ln -s ${installPath}/../pepr ${installPath}/use-arbitrary-pepr-version/node_modules/pepr`)
+
     })
 
     afterAll(()=>{
@@ -68,11 +62,11 @@ describe('version tests', () => {
     })
 
     it('shows the correct version', ()=>{
-      const result = execSync('npx pepr --version').toString()
+      const result = execSync(`npx ${peprAlias} --version`).toString()
       expect(result).toContain('0.0.0-development');
     })
     it('shows the help menu with --unpublished', () =>{
-      const result = execSync('npx pepr init --help').toString()
+      const result = execSync(`npx ${peprAlias} init --help`).toString()
       expect(result).toContain('--unpublished')
     })
   })

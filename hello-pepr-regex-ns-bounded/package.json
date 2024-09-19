@@ -1,0 +1,43 @@
+{
+  "name": "hello-pepr-regex-ns-bounded",
+  "version": "0.0.1",
+  "description": "Pepr Feature: Module Regex Namespaces Limited",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "pepr-module",
+    "security"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "uuid": "201764fa-a155-43e5-ab53-e4217cd217ab",
+    "onError": "reject",
+    "webhookTimeout": 10,
+    "customLabels": {},
+    "alwaysIgnore": {},
+    "includedFiles": [],
+    "env": {
+      "LOG_LEVEL": "debug"
+    }
+  },
+  "dependencies": {
+    "pepr": "^0.31.1"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/node": "^20.13.0",
+    "jest": "^29.7.0",
+    "kubernetes-fluent-client": "^2.6.1",
+    "typescript": "5.3.3"
+  },
+  "scripts": {
+    "pepr": "pepr",
+    "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
+    "test": "npm run cli -- test --suite all",
+    "test:e2e": "npm run cli -- test --suite e2e",
+    "test:unit": "npm run cli -- test --suite unit"
+  }
+}

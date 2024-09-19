@@ -47,10 +47,10 @@ describe('version tests', () => {
     })
   })
   describe('when pepr is a local dev copy', () => { 
-    const peprAlias = "file:pepr-0.0.0-development.tgz"
+    const peprAlias = "file:../pepr-0.0.0-development.tgz"
     const installPath = execSync('pwd').toString().trim().concat('/..') // Top-level package.json
     beforeAll(() =>{
-      expect(execSync(`ls -l`, {cwd: installPath}).toString()).toContain('pepr-0.0.0-development.tgz')
+      expect(execSync(`ls -l ../`, {cwd: installPath}).toString()).toContain('pepr-0.0.0-development.tgz')
     })
 
     afterAll(()=>{

@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-ns-all
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-ns
+  namespace: hello-pepr-ns-all
+data: {}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-def
+  namespace: default
+data: {}

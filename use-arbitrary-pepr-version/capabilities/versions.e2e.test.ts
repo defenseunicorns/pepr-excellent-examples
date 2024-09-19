@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
-import { execSync } from "child_process";
+import { exec, execSync } from "child_process";
 
 
 //Workflow:
@@ -47,26 +47,23 @@ describe('version tests', () => {
     })
   })
   describe('when pepr is a local dev copy', () => { 
-    const peprAlias = "file:../../pepr-0.0.0-development.tgz"
+    const peprAlias = "file:pepr-0.0.0-development.tgz"
+    const installPath = execSync('pwd').toString().trim().concat('/..') // Top-level package.json
     beforeAll(() =>{
-
+      expect(execSync(`ls -l`, {cwd: installPath}).toString()).toContain('pepr-0.0.0-development.tgz')
     })
 
     afterAll(()=>{
-      const installPath = execSync('pwd').toString().trim().concat('/..')
-      execSync('rm -rf node_modules/pepr', {cwd: installPath})
-      execSync('rm -rf node_modules/pepr')
-      execSync('npm install', {cwd: installPath})
       const result = execSync('npx pepr --version').toString()
       expect(result).toContain('0.36.0');
     })
 
     it('shows the correct version', ()=>{
-      const result = execSync(`npx ${peprAlias} --version`).toString()
+      const result = execSync(`npx --yes ${peprAlias} --version`, {cwd: installPath}).toString()
       expect(result).toContain('0.0.0-development');
     })
     it('shows the help menu with --unpublished', () =>{
-      const result = execSync(`npx ${peprAlias} init --help`).toString()
+      const result = execSync(`npx --yes ${peprAlias} init --help`, {cwd: installPath}).toString()
       expect(result).toContain('--unpublished')
     })
   })

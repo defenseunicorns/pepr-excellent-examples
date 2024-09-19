@@ -3,15 +3,22 @@ import { exec, execSync } from "child_process";
 
 
 //Workflow:
-// 0. Create symlink IAW readme
 // 1. Change file in pepr
 // 2. In pepr, run `npm test:journey:build`
 // 3. Execute tests
 
+//In Pepr CI:
+// Excellent-Examples is cloned to PEXEX directory
+// See `pepr-excellent-examples.yaml`
+
+//In Excellent-Examples:
+// pepr.ts has moduleUp() which is used by each E2E test
+// moduleUp() calls peprBuild(), which in turn calls peprVersion()
+
 describe('version tests', () => {
-  describe('when pepr is v0.31.1', () => { 
+  describe.skip('when pepr version is defined in an example folder (0.31.1)', () => { 
     beforeAll(() =>{
-      const installPath = execSync('pwd').toString().trim().concat('/..')
+      const installPath = execSync('pwd').toString().trim().concat('/..') // Top-level package.json
       execSync('npm install', {cwd: installPath})
     })
 
@@ -24,12 +31,31 @@ describe('version tests', () => {
       expect(result).not.toContain('--unpublished')
     })
   })
+  describe('when pepr version matches the top-level package.json file (v0.36.0)', () => { 
+    beforeAll(() =>{
+      const installPath = execSync('pwd').toString().trim().concat('/..')
+      execSync('npm install', {cwd: installPath})
+    })
+
+    it('shows the correct version', ()=>{
+      const result = execSync('npx pepr --version').toString()
+      expect(result).toContain('0.36.0');
+    })
+    it('shows the help menu without --unpublished', () =>{
+      const result = execSync('npx pepr init --help').toString()
+      expect(result).not.toContain('--unpublished')
+    })
+  })
   describe('when pepr is a local dev copy', () => { 
     beforeAll(() =>{
       const installPath = execSync('pwd').toString().trim().concat('/..')
       execSync('npm install', {cwd: installPath})
+      //TODO: Not necessary?
       execSync('rm -rf node_modules/pepr', {cwd: installPath})
       execSync(`ln -s ${installPath}/../pepr ${installPath}/node_modules/pepr`)
+      //TODO: We do this twice, just to be safe. Can probably just do it in the module under test.
+      execSync('rm -rf node_modules/pepr')
+      execSync(`ln -s ${installPath}/../pepr ${installPath}/use-arbitrary-pepr-version/node_modules/pepr`)
     })
     it('shows the correct version', ()=>{
       const result = execSync('npx pepr --version').toString()

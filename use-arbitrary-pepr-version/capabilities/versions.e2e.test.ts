@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "@jest/globals";
+import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
 import { exec, execSync } from "child_process";
 
 
@@ -57,6 +57,16 @@ describe('version tests', () => {
       execSync('rm -rf node_modules/pepr')
       execSync(`ln -s ${installPath}/../pepr ${installPath}/use-arbitrary-pepr-version/node_modules/pepr`)
     })
+
+    afterAll(()=>{
+      const installPath = execSync('pwd').toString().trim().concat('/..')
+      execSync('rm -rf node_modules/pepr', {cwd: installPath})
+      execSync('rm -rf node_modules/pepr')
+      execSync('npm install', {cwd: installPath})
+      const result = execSync('npx pepr --version').toString()
+      expect(result).toContain('0.36.0');
+    })
+
     it('shows the correct version', ()=>{
       const result = execSync('npx pepr --version').toString()
       expect(result).toContain('0.0.0-development');

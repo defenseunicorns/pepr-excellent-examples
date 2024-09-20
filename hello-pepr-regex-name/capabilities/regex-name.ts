@@ -42,3 +42,9 @@ When(a.ConfigMap)
       },
     });
   });
+
+  // https://regex101.com/r/KOGr7r/1
+When(a.ConfigMap)
+.IsCreated()
+.WithRegexName(/^invisible/)
+.Mutate(cm=> cm.SetAnnotation("not", "seen"));

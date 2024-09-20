@@ -14,7 +14,7 @@ describe("namespace.ts", () => {
     let stderr = []
     try { await moduleBuild() } catch (e) { stderr = e.stderr }
     expect(stderr.join("\n")).toMatch(
-      "Binding uses namespace not governed by capability:"
+      "Ignoring Watch Callback: Object namespace does not match any capability namespace with regex ^wrong."
     )
   }, mins(1))
 })

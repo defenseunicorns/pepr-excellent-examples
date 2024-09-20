@@ -13,7 +13,7 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "uuid": "7b167439-3112-4d30-942f-db3c12e7b244",
+    "uuid": "regex-ns-all",
     "onError": "reject",
     "webhookTimeout": 10,
     "customLabels": {},

@@ -1,4 +1,4 @@
-import { Capability, a } from "pepr";
+import { Capability, a, K8s, kind } from "pepr";
 
 const name = "hello-pepr-ns-all";
 
@@ -21,8 +21,19 @@ When(a.ConfigMap)
 When(a.ConfigMap)
   .IsCreated()
   .InRegexNamespace(/-ns-all$/)
-  .Mutate(function mutateNs(request) {
-    request.SetAnnotation("ns", "seen");
+  .Watch(async cm =>  {
+    await K8s(kind.ConfigMap).Apply({
+      metadata: {
+        name: cm.metadata.name,
+        namespace: cm.metadata.namespace,
+        annotations: {
+          ns: "seen",
+        },
+      },
+      data: {
+        "cm-uid": cm.metadata.uid,
+      },
+    });
   });
 
 When(a.ConfigMap)

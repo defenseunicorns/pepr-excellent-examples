@@ -22,6 +22,7 @@
     "hello-pepr-reconcile-kind",
     "hello-pepr-reconcile-kindns",
     "hello-pepr-reconcile-kindnsname",
+    "hello-pepr-regex-name",
     "hello-pepr-regex-ns-all",
     "hello-pepr-regex-ns-bounded",
     "hello-pepr-regex-ns-wrong",

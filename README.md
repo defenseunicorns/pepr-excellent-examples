@@ -38,7 +38,7 @@ npm run test:e2e -w hello-pepr-validate -- --passthru="--testNamePattern='valida
 ```sh
 # KUBECONFIG=$(k3d kubeconfig write pexex-<npm module name>-e2e) k9s
 
-KUBECONFIG=$(k3d kubeconfig write pexex-hello-pepr-watch-e2e) k9s
+KUBECONFIG=$(k3d kubeconfig write pexex-hello-pepr-regex-name-e2e) k9s
 ``` 
  Note: the tests will _automatically_ clean these clusters up when they complete, so be sure to Ctrl+C-out of a running suite if you wanna poke around!
 

@@ -1,7 +1,7 @@
 {
-  "name": "hello-pepr-regex-ns-bounded",
+  "name": "hello-pepr-regex-name",
   "version": "0.0.1",
-  "description": "Pepr Feature: Module Regex Namespaces Limited",
+  "description": "Pepr Feature: Module Regex Name with Ignored NS Test",
   "keywords": [
     "pepr",
     "k8s",
@@ -13,14 +13,16 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "uuid": "regex-ns-bounded",
+    "uuid": "regex-name",
     "onError": "reject",
     "webhookTimeout": 10,
     "customLabels": {},
-    "alwaysIgnore": {},
     "includedFiles": [],
-    "env": {
-      "LOG_LEVEL": "debug"
+    "env": {},
+    "alwaysIgnore": {
+      "namespaces": [
+        "ignored"
+      ]
     }
   },
   "dependencies": {

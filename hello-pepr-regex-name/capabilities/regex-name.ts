@@ -28,7 +28,7 @@ When(a.ConfigMap)
 When(a.ConfigMap)
   .IsCreated()
   .WithRegexName(/^invisible/)
-  .Watch(async (cm)=> {
+  .Watch(async cm => {
     await K8s(kind.ConfigMap).Apply({
       metadata: {
         name: cm.metadata.name,
@@ -43,8 +43,8 @@ When(a.ConfigMap)
     });
   });
 
-  // https://regex101.com/r/KOGr7r/1
+// https://regex101.com/r/KOGr7r/1
 When(a.ConfigMap)
-.IsCreated()
-.WithRegexName(/^invisible/)
-.Mutate(cm=> cm.SetAnnotation("not", "seen"));
+  .IsCreated()
+  .WithRegexName(/^invisible/)
+  .Mutate(cm => cm.SetAnnotation("not", "seen"));

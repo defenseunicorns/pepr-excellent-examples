@@ -1,6 +1,6 @@
 import { Capability, a, K8s, kind } from "pepr";
 
-const name = "hello-pepr-regex-name";
+const name = "hello-pepr-config-ignored-ns";
 
 export const HelloPeprIgnoredNS = new Capability({
   name: name,

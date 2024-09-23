@@ -14,7 +14,7 @@ const { When } = HelloPeprNamespace;
 // https://regex101.com/r/MGlq5l/1
 When(a.ConfigMap)
   .IsCreated()
-  .InRegexNamespace(/-alpha$/)
+  .InNamespaceRegex(/-alpha$/)
   .Mutate(function mutateAlpha(request) {
     request.SetAnnotation("a", "alpha");
   });
@@ -22,7 +22,8 @@ When(a.ConfigMap)
 // https://regex101.com/r/09FplD/1
 When(a.ConfigMap)
   .IsCreated()
-  .InNamespace(bravo)
+  .InNamespaceRegex(/-bravo$/)
+  .WithNameRegex(/^two/)
   .Mutate(function mutateBravo(request) {
     request.SetAnnotation("b", "bravo");
   });

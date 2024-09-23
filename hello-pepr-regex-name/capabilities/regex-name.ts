@@ -12,7 +12,7 @@ const { When } = HelloPeprRegexName;
 // https://regex101.com/r/tLkgcf/1
 When(a.ConfigMap)
   .IsCreated()
-  .WithRegexName(/^default/)
+  .WithNameRegex(/^default/)
   .Mutate(function mutateDef(request) {
     request.SetAnnotation("def", "seen");
   });
@@ -20,14 +20,14 @@ When(a.ConfigMap)
 // https://regex101.com/r/IFdxd8/1
 When(a.ConfigMap)
   .IsCreated()
-  .WithRegexName(/-default$/)
+  .WithNameRegex(/-default$/)
   .Mutate(function mutateNs(request) {
     request.SetAnnotation("obviously", "seen");
   });
 // https://regex101.com/r/KOGr7r/1
 When(a.ConfigMap)
   .IsCreated()
-  .WithRegexName(/^invisible/)
+  .WithNameRegex(/^invisible/)
   .Watch(async cm => {
     await K8s(kind.ConfigMap).Apply({
       metadata: {
@@ -46,5 +46,5 @@ When(a.ConfigMap)
 // https://regex101.com/r/KOGr7r/1
 When(a.ConfigMap)
   .IsCreated()
-  .WithRegexName(/^invisible/)
+  .WithNameRegex(/^invisible/)
   .Mutate(cm => cm.SetAnnotation("not", "seen"));

@@ -12,7 +12,7 @@ const { When } = HelloPeprNamespace;
 // https://regex101.com/r/xiuiU2/1
 When(a.ConfigMap)
   .IsCreated()
-  .InRegexNamespace(/^default/)
+  .InNamespaceRegex(/^default/)
   .Mutate(function mutateDef(request) {
     request.SetAnnotation("def", "seen");
   });
@@ -20,7 +20,7 @@ When(a.ConfigMap)
 // https://regex101.com/r/AiZpo5/1
 When(a.ConfigMap)
   .IsCreated()
-  .InRegexNamespace(/-ns-all$/)
+  .InNamespaceRegex(/-ns-all$/)
   .Watch(async cm =>  {
     await K8s(kind.ConfigMap).Apply({
       metadata: {

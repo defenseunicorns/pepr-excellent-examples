@@ -1,4 +1,4 @@
-import { Capability, a } from "pepr";
+import { Capability, a, Log } from "pepr";
 
 const name = "hello-pepr-namespace";
 
@@ -12,7 +12,8 @@ const { When } = HelloPeprNamespace;
 // https://regex101.com/r/sQUD4f/1
 When(a.ConfigMap)
   .IsCreated()
-  .InRegexNamespace(/^wrong/)
+  .InNamespaceRegex(/^wrong/)
   .Validate(async function validateWrong(request) {
     return request.Approve();
   });
+

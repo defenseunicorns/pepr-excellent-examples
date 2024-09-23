@@ -47,13 +47,30 @@ describe('version tests', () => {
     })
   })
   describe('when pepr is a local dev copy', () => { 
-    const peprAlias = "file:../pepr-0.0.0-development.tgz"
+    let peprAlias = "pepr"
     const installPath = execSync('pwd').toString().trim().concat('/..') // Top-level package.json
     beforeAll(() =>{
-      expect(execSync(`ls -l ../`, {cwd: installPath}).toString()).toContain('pepr-0.0.0-development.tgz')
+      execSync('npm install', {cwd: installPath})
+      if(process.env.CI){
+        console.log("Testing In CI with .tgz!")
+        peprAlias = "file:../pepr-0.0.0-development.tgz"
+        expect(execSync(`ls -l ../`, {cwd: installPath}).toString()).toContain('pepr-0.0.0-development.tgz')
+      }
+      else{
+        console.log("Local testing via symlink!")
+        execSync(`npm install`, {cwd: installPath})
+        execSync(`rm -rf node_modules/pepr`)
+        execSync(`ln -s $(pwd)/../pepr/ node_modules/pepr`)
+        execSync(`rm -rf node_modules/pepr`, {cwd: installPath})
+        execSync(`ln -s $(pwd)/../pepr/ node_modules/pepr`, {cwd: installPath})
+        expect(execSync(`ls -l node_modules/pepr`, {cwd: installPath}).toString()).toContain('->')
+      }
     })
 
     afterAll(()=>{
+      execSync(`rm -rf node_modules/pepr`)
+      execSync(`rm -rf node_modules/pepr`, {cwd: installPath})
+      execSync(`npm install`, {cwd: installPath})
       const result = execSync('npx pepr --version').toString()
       expect(result).toContain('0.36.0');
     })

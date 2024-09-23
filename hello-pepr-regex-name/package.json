@@ -1,7 +1,7 @@
 {
   "name": "hello-pepr-regex-name",
   "version": "0.0.1",
-  "description": "Pepr Feature: Module Regex Name with Ignored NS Test",
+  "description": "Pepr Feature: Module Regex Name",
   "keywords": [
     "pepr",
     "k8s",

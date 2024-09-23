@@ -13,12 +13,12 @@ const apply = async res => {
 
 const trc = new TestRunCfg(__filename);
 
-describe("regex-name.ts", () => {
+describe("ignored-ns.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2));
 
   afterAll(async () => await moduleDown(), mins(2));
 
-  describe("regex name for watch and mutate", () => {
+  describe("ignored-ns-test", () => {
     beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.name.yaml`;
       await timed(`load: ${file}`, async () => {
@@ -31,31 +31,15 @@ describe("regex-name.ts", () => {
     });
 
     afterAll(async () => await clean(trc), mins(5));
-
     it(
-      "handles: regex name through admission",
+      "handles: handles ignored namespaces",
       async () => {
         const cm = await K8s(kind.ConfigMap)
-          .InNamespace("hello-pepr-regex-name")
-          .Get("default");
-        expect(cm.metadata?.annotations).toEqual(
+          .InNamespace("ignored")
+          .Get("invisible");
+        expect(cm.metadata?.annotations).not.toEqual(
           expect.objectContaining({
-            def: "seen",
-          }),
-        );
-      },
-      secs(10),
-    );
-
-    it(
-      "handles: handles regex name through watch",
-      async () => {
-        const cm = await K8s(kind.ConfigMap)
-          .InNamespace("hello-pepr-regex-name")
-          .Get("not-default");
-        expect(cm.metadata?.annotations).toEqual(
-          expect.objectContaining({
-            obviously: "seen",
+            not: "seen",
           }),
         );
       },

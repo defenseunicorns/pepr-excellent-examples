@@ -10,6 +10,7 @@
     "dash-policyreport",
     "hello-pepr",
     "hello-pepr-config",
+    "hello-pepr-config-ignored-ns",
     "hello-pepr-deletion-timestamp",
     "hello-pepr-finalize",
     "hello-pepr-hooks",

@@ -6,12 +6,6 @@ metadata:
 
 ---
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: ignored
-
----
-apiVersion: v1
 kind: ConfigMap
 metadata:
   name: default
@@ -26,10 +20,3 @@ metadata:
   namespace: hello-pepr-regex-name
 data: {}
 
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: invisible
-  namespace: ignored
-data: {}

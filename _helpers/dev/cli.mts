@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { program, Option } from 'commander';
 import { resolve, basename } from 'node:path';
 import { chdir } from 'node:process';
-import { spawnSync } from 'node:child_process';
+import { execSync, spawnSync } from 'node:child_process';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
@@ -43,6 +43,20 @@ const test = program.command('test')
       'args to pass to test runner (e.g. --passthru=\'--testNamePattern="testName()"\')'
     )
   )
+  .hook('preAction', () =>{
+    const installPath = execSync('pwd').toString().trim().concat('/..') // Top-level package.json
+    execSync('npm install', {cwd: installPath})
+    if(!process.env.CI)
+    {
+      //Local setup, since we're not in CI
+      //TODO: Hardcoded paths need to be generalized
+      console.log(execSync(`pwd`).toString())
+      execSync('npm run build > /dev/null 2>&1', {cwd: '/Users/sam/code/work/pepr'})
+      execSync('cp ../../pepr/pepr-0.0.0-development.tgz ../')
+      console.log(`Pepr Build under test: ${execSync('shasum ../pepr-0.0.0-development.tgz').toString()}`)
+      console.log(`Pepr Image under test: ${execSync('docker inspect --format=\'{{.Id}}\' pepr:dev').toString()}`)
+    }
+  })
   .action(async ({suite, passthru, image}) => {
     if (image) { process.env.PEPR_IMAGE = image }
     passthru = passthru || []

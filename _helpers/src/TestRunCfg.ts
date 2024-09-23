@@ -61,36 +61,4 @@ export class TestRunCfg {
     }
     return resources
   }
-
-  // module(): string {
-  //   return `${this.here()}/${this.name()}.pepr.ts`
-  // }
-
-  // manifests(): [string, string][] {
-  //   return fs.readdirSync(this.here())
-  //   .filter(f => new RegExp(`^${this.name()}\..*`).test(f))
-  //   .filter(f => /\.test\.\d+\.yaml$/.test(f))
-  //   .sort((l, r) => {
-  //     let lnum = parseInt(l.match(/test\.(\d+)\.yaml/)[1])
-  //     let rnum = parseInt(r.match(/test\.(\d+)\.yaml/)[1])
-  //     return lnum === rnum
-  //       ? 0
-  //       : lnum < rnum ? -1 : 1
-  //   })
-  //   .map(f => [
-  //     `${this.here()}/${f}`,
-  //     `${this.here()}/${f.concat(".json")}`
-  //   ])
-  // }
-
-  // manifest(index: number): string {
-  //   return this.manifests()
-  //     .map(m => m[1])
-  //     .filter(f => {
-  //       let str = f.match(/.*\.(\d+)\.yaml.json/)[1]
-  //       let num = parseInt(str)
-  //       return num === index
-  //     })
-  //     [0]
-  // }
 }

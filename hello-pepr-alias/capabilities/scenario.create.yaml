@@ -1,18 +1,32 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: hello-pepr-finalize-create
+  name: hello-pepr-alias-create
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cm-reconcile-create
-  namespace: hello-pepr-finalize-create
+  namespace: hello-pepr-alias-create
 data: {}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cm-watch-create
-  namespace: hello-pepr-finalize-create
+  namespace: hello-pepr-alias-create
+data: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-validate-create
+  namespace: hello-pepr-alias-create
+data: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-mutate-create
+  namespace: hello-pepr-alias-create
 data: {}

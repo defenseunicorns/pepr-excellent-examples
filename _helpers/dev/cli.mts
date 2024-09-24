@@ -34,6 +34,18 @@ const test = program.command('test')
   )
   .addOption(
     new Option(
+      "--local-package",
+      "Build the pepr cli package and then use that generated version for tests (i.e., pepr-0.0.0-development.tgz). Mututally exclusive with --custom-package",
+    ),
+  )
+  .addOption(
+    new Option(
+      "--custom-package <package>",
+      "use a pepr cli package that your provide (e.g., my-custom-pepr.tgz). Mutually exclusive with --local-package",
+    ),
+  )
+  .addOption(
+    new Option(
       "-i, --image <image>",
       "pepr controller image to use. (e.g. --image=\"pepr:dev\")",
     ),
@@ -44,19 +56,35 @@ const test = program.command('test')
       'args to pass to test runner (e.g. --passthru=\'--testNamePattern="testName()"\')'
     )
   )
-  .hook('preAction', () =>{
+  .hook('preAction', (thisCommand) =>{
     const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'})
     execSync('npm install', {cwd: peprExcellentExamplesRepo})
     if(!process.env.CI)
     {
-      const peprRepoLocation = findUpSync('pepr', {type: 'directory'})
-      const peprBuild = 'pepr-0.0.0-development.tgz'
-      const peprContainerImage = 'pepr:dev'
+      if(thisCommand.opts().customPackage){
+        console.log('--custom-package is set!')
+        const peprBuild = thisCommand.opts().customPackage
+        const peprContainerImage = 'pepr:dev'
 
-      execSync('npm run build > /dev/null 2>&1', {cwd: peprRepoLocation})
-      execSync(`cp ${peprRepoLocation}/${peprBuild} ${peprExcellentExamplesRepo}`)
-      console.log(`Pepr Build under test: ${execSync(`shasum ${peprExcellentExamplesRepo}/${peprBuild}`).toString()}`)
-      console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${peprContainerImage}`).toString()}`)
+        console.log(`Running custom package at: ${thisCommand.opts().customPackage}`)
+        console.log(`Pepr Build under test: ${execSync(`shasum ${peprBuild}`).toString()}`)
+        console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${peprContainerImage}`).toString()}`)
+        process.env.CUSTOM_PACKAGE = `${peprBuild}`
+        console.log(`Running custom package at: ${process.env.CUSTOM_PACKAGE}`)
+      }
+      if(thisCommand.opts().localPackage){
+        console.log('--local-package is set!')
+        const peprRepoLocation = findUpSync('pepr', {type: 'directory'})
+        const peprBuild = 'pepr-0.0.0-development.tgz'
+        const peprContainerImage = 'pepr:dev'
+
+        execSync('npm run build > /dev/null 2>&1', {cwd: peprRepoLocation})
+        execSync(`cp ${peprRepoLocation}/${peprBuild} ${peprExcellentExamplesRepo}`)
+        console.log(`Pepr Build under test: ${execSync(`shasum ${peprExcellentExamplesRepo}/${peprBuild}`).toString()}`)
+        console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${peprContainerImage}`).toString()}`)
+        process.env.LOCAL_PACKAGE = `${peprExcellentExamplesRepo}/${peprBuild}`
+        console.log(`Running local package at: ${process.env.LOCAL_PACKAGE}`)
+      }
     }
   })
   .action(async ({suite, passthru, image}) => {

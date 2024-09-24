@@ -36,13 +36,15 @@ describe('version tests', () => {
   describe('when pepr is a local dev copy', () => { 
     const peprBuildName = 'pepr-0.0.0-development.tgz';
     let peprBuildPath = '';
-    let peprAlias = '';
+    let peprAlias = process.env.LOCAL_PACKAGE ? process.env.LOCAL_PACKAGE : 'pepr';
+    peprAlias = process.env.CUSTOM_PACKAGE ? process.env.CUSTOM_PACKAGE : process.env.LOCAL_PACKAGE as string;
     let peprExcellentExamplesRepo = '';
     beforeAll(async () =>{
       peprBuildPath = await findUp(peprBuildName) as string //TODO: Type coercion
       peprAlias = `file:${peprBuildPath}`
       peprExcellentExamplesRepo = await findUp('pepr-excellent-examples', {type: 'directory'}) as string //TODO: type coercion
       expect(execSync(`ls -l`, {cwd: peprExcellentExamplesRepo}).toString()).toContain(peprBuildName)
+      console.log(`PEPR ALIAS IS: ${peprAlias}`)
     })
 
     afterAll(()=>{

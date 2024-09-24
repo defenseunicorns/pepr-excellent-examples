@@ -29,8 +29,5 @@
     "hello-pepr-watch",
     "pepr-operator",
     "test-specific-version"
-  ],
-  "devDependencies": {
-    "find-up": "^7.0.0"
-  }
+  ]
 }

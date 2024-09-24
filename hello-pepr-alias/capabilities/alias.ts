@@ -17,12 +17,41 @@ When(a.ConfigMap)
   .IsCreated()
   .InNamespace("hello-pepr-finalize-create")
   .WithName("cm-reconcile-create")
-  .Reconcile(function reconcileCreate(cm) {
-    Log.info(cm, "external api call (create): reconcile/callback")
+  .Alias("alias:create:reconcile")
+  .Reconcile(function reconcileCreate(cm, phase, logger) {
+    logger.info(cm, "external api call (reconcile-create-alias): reconcile/callback")
   })
   .Finalize(function finalizeCreate(cm) {
-    Log.info(cm, "external api call (create): reconcile/finalize")
+    Log.info(cm, "external api call (reconcile-create-alias): reconcile/finalize")
   });
+
+  When(a.ConfigMap)
+  .IsCreated()
+  .InNamespace("hello-pepr-finalize-create")
+  .WithName("cm-reconcile-create")
+  .Alias("alias:create:reconcile:finalize")
+  .Reconcile(function reconcileCreate(cm) {
+    Log.info(cm, "external api call (reconcile-create-alias): reconcile/callback")
+  })
+  .Finalize(function finalizeCreate(cm, logger) {
+    logger.info(cm, "external api call (reconcile-create-alias): reconcile/finalize")
+  });
+
+When(a.ConfigMap)
+  .IsCreated()
+  .InNamespace("hello-pepr-finalize-create")
+  .WithName("cm-reconcile-create")
+  .Reconcile(function reconcileCreate(cm, phase, logger) {
+    logger.info(cm, "external api call (reconcile-create-default-alias): reconcile/callback")
+  })
+
+When(a.ConfigMap)
+  .IsCreated()
+  .InNamespace("hello-pepr-finalize-create")
+  .WithName("cm-reconcile-create")
+  .Reconcile(function reconcileCreate(cm) {
+    Log.info(cm, "external api call (reconcile-create-no-child-logger): reconcile/callback")
+  })
 
 When(a.ConfigMap)
   .IsCreated()

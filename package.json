@@ -9,6 +9,7 @@
     "_helpers",
     "dash-policyreport",
     "hello-pepr",
+    "hello-pepr-alias",
     "hello-pepr-config",
     "hello-pepr-config-ignored-ns",
     "hello-pepr-deletion-timestamp",

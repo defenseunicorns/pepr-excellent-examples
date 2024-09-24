@@ -28,7 +28,7 @@
     "hello-pepr-validate",
     "hello-pepr-watch",
     "pepr-operator",
-    "use-arbitrary-pepr-version"
+    "test-specific-version"
   ],
   "devDependencies": {
     "find-up": "^7.0.0"

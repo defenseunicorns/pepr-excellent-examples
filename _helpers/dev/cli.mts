@@ -6,6 +6,7 @@ import { execSync, spawnSync } from 'node:child_process';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
+import { findUpSync } from 'find-up'
 
 program.name('cli')
   .version('0.0.0', '-v, --version')
@@ -44,17 +45,18 @@ const test = program.command('test')
     )
   )
   .hook('preAction', () =>{
-    const installPath = execSync('pwd').toString().trim().concat('/..') // Top-level package.json
-    execSync('npm install', {cwd: installPath})
+    const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'})
+    execSync('npm install', {cwd: peprExcellentExamplesRepo})
     if(!process.env.CI)
     {
-      //Local setup, since we're not in CI
-      //TODO: Hardcoded paths need to be generalized
-      console.log(execSync(`pwd`).toString())
-      execSync('npm run build > /dev/null 2>&1', {cwd: '/Users/sam/code/work/pepr'})
-      execSync('cp ../../pepr/pepr-0.0.0-development.tgz ../')
-      console.log(`Pepr Build under test: ${execSync('shasum ../pepr-0.0.0-development.tgz').toString()}`)
-      console.log(`Pepr Image under test: ${execSync('docker inspect --format=\'{{.Id}}\' pepr:dev').toString()}`)
+      const peprRepoLocation = findUpSync('pepr', {type: 'directory'})
+      const peprBuild = 'pepr-0.0.0-development.tgz'
+      const peprContainerImage = 'pepr:dev'
+
+      execSync('npm run build > /dev/null 2>&1', {cwd: peprRepoLocation})
+      execSync(`cp ${peprRepoLocation}/${peprBuild} ${peprExcellentExamplesRepo}`)
+      console.log(`Pepr Build under test: ${execSync(`shasum ${peprExcellentExamplesRepo}/${peprBuild}`).toString()}`)
+      console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${peprContainerImage}`).toString()}`)
     }
   })
   .action(async ({suite, passthru, image}) => {

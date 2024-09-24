@@ -18,21 +18,6 @@ import { peprVersion, moduleUp, moduleDown } from './pepr';
 
 const trc = new TestRunCfg(__filename)
 
-// Temporarily disabled due to the following error:
-    // Expected: "0.34.1"
-    // Received: "0.31.1"
-// We use pepr:dev images for e2e test. Will revisit this when we update all the modules
-// describe("peprVersion()", () => {
-//   it("returns pepr version defined by workspace root", async () => {
-//     const cfg = (await readFile(`${trc.root()}/../package.json`)).toString()
-//     const expected = cfg.match(/"pepr": "npx pepr@(?<version>[^"]*)"/)!.groups!.version
-
-//     const actual = await peprVersion()
-
-//     expect(actual).toBe(expected)
-//   })
-// })
-
 describe("module lifecycle", () => {
   let wipeMod = async (mod) => {
     await rm(mod, { recursive: true, force: true })

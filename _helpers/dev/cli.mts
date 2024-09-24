@@ -62,28 +62,23 @@ const test = program.command('test')
     if(!process.env.CI)
     {
       if(thisCommand.opts().customPackage){
-        console.log('--custom-package is set!')
         const peprBuild = thisCommand.opts().customPackage
         const peprContainerImage = 'pepr:dev'
 
-        console.log(`Running custom package at: ${thisCommand.opts().customPackage}`)
-        console.log(`Pepr Build under test: ${execSync(`shasum ${peprBuild}`).toString()}`)
-        console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${peprContainerImage}`).toString()}`)
+        console.log(`Pepr Build under test: ${execSync(`shasum ${peprBuild}`).toString()}\n` +
+        `Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${peprContainerImage}`).toString()}`)
         process.env.CUSTOM_PACKAGE = `${peprBuild}`
-        console.log(`Running custom package at: ${process.env.CUSTOM_PACKAGE}`)
       }
       if(thisCommand.opts().localPackage){
-        console.log('--local-package is set!')
         const peprRepoLocation = findUpSync('pepr', {type: 'directory'})
         const peprBuild = 'pepr-0.0.0-development.tgz'
         const peprContainerImage = 'pepr:dev'
 
         execSync('npm run build > /dev/null 2>&1', {cwd: peprRepoLocation})
         execSync(`cp ${peprRepoLocation}/${peprBuild} ${peprExcellentExamplesRepo}`)
-        console.log(`Pepr Build under test: ${execSync(`shasum ${peprExcellentExamplesRepo}/${peprBuild}`).toString()}`)
-        console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${peprContainerImage}`).toString()}`)
+        console.log(`Pepr Build under test: ${execSync(`shasum ${peprExcellentExamplesRepo}/${peprBuild}`).toString()}\n` +
+        `Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${peprContainerImage}`).toString()}`)
         process.env.LOCAL_PACKAGE = `${peprExcellentExamplesRepo}/${peprBuild}`
-        console.log(`Running local package at: ${process.env.LOCAL_PACKAGE}`)
       }
     }
   })

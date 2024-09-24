@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
-import { exec, execSync } from "child_process";
+import { execSync } from "child_process";
 import findUp from 'find-up' // TODO: Would rather use findUpSync()
+import {getPeprAlias} from '../../_helpers/src/pepr'
 
 describe('version tests', () => {
   describe('when pepr version is defined in an example folder (v0.31.1)', () => { 
@@ -44,7 +45,6 @@ describe('version tests', () => {
       peprAlias = `file:${peprBuildPath}`
       peprExcellentExamplesRepo = await findUp('pepr-excellent-examples', {type: 'directory'}) as string //TODO: type coercion
       expect(execSync(`ls -l`, {cwd: peprExcellentExamplesRepo}).toString()).toContain(peprBuildName)
-      console.log(`PEPR ALIAS IS: ${peprAlias}`)
     })
 
     afterAll(()=>{
@@ -53,11 +53,11 @@ describe('version tests', () => {
     })
 
     it('shows the correct version', ()=>{
-      const result = execSync(`npx --yes ${peprAlias} --version`, {cwd: peprExcellentExamplesRepo}).toString()
+      const result = execSync(`npx --yes ${getPeprAlias()} --version`, {cwd: peprExcellentExamplesRepo}).toString()
       expect(result).toContain('0.0.0-development');
     })
     it('shows the help menu with --unpublished', () =>{
-      const result = execSync(`npx --yes ${peprAlias} init --help`, {cwd: peprExcellentExamplesRepo}).toString()
+      const result = execSync(`npx --yes ${getPeprAlias()} init --help`, {cwd: peprExcellentExamplesRepo}).toString()
       expect(result).toContain('--unpublished')
     })
   })

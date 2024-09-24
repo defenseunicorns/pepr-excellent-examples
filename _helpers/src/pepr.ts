@@ -64,6 +64,18 @@ export async function untilLogged(needle: String | Function, count = 1) {
   }
 }
 
+export function getPeprAlias(): string{
+  if(process.env.LOCAL_PACKAGE){
+    return `file:${process.env.LOCAL_PACKAGE}`
+  }
+  else if(process.env.CUSTOM_PACKAGE){
+    return `file:${process.env.CUSTOM_PACKAGE.replace('../', '')}`
+  }
+  else{
+    return 'pepr'
+  }
+}
+
 export async function peprVersion() {
   // determine npx pepr@version from workspace root
   const root = (await new Cmd({ cmd: `npm root` }).run()).stdout[0]

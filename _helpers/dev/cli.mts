@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { program, Option } from 'commander';
 import path, { resolve, basename } from 'node:path';
 import { chdir } from 'node:process';
-import { execSync, spawnSync } from 'node:child_process';
+import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
@@ -57,30 +57,28 @@ const test = program.command('test')
     )
   )
   .hook('preAction', (thisCommand) =>{
-    const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'})
-    const buildLocalPepr = (parentDirectory: string) => {
-      const peprRepoLocation = findUpSync('pepr', { type: 'directory' });
-      const peprBuild = 'pepr-0.0.0-development.tgz';
-      execSync('npm run build > /dev/null 2>&1', { cwd: peprRepoLocation });
-      execSync(`cp ${peprRepoLocation}/${peprBuild} ${parentDirectory}`);
-      return `${parentDirectory}/${peprBuild}`;
+    const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'});
+    if(!peprExcellentExamplesRepo){
+      throw new Error('Could not find parent "pepr-excellent-examples" directory');
     }
 
-    execSync('npm install', {cwd: peprExcellentExamplesRepo})
+    try {
+      execSync('npm install', { cwd: peprExcellentExamplesRepo });
+    } catch (err) {
+      throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}: ${err.message}`);
+    }
 
     if(thisCommand.opts().customPackage){
       process.env.PEPR_PACKAGE = `${path.resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
     }
-    if(thisCommand.opts().localPackage){
+    else if(thisCommand.opts().localPackage){
       process.env.PEPR_PACKAGE = buildLocalPepr(peprExcellentExamplesRepo)
     }
-    process.env.PEPR_PACKAGE ?
-      console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`).toString()}`) : 
-      console.log(`Pepr Version under test: ${execSync(`npx --yes ${getPeprAlias()} --version`).toString()}`);
-    console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}} {{.RepoTags}}\' ${thisCommand.opts().image}`).toString()}`)
+    process.env.PEPR_IMAGE = thisCommand.opts().image
+
+    printTestInfo() 
   })
   .action(async ({suite, passthru, image}) => {
-    if (image) { process.env.PEPR_IMAGE = image }
     passthru = passthru || []
     switch (suite) {
       case 'unit':  testUnit(passthru)      ; break
@@ -88,6 +86,29 @@ const test = program.command('test')
       case 'all':   await testAll(passthru) ; break
     }
   })
+
+const printTestInfo = () => {
+    if (process.env.PEPR_PACKAGE) {
+      console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`).toString()}`);
+    } else {
+      const peprVersion = execSync(`npx --yes ${getPeprAlias()} --version`).toString();
+      console.log(`Pepr Version under test: ${peprVersion}`);
+    }
+    console.log(`Pepr Image under test: ${execSync(`docker inspect --format="{{.Id}} {{.RepoTags}}" ${process.env.PEPR_IMAGE}`).toString()}`);
+}
+
+
+const buildLocalPepr = (outputDirectory: string) => {
+  const peprRepoLocation = findUpSync('pepr', { type: 'directory' });
+  if(!peprRepoLocation){
+    throw new Error('Could not find "pepr" repository. Unable to generate a local build.');
+  }
+  const peprBuild = 'pepr-0.0.0-development.tgz';
+  const suppressOutput = process.env.DEBUG ? '' : ' > /dev/null 2>&1';
+  execSync(`npm run build ${suppressOutput}`, { cwd: peprRepoLocation });
+  execFileSync('cp', [`${peprRepoLocation}/${peprBuild}`, `${outputDirectory}`]);
+  return `${outputDirectory}/${peprBuild}`;
+}
 
 const dpr = program.command('dpr')
   .description('utilities for dash-policyreport module')

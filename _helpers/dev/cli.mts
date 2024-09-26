@@ -45,10 +45,10 @@ const test = program.command('test')
       "test a specified pepr cli .tgz package",
     ).conflicts('localPackage')
   )
-  .option(
+  .requiredOption(
       "-i, --image <image>",
       "pepr controller image under test",
-      "pepr:dev", // TODO: Is this really required all the time?
+      "pepr:dev"
   )
   .addOption(
     new Option(
@@ -77,7 +77,7 @@ const test = program.command('test')
     process.env.PEPR_PACKAGE ?
       console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`).toString()}`) : 
       console.log(`Pepr Version under test: ${execSync(`npx --yes ${getPeprAlias()} --version`).toString()}`);
-    console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}} {{.RepoTags}}\' ${thisCommand.opts().image ?? 'pepr:dev'}`).toString()}`)
+    console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}} {{.RepoTags}}\' ${thisCommand.opts().image}`).toString()}`)
   })
   .action(async ({suite, passthru, image}) => {
     if (image) { process.env.PEPR_IMAGE = image }

@@ -64,6 +64,10 @@ export async function untilLogged(needle: String | Function, count = 1) {
   }
 }
 
+export function getPeprAlias(): string{
+  return process.env.PEPR_PACKAGE ? `file:${process.env.PEPR_PACKAGE}` : 'pepr';
+}
+
 export async function peprVersion() {
   // determine npx pepr@version from workspace root
   const root = (await new Cmd({ cmd: `npm root` }).run()).stdout[0]
@@ -81,7 +85,7 @@ export async function moduleBuild({ version = "", verbose = false } = {}) {
   // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
   const pepr = { TS_NODE_PROJECT: "" }
 
-  let cmd = `npx --yes pepr@${version} build`
+  let cmd = `npx --yes ${getPeprAlias()} build`
   console.time(cmd)
   const build = await new Cmd({ env: pepr, cmd }).run()
   if (verbose) { console.log(build) }
@@ -101,9 +105,9 @@ export async function moduleUp({ version = "", verbose = false } = {}) {
   await moduleBuild({ version, verbose })
 
   if (process.env.PEPR_IMAGE) {
-    cmd = `npx --yes pepr@${version} deploy --image=${process.env.PEPR_IMAGE} --confirm`
+    cmd = `npx --yes ${getPeprAlias()} deploy --image=${process.env.PEPR_IMAGE} --confirm`
   } else {
-    cmd = `npx --yes pepr@${version} deploy --confirm`
+    cmd = `npx --yes ${getPeprAlias()} deploy --confirm`
   }
 
   console.time(cmd)

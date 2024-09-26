@@ -1,11 +1,16 @@
 import 'dotenv/config';
 import { program, Option } from 'commander';
-import { resolve, basename } from 'node:path';
+import path, { resolve, basename } from 'node:path';
 import { chdir } from 'node:process';
-import { spawnSync } from 'node:child_process';
+import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
+import { findUpSync } from 'find-up'
+import {getPeprAlias} from '../src/pepr'
+import { mkdirSync } from 'fs';
+import { rmdirSync } from 'node:fs';
+import assert from 'node:assert';
 
 program.name('cli')
   .version('0.0.0', '-v, --version')
@@ -32,10 +37,21 @@ const test = program.command('test')
       .default('all')
   )
   .addOption(
+      new Option(
+      "-lp, --local-package",
+      "build & test the pepr cli package from a local copy of the pepr repo",
+      ).conflicts('customPackage')
+  )
+  .addOption(
     new Option(
+      "-cp, --custom-package <package>",
+      "test a specified pepr cli .tgz package",
+    ).conflicts('localPackage')
+  )
+  .requiredOption(
       "-i, --image <image>",
-      "pepr controller image to use. (e.g. --image=\"pepr:dev\")",
-    ),
+      "pepr controller image under test",
+      "pepr:dev"
   )
   .addOption(
     new Option(
@@ -43,8 +59,30 @@ const test = program.command('test')
       'args to pass to test runner (e.g. --passthru=\'--testNamePattern="testName()"\')'
     )
   )
+  .hook('preAction', (thisCommand) =>{
+    const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'});
+    if(!peprExcellentExamplesRepo){
+      throw new Error('Could not find parent "pepr-excellent-examples" directory');
+    }
+
+    try {
+      execSync('npm install', { cwd: peprExcellentExamplesRepo });
+    } catch (err) {
+      throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}: ${err.message}`);
+    }
+
+    if(thisCommand.opts().customPackage){
+      process.env.PEPR_PACKAGE = `${path.resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
+      validateCustomPackage(peprExcellentExamplesRepo);
+    }
+    else if(thisCommand.opts().localPackage){
+      process.env.PEPR_PACKAGE = buildLocalPepr(peprExcellentExamplesRepo)
+    }
+    process.env.PEPR_IMAGE = thisCommand.opts().image
+
+    printTestInfo() 
+  })
   .action(async ({suite, passthru, image}) => {
-    if (image) { process.env.PEPR_IMAGE = image }
     passthru = passthru || []
     switch (suite) {
       case 'unit':  testUnit(passthru)      ; break
@@ -52,6 +90,29 @@ const test = program.command('test')
       case 'all':   await testAll(passthru) ; break
     }
   })
+
+const printTestInfo = () => {
+    if (process.env.PEPR_PACKAGE) {
+      console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`).toString()}`);
+    } else {
+      const peprVersion = execSync(`npx --yes ${getPeprAlias()} --version`).toString();
+      console.log(`Pepr Version under test: ${peprVersion}`);
+    }
+    console.log(`Pepr Image under test: ${execSync(`docker inspect --format="{{.Id}} {{.RepoTags}}" ${process.env.PEPR_IMAGE}`).toString()}`);
+}
+
+
+const buildLocalPepr = (outputDirectory: string) => {
+  const peprRepoLocation = findUpSync('pepr', { type: 'directory' });
+  if(!peprRepoLocation){
+    throw new Error('Could not find "pepr" repository. Unable to generate a local build.');
+  }
+  const peprBuild = 'pepr-0.0.0-development.tgz';
+  const suppressOutput = process.env.DEBUG ? '' : ' > /dev/null 2>&1';
+  execSync(`npm run build ${suppressOutput}`, { cwd: peprRepoLocation });
+  execFileSync('cp', [`${peprRepoLocation}/${peprBuild}`, `${outputDirectory}`]);
+  return `${outputDirectory}/${peprBuild}`;
+}
 
 const dpr = program.command('dpr')
   .description('utilities for dash-policyreport module')
@@ -64,6 +125,22 @@ const gen = dpr.command('gen')
 
 await program.parseAsync(process.argv);
 const opts = program.opts();
+
+function validateCustomPackage(parentDir: string) {
+  try {
+    mkdirSync(`${parentDir}/custom-package`, { recursive: true });
+    execSync(`tar -xzf ${process.env.PEPR_PACKAGE} -C custom-package`, { cwd: parentDir }).toString();
+    const npmInfo = execSync(`npm view --json custom-package/package/`, { cwd: parentDir }).toString();
+    assert(npmInfo.includes('\"name\": \"pepr\"'));
+    assert(npmInfo.includes('\"pepr\": \"dist/cli.js\"'));
+  }
+  catch (error) {
+    throw new Error(`Custom-Package (${process.env.PEPR_PACKAGE}) does not appear to be a pepr package, exiting.`);
+  }
+  finally {
+    rmdirSync(`${parentDir}/custom-package`, { recursive: true });
+  }
+}
 
 function testUnit(passthru) {
   spawnSync(

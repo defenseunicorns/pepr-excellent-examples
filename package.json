@@ -33,6 +33,7 @@
     "hello-pepr-store",
     "hello-pepr-validate",
     "hello-pepr-watch",
-    "pepr-operator"
+    "pepr-operator",
+    "test-specific-version"
   ]
 }

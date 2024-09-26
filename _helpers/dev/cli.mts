@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { program, Option } from 'commander';
-import { resolve, basename } from 'node:path';
+import path, { resolve, basename } from 'node:path';
 import { chdir } from 'node:process';
 import { execSync, spawnSync } from 'node:child_process';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
@@ -58,7 +58,7 @@ const test = program.command('test')
   )
   .hook('preAction', (thisCommand) =>{
     const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'})
-    const localPeprPath = (parentDirectory: string) => {
+    const buildLocalPepr = (parentDirectory: string) => {
       const peprRepoLocation = findUpSync('pepr', { type: 'directory' });
       const peprBuild = 'pepr-0.0.0-development.tgz';
       execSync('npm run build > /dev/null 2>&1', { cwd: peprRepoLocation });
@@ -69,15 +69,15 @@ const test = program.command('test')
     execSync('npm install', {cwd: peprExcellentExamplesRepo})
 
     if(thisCommand.opts().customPackage){
-      process.env.PEPR_PACKAGE = `${thisCommand.opts().customPackage}`
+      process.env.PEPR_PACKAGE = `${path.resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
     }
     if(thisCommand.opts().localPackage){
-      process.env.PEPR_PACKAGE = localPeprPath(peprExcellentExamplesRepo)
+      process.env.PEPR_PACKAGE = buildLocalPepr(peprExcellentExamplesRepo)
     }
     process.env.PEPR_PACKAGE ?
-      console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`, {cwd: peprExcellentExamplesRepo}).toString()}`) : 
+      console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`).toString()}`) : 
       console.log(`Pepr Version under test: ${execSync(`npx --yes ${getPeprAlias()} --version`).toString()}`);
-    console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${thisCommand.opts().image ?? 'pepr:dev'}`).toString()}`)
+    console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}} {{.RepoTags}}\' ${thisCommand.opts().image ?? 'pepr:dev'}`).toString()}`)
   })
   .action(async ({suite, passthru, image}) => {
     if (image) { process.env.PEPR_IMAGE = image }

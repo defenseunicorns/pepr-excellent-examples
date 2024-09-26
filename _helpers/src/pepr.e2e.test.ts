@@ -14,7 +14,7 @@ import { TestRunCfg } from './TestRunCfg';
 import { Cmd } from './Cmd';
 import { clean } from './cluster';
 import { readFile, rm, writeFile } from 'node:fs/promises';
-import { peprVersion, moduleUp, moduleDown } from './pepr';
+import { peprVersion, moduleUp, moduleDown, getPeprAlias } from './pepr';
 
 const trc = new TestRunCfg(__filename)
 
@@ -36,7 +36,7 @@ describe("module lifecycle", () => {
   let makeMod = async (mod, ver, verbose = false) => {
     const env = { TEST_MODE: true, TS_NODE_PROJECT: `${mod}/tsconfig.json` }
   
-    let cmd = `npx --yes pepr@${ver} init --skip-post-init`
+    let cmd = `npx --yes ${getPeprAlias()} init --skip-post-init`
     console.time(cmd)
     let init = await new Cmd({env, cmd}).run()
     if (verbose) { console.log(init) }

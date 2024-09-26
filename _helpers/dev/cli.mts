@@ -58,29 +58,24 @@ const test = program.command('test')
   )
   .hook('preAction', (thisCommand) =>{
     const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'})
-    execSync('npm install', {cwd: peprExcellentExamplesRepo})
-    if(!process.env.CI)
-    {
-      if(thisCommand.opts().customPackage){
-        const peprBuild = thisCommand.opts().customPackage
-        const peprContainerImage = 'pepr:dev'
-
-        console.log(`Pepr Build under test: ${execSync(`shasum ${peprBuild}`).toString()}\n` +
-        `Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${peprContainerImage}`).toString()}`)
-        process.env.CUSTOM_PACKAGE = `${peprBuild}`
-      }
-      if(thisCommand.opts().localPackage){
-        const peprRepoLocation = findUpSync('pepr', {type: 'directory'})
-        const peprBuild = 'pepr-0.0.0-development.tgz'
-        const peprContainerImage = 'pepr:dev'
-
-        execSync('npm run build > /dev/null 2>&1', {cwd: peprRepoLocation})
-        execSync(`cp ${peprRepoLocation}/${peprBuild} ${peprExcellentExamplesRepo}`)
-        console.log(`Pepr Build under test: ${execSync(`shasum ${peprExcellentExamplesRepo}/${peprBuild}`).toString()}\n` +
-        `Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${peprContainerImage}`).toString()}`)
-        process.env.LOCAL_PACKAGE = `${peprExcellentExamplesRepo}/${peprBuild}`
-      }
+    const localPeprPath = (parentDirectory: string) => {
+      const peprRepoLocation = findUpSync('pepr', { type: 'directory' });
+      const peprBuild = 'pepr-0.0.0-development.tgz';
+      execSync('npm run build > /dev/null 2>&1', { cwd: peprRepoLocation });
+      execSync(`cp ${peprRepoLocation}/${peprBuild} ${parentDirectory}`);
+      return `${parentDirectory}/${peprBuild}`;
     }
+
+    execSync('npm install', {cwd: peprExcellentExamplesRepo})
+
+    if(thisCommand.opts().customPackage){
+      process.env.PEPR_PACKAGE = `${thisCommand.opts().customPackage}`
+    }
+    if(thisCommand.opts().localPackage){
+      process.env.PEPR_PACKAGE = localPeprPath(peprExcellentExamplesRepo)
+    }
+    console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`, {cwd: peprExcellentExamplesRepo}).toString()}\n` +
+    `Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${thisCommand.opts().image ?? 'pepr:dev'}`).toString()}`)
   })
   .action(async ({suite, passthru, image}) => {
     if (image) { process.env.PEPR_IMAGE = image }

@@ -7,6 +7,7 @@ import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
 import { findUpSync } from 'find-up'
+import {getPeprAlias} from '../src/pepr'
 
 program.name('cli')
   .version('0.0.0', '-v, --version')
@@ -73,8 +74,10 @@ const test = program.command('test')
     if(thisCommand.opts().localPackage){
       process.env.PEPR_PACKAGE = localPeprPath(peprExcellentExamplesRepo)
     }
-    console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`, {cwd: peprExcellentExamplesRepo}).toString()}\n` +
-    `Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${thisCommand.opts().image ?? 'pepr:dev'}`).toString()}`)
+    process.env.PEPR_PACKAGE ?
+      console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`, {cwd: peprExcellentExamplesRepo}).toString()}`) : 
+      console.log(`Pepr Version under test: ${execSync(`npx --yes ${getPeprAlias()} --version`).toString()}`);
+    console.log(`Pepr Image under test: ${execSync(`docker inspect --format=\'{{.Id}}\' ${thisCommand.opts().image ?? 'pepr:dev'}`).toString()}`)
   })
   .action(async ({suite, passthru, image}) => {
     if (image) { process.env.PEPR_IMAGE = image }

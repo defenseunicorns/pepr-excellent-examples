@@ -65,12 +65,7 @@ export async function untilLogged(needle: String | Function, count = 1) {
 }
 
 export function getPeprAlias(): string{
-  if(process.env.PEPR_PACKAGE){
-    return `file:${process.env.PEPR_PACKAGE}`
-  }
-  else{
-    return 'pepr'
-  }
+  return process.env.PEPR_PACKAGE ? `file:${process.env.PEPR_PACKAGE}` : 'pepr';
 }
 
 export async function peprVersion() {

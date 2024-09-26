@@ -8,6 +8,9 @@ import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
 import { findUpSync } from 'find-up'
 import {getPeprAlias} from '../src/pepr'
+import { mkdirSync } from 'fs';
+import { rmdirSync } from 'node:fs';
+import assert from 'node:assert';
 
 program.name('cli')
   .version('0.0.0', '-v, --version')
@@ -70,6 +73,7 @@ const test = program.command('test')
 
     if(thisCommand.opts().customPackage){
       process.env.PEPR_PACKAGE = `${path.resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
+      validateCustomPackage(peprExcellentExamplesRepo);
     }
     else if(thisCommand.opts().localPackage){
       process.env.PEPR_PACKAGE = buildLocalPepr(peprExcellentExamplesRepo)
@@ -121,6 +125,22 @@ const gen = dpr.command('gen')
 
 await program.parseAsync(process.argv);
 const opts = program.opts();
+
+function validateCustomPackage(parentDir: string) {
+  try {
+    mkdirSync(`${parentDir}/custom-package`, { recursive: true });
+    execSync(`tar -xzf ${process.env.PEPR_PACKAGE} -C custom-package`, { cwd: parentDir }).toString();
+    const npmInfo = execSync(`npm view --json custom-package/package/`, { cwd: parentDir }).toString();
+    assert(npmInfo.includes('\"name\": \"pepr\"'));
+    assert(npmInfo.includes('\"pepr\": \"dist/cli.js\"'));
+  }
+  catch (error) {
+    throw new Error(`Custom-Package (${process.env.PEPR_PACKAGE}) does not appear to be a pepr package, exiting.`);
+  }
+  finally {
+    rmdirSync(`${parentDir}/custom-package`, { recursive: true });
+  }
+}
 
 function testUnit(passthru) {
   spawnSync(

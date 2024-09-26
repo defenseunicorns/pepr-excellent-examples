@@ -31,6 +31,7 @@
     "hello-pepr-soak",
     "hello-pepr-soak-ci",
     "hello-pepr-store",
+    "hello-pepr-store-redact-logs",
     "hello-pepr-validate",
     "hello-pepr-watch",
     "pepr-operator"

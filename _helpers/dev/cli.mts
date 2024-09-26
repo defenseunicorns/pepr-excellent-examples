@@ -33,22 +33,21 @@ const test = program.command('test')
       .default('all')
   )
   .addOption(
-    new Option(
-      "--local-package",
-      "Build the pepr cli package and then use that generated version for tests (i.e., pepr-0.0.0-development.tgz). Mututally exclusive with --custom-package",
-    ),
+      new Option(
+      "-lp, --local-package",
+      "build & test the pepr cli package from a local copy of the pepr repo",
+      ).conflicts('customPackage')
   )
   .addOption(
     new Option(
-      "--custom-package <package>",
-      "use a pepr cli package that your provide (e.g., my-custom-pepr.tgz). Mutually exclusive with --local-package",
-    ),
+      "-cp, --custom-package <package>",
+      "test a specified pepr cli .tgz package",
+    ).conflicts('localPackage')
   )
-  .addOption(
-    new Option(
+  .option(
       "-i, --image <image>",
-      "pepr controller image to use. (e.g. --image=\"pepr:dev\")",
-    ),
+      "pepr controller image under test",
+      "pepr:dev", // TODO: Is this really required all the time?
   )
   .addOption(
     new Option(

@@ -79,6 +79,7 @@ const test = program.command('test')
       execSync(`npm i ${getPeprAlias()}`)
       execSync('rm package-lock.json', {cwd: peprExcellentExamplesRepo})
       execSync('npm install', { cwd: peprExcellentExamplesRepo });
+      console.log(execSync('grep "pepr" package-lock.json', {cwd: peprExcellentExamplesRepo}).toString())
     } catch (err) {
       throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}: ${err.message}`);
     }

@@ -1,4 +1,2 @@
 node_modules/
 cluster.lock
-custom-package/
-pepr-*.tgz

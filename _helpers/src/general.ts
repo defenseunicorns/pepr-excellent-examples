@@ -47,6 +47,23 @@ export async function unlock(trc: TestRunCfg) {
   }
 }
 
+export function nearestAncestor(filename: string, fromPath: string): string {
+  let parts = fromPath.split(path.sep)
+  let starp = Array.from(parts).reverse()
+
+  let searchPaths = []
+  parts.forEach((_, idx) => searchPaths.push(
+    starp.slice(idx, parts.length).reverse().join(path.sep)
+  ))
+
+  for (const sp of searchPaths) {
+    const candidate = sp + path.sep + filename
+    if (fs.statSync(candidate, { throwIfNoEntry: false })) { return candidate }
+  }
+
+  throw `Can't find file "${filename}" in/above path "${fromPath}".`
+}
+
 export async function halfCreate(resources, kinds = kind) {
   resources = [ resources ].flat()
 
@@ -60,6 +77,14 @@ export async function halfCreate(resources, kinds = kind) {
 
 export async function fullCreate(resources, kinds = kind) {
   resources = [ resources ].flat()
+
+  // return Promise.all(resources.map(async (r) => {
+  //   const kynd = kinds[r.kind]
+  //   const applied = await K8s(kynd).Apply(r)
+  //   await untilTrue(() => live(kynd, applied))
+
+  //   return applied
+  // }))
 
   let applied = []
   for(let r of resources) {

@@ -255,4 +255,56 @@ describe("TestRunCfg", () => {
       expect(actual).toEqual(expected)
     })
   })
+
+  // it ("derives cluster module file path", () => {
+  //   const mod = me.replace('.e2e.test', '.pepr')
+  //   const trc = new TestRunCfg(me)
+  //   expect(trc.module()).toBe(mod)
+  // })
+
+  // describe("discovers to-be-applied, index-ordered capability test manifests", () => {
+  //   const files = [
+  //     `${name}.test.0.yaml`,
+  //     `${name}.test.8675309.yaml`,
+  //     `${name}.test.09.yaml`,
+  //     `${name}.test.8.yaml`,
+  //     `${name}.test.1009.yaml`,
+  //     `nope.test.1.yaml`
+  //   ]
+  //   const manifestList = [
+  //     [`${here}/${name}.test.0.yaml`, `${here}/${name}.test.0.yaml.json`],
+  //     [`${here}/${name}.test.8.yaml`, `${here}/${name}.test.8.yaml.json`],
+  //     [`${here}/${name}.test.09.yaml`, `${here}/${name}.test.09.yaml.json`],
+  //     [`${here}/${name}.test.1009.yaml`, `${here}/${name}.test.1009.yaml.json`],
+  //     [`${here}/${name}.test.8675309.yaml`, `${here}/${name}.test.8675309.yaml.json`]
+  //   ]
+
+  //   beforeEach(() => {
+  //     readdirSync.mockImplementation(
+  //       ( () => files ) as unknown as typeof readdirSync
+  //     )
+  //   })
+
+  //   it("exposes the ordered manifest lookup list", () => {
+  //     const trc = new TestRunCfg(me)
+  //     expect(trc.manifests()).not.toHaveLength(0)
+  //     trc.manifests().forEach((manifest, idx) => {
+  //       const [yaml, json] = manifest
+  //       const [yexp, jexp] = manifestList[idx]
+  //       expect(yaml).toBe(yexp)
+  //       expect(json).toBe(jexp)
+  //     })
+  //   })
+
+  //   it("exposes json manifest lookup-by-index-number method", () => {
+  //     const trc = new TestRunCfg(me)
+
+  //     const json = (i: number) => manifestList[i][1]
+  //     expect(trc.manifest(0)).toBe(json(0))
+  //     expect(trc.manifest(8)).toBe(json(1))
+  //     expect(trc.manifest(9)).toBe(json(2))
+  //     expect(trc.manifest(1009)).toBe(json(3))
+  //     expect(trc.manifest(8675309)).toBe(json(4))
+  //   })
+  // })
 })

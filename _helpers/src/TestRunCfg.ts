@@ -1,7 +1,7 @@
-import * as fs from 'fs';
 import * as path from 'node:path';
-import { parseAllDocuments } from 'yaml';
 import { readFile } from 'node:fs/promises';
+import { parseAllDocuments } from 'yaml';
+import { nearestAncestor } from './general'
 
 export class TestRunCfg {
   me: string;
@@ -61,21 +61,36 @@ export class TestRunCfg {
     }
     return resources
   }
-}
 
-function nearestAncestor(filename: string, fromPath: string): string {
-  let parts = fromPath.split(path.sep)
-  let starp = Array.from(parts).reverse()
+  // module(): string {
+  //   return `${this.here()}/${this.name()}.pepr.ts`
+  // }
 
-  let searchPaths = []
-  parts.forEach((_, idx) => searchPaths.push(
-    starp.slice(idx, parts.length).reverse().join(path.sep)
-  ))
+  // manifests(): [string, string][] {
+  //   return fs.readdirSync(this.here())
+  //   .filter(f => new RegExp(`^${this.name()}\..*`).test(f))
+  //   .filter(f => /\.test\.\d+\.yaml$/.test(f))
+  //   .sort((l, r) => {
+  //     let lnum = parseInt(l.match(/test\.(\d+)\.yaml/)[1])
+  //     let rnum = parseInt(r.match(/test\.(\d+)\.yaml/)[1])
+  //     return lnum === rnum
+  //       ? 0
+  //       : lnum < rnum ? -1 : 1
+  //   })
+  //   .map(f => [
+  //     `${this.here()}/${f}`,
+  //     `${this.here()}/${f.concat(".json")}`
+  //   ])
+  // }
 
-  for (const sp of searchPaths) {
-    const candidate = sp + path.sep + filename
-    if (fs.statSync(candidate, { throwIfNoEntry: false })) { return candidate }
-  }
-
-  throw `Can't find file "${filename}" in/above path "${fromPath}".`
+  // manifest(index: number): string {
+  //   return this.manifests()
+  //     .map(m => m[1])
+  //     .filter(f => {
+  //       let str = f.match(/.*\.(\d+)\.yaml.json/)[1]
+  //       let num = parseInt(str)
+  //       return num === index
+  //     })
+  //     [0]
+  // }
 }

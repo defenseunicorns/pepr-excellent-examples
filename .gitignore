@@ -1,4 +1,5 @@
-node_modules/
+*.bak
 cluster.lock
 custom-package/
+node_modules/
 pepr-*.tgz

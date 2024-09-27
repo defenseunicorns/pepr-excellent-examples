@@ -76,7 +76,10 @@ const test = program.command('test')
     process.env.PEPR_IMAGE = thisCommand.opts().image
 
     try {
-      if(path.basename(process.cwd()) !== '_helpers'){
+      //Make this decision early, and make it easily reversible, don't do repeated lookups (we aren't?)
+      if(path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr'){
+        execSync(`cp package-lock.json package-lock.json.bak`, {cwd: peprExcellentExamplesRepo})
+        execSync(`cp package.json package.json.bak`)
         execSync(`npm i ${getPeprAlias()}`)
         execSync('rm package-lock.json', {cwd: peprExcellentExamplesRepo})
       }
@@ -89,11 +92,21 @@ const test = program.command('test')
     printTestInfo() 
   })
   .action(async ({suite, passthru, image}) => {
-    passthru = passthru || []
-    switch (suite) {
-      case 'unit':  testUnit(passthru)      ; break
-      case 'e2e':   await testE2e(passthru) ; break
-      case 'all':   await testAll(passthru) ; break
+    //Use envar?
+    const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'});
+    try{
+      passthru = passthru || []
+      switch (suite) {
+        case 'unit':  testUnit(passthru)      ; break
+        case 'e2e':   await testE2e(passthru) ; break
+        case 'all':   await testAll(passthru) ; break
+      }
+    }
+    finally{
+      if(path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr'){
+        execSync('mv package.json.bak package.json')
+        execSync('mv package-lock.json.bak package-lock.json', {cwd: peprExcellentExamplesRepo})
+      }
     }
   })
 

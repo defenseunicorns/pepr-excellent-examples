@@ -65,11 +65,6 @@ const test = program.command('test')
       throw new Error('Could not find parent "pepr-excellent-examples" directory');
     }
 
-    try {
-      execSync('npm install', { cwd: peprExcellentExamplesRepo });
-    } catch (err) {
-      throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}: ${err.message}`);
-    }
 
     if(thisCommand.opts().customPackage){
       process.env.PEPR_PACKAGE = `${path.resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
@@ -79,6 +74,14 @@ const test = program.command('test')
       process.env.PEPR_PACKAGE = buildLocalPepr(peprExcellentExamplesRepo)
     }
     process.env.PEPR_IMAGE = thisCommand.opts().image
+
+    try {
+      execSync(`npm i ${getPeprAlias()}`)
+      execSync('rm package-lock.json', {cwd: peprExcellentExamplesRepo})
+      execSync('npm install', { cwd: peprExcellentExamplesRepo });
+    } catch (err) {
+      throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}: ${err.message}`);
+    }
 
     printTestInfo() 
   })

@@ -24,7 +24,7 @@
     },
     "alwaysIgnore": {
       "namespaces": [
-        "hello-pepr-global-ignore"
+        "hello-pepr-config-ignore"
       ]
     },
     "includedFiles": [],

@@ -2,13 +2,13 @@ import 'dotenv/config';
 import { program, Option } from 'commander';
 import path, { resolve, basename } from 'node:path';
 import { chdir } from 'node:process';
-import { execFileSync, execSync, spawnSync } from 'node:child_process';
+import { execSync, spawnSync } from 'node:child_process';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
 import { findUpSync } from 'find-up'
 import {getPeprAlias} from '../src/pepr'
-import { mkdirSync } from 'fs';
+import { copyFileSync, mkdirSync, renameSync, rmSync } from 'fs';
 import { rmdirSync } from 'node:fs';
 import assert from 'node:assert';
 
@@ -78,10 +78,10 @@ const test = program.command('test')
     try {
       //Make this decision early, and make it easily reversible, don't do repeated lookups (we aren't?)
       if(path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr'){
-        execSync(`cp package-lock.json package-lock.json.bak`, {cwd: peprExcellentExamplesRepo})
-        execSync(`cp package.json package.json.bak`)
+        copyFileSync(`${peprExcellentExamplesRepo}/package-lock.json`, `${peprExcellentExamplesRepo}/package-lock.json.bak`)
+        copyFileSync(`${peprExcellentExamplesRepo}/package.json`, `${peprExcellentExamplesRepo}/package.json.bak`)
         execSync(`npm i ${getPeprAlias()}`)
-        execSync('rm package-lock.json', {cwd: peprExcellentExamplesRepo})
+        rmSync(`${peprExcellentExamplesRepo}/package-lock.json`)
       }
 
       execSync('npm install', { cwd: peprExcellentExamplesRepo });
@@ -104,8 +104,8 @@ const test = program.command('test')
     }
     finally{
       if(path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr'){
-        execSync('mv package.json.bak package.json')
-        execSync('mv package-lock.json.bak package-lock.json', {cwd: peprExcellentExamplesRepo})
+        copyFileSync('package.json.bak', 'package.json')
+        renameSync(`${peprExcellentExamplesRepo}/package-lock.json.bak`, `${peprExcellentExamplesRepo}/package-lock.json`)
       }
     }
   })
@@ -129,7 +129,7 @@ const buildLocalPepr = (outputDirectory: string) => {
   const peprBuild = 'pepr-0.0.0-development.tgz';
   const suppressOutput = process.env.DEBUG ? '' : ' > /dev/null 2>&1';
   execSync(`npm run build ${suppressOutput}`, { cwd: peprRepoLocation });
-  execFileSync('cp', [`${peprRepoLocation}/${peprBuild}`, `${outputDirectory}`]);
+  copyFileSync(`${peprRepoLocation}/${peprBuild}`, `${outputDirectory}/${peprBuild}`)
   return `${outputDirectory}/${peprBuild}`;
 }
 

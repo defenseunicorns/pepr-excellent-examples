@@ -71,3 +71,20 @@ export async function fullCreate(resources, kinds = kind) {
   }
   return applied
 }
+
+export function nearestAncestor(filename: string, fromPath: string): string {
+  let parts = fromPath.split(path.sep)
+  let starp = Array.from(parts).reverse()
+
+  let searchPaths = []
+  parts.forEach((_, idx) => searchPaths.push(
+    starp.slice(idx, parts.length).reverse().join(path.sep)
+  ))
+
+  for (const sp of searchPaths) {
+    const candidate = sp + path.sep + filename
+    if (fs.statSync(candidate, { throwIfNoEntry: false })) { return candidate }
+  }
+
+  throw `Can't find file "${filename}" in/above path "${fromPath}".`
+}

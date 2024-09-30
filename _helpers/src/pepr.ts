@@ -7,7 +7,7 @@ import { gone } from './resource'
 import { cwd } from 'node:process';
 import { readFile } from 'node:fs/promises';
 
-function sift(stdout) {
+export function sift(stdout) {
   try {
     const parsed = stdout
       .filter(l => l !== '' && !l.includes('] DeprecationWarning: ')  && !l.includes('--trace-deprecation'))
@@ -23,7 +23,21 @@ function sift(stdout) {
 
   } catch (e) {
     console.log(stdout);
-    console.error(e);
+
+    if (e.message === "Unexpected end of JSON input") {
+      console.error("Unexpected end of JSON input. Offending lines:")
+      const offenders = stdout
+        .filter(l => l.trim() !== '[' && l.trim() !== ']')
+        .filter(l => {
+          let fails = false
+          try { JSON.parse(l) } catch { fails = true }
+          return fails
+        })
+      offenders.forEach(o => console.error(`-->${o}<--`))
+    }
+    else {
+      console.error(e);
+    }
   }
 }
 

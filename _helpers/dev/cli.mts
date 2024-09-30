@@ -64,26 +64,26 @@ const test = program.command('test')
       'args to pass to test runner (e.g. --passthru=\'--testNamePattern="testName()"\')'
     )
   )
-  // .hook('preAction', (thisCommand) =>{
-  //   if(thisCommand.opts().customPackage){
-  //     process.env.PEPR_PACKAGE = `${path.resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
-  //     validateCustomPackage(peprExcellentExamplesRepo);
-  //   }
-  //   else if(thisCommand.opts().localPackage){
-  //     process.env.PEPR_PACKAGE = buildLocalPepr(peprExcellentExamplesRepo)
-  //   }
-  //   process.env.PEPR_IMAGE = thisCommand.opts().image
+  .hook('preAction', (thisCommand) =>{
+    if(thisCommand.opts().customPackage){
+      process.env.PEPR_PACKAGE = `${path.resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
+      validateCustomPackage(peprExcellentExamplesRepo);
+    }
+    else if(thisCommand.opts().localPackage){
+      process.env.PEPR_PACKAGE = buildLocalPepr(peprExcellentExamplesRepo)
+    }
+    process.env.PEPR_IMAGE = thisCommand.opts().image
 
-  //   try {
-  //     backupPackageJSON();
+    try {
+      backupPackageJSON();
 
-  //     execSync('npm install', { cwd: peprExcellentExamplesRepo });
-  //   } catch (err) {
-  //     throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}. Check package.json and package-lock.json. Error: ${err.message}`);
-  //   }
+      execSync('npm install', { cwd: peprExcellentExamplesRepo });
+    } catch (err) {
+      throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}. Check package.json and package-lock.json. Error: ${err.message}`);
+    }
 
-  //   printTestInfo() 
-  // })
+    printTestInfo() 
+  })
   .action(async ({suite, passthru, image}) => {
     try{
       passthru = passthru || []

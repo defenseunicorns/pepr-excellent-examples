@@ -12,6 +12,11 @@ import { copyFileSync, mkdirSync, renameSync, rmSync } from 'fs';
 import { rmdirSync } from 'node:fs';
 import assert from 'node:assert';
 
+const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'});
+if(!peprExcellentExamplesRepo){
+  throw new Error('Could not find parent "pepr-excellent-examples" directory');
+}
+
 program.name('cli')
   .version('0.0.0', '-v, --version')
   .addOption(new Option('-m, --module <dir>', 'module path to run CLI within'))
@@ -60,12 +65,6 @@ const test = program.command('test')
     )
   )
   .hook('preAction', (thisCommand) =>{
-    const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'});
-    if(!peprExcellentExamplesRepo){
-      throw new Error('Could not find parent "pepr-excellent-examples" directory');
-    }
-
-
     if(thisCommand.opts().customPackage){
       process.env.PEPR_PACKAGE = `${path.resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
       validateCustomPackage(peprExcellentExamplesRepo);
@@ -76,24 +75,16 @@ const test = program.command('test')
     process.env.PEPR_IMAGE = thisCommand.opts().image
 
     try {
-      //Make this decision early, and make it easily reversible, don't do repeated lookups (we aren't?)
-      if(path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr'){
-        copyFileSync(`${peprExcellentExamplesRepo}/package-lock.json`, `${peprExcellentExamplesRepo}/package-lock.json.bak`)
-        copyFileSync(`${peprExcellentExamplesRepo}/package.json`, `${peprExcellentExamplesRepo}/package.json.bak`)
-        execSync(`npm i ${getPeprAlias()}`)
-        rmSync(`${peprExcellentExamplesRepo}/package-lock.json`)
-      }
+      backupPackageJSON();
 
       execSync('npm install', { cwd: peprExcellentExamplesRepo });
     } catch (err) {
-      throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}: ${err.message}`);
+      throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}. Check package.json and package-lock.json. Error: ${err.message}`);
     }
 
     printTestInfo() 
   })
   .action(async ({suite, passthru, image}) => {
-    //Use envar?
-    const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'});
     try{
       passthru = passthru || []
       switch (suite) {
@@ -103,12 +94,21 @@ const test = program.command('test')
       }
     }
     finally{
-      if(path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr'){
-        copyFileSync('package.json.bak', 'package.json')
-        renameSync(`${peprExcellentExamplesRepo}/package-lock.json.bak`, `${peprExcellentExamplesRepo}/package-lock.json`)
-      }
+      restorePackageJSON();
     }
   })
+
+const dpr = program.command('dpr')
+  .description('utilities for dash-policyreport module')
+
+const gen = dpr.command('gen')
+  .description('generate policyReport types from github crds')
+  .action(async () => {
+    await generateTypes()
+  })
+
+await program.parseAsync(process.argv);
+const opts = program.opts();
 
 const printTestInfo = () => {
     if (process.env.PEPR_PACKAGE) {
@@ -119,7 +119,6 @@ const printTestInfo = () => {
     }
     console.log(`Pepr Image under test: ${execSync(`docker inspect --format="{{.Id}} {{.RepoTags}}" ${process.env.PEPR_IMAGE}`).toString()}`);
 }
-
 
 const buildLocalPepr = (outputDirectory: string) => {
   const peprRepoLocation = findUpSync('pepr', { type: 'directory' });
@@ -133,17 +132,23 @@ const buildLocalPepr = (outputDirectory: string) => {
   return `${outputDirectory}/${peprBuild}`;
 }
 
-const dpr = program.command('dpr')
-  .description('utilities for dash-policyreport module')
+function restorePackageJSON() {
+  if (path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr') {
+    renameSync(`${peprExcellentExamplesRepo}/package-lock.json.bak`, `${peprExcellentExamplesRepo}/package-lock.json`);
+    renameSync(`${peprExcellentExamplesRepo}/package.json.bak`, `${peprExcellentExamplesRepo}/package.json`);
+    renameSync(`${process.cwd()}/package.json.bak`, `${process.cwd()}/package.json`);
+  }
+}
 
-const gen = dpr.command('gen')
-  .description('generate policyReport types from github crds')
-  .action(async () => {
-    await generateTypes()
-  })
-
-await program.parseAsync(process.argv);
-const opts = program.opts();
+function backupPackageJSON() {
+  if (path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr') {
+    copyFileSync(`${peprExcellentExamplesRepo}/package-lock.json`, `${peprExcellentExamplesRepo}/package-lock.json.bak`);
+    copyFileSync(`${peprExcellentExamplesRepo}/package.json`, `${peprExcellentExamplesRepo}/package.json.bak`);
+    copyFileSync(`${process.cwd()}/package.json`, `${process.cwd()}/package.json.bak`);
+    execSync(`npm i ${getPeprAlias()}`);
+    rmSync(`${peprExcellentExamplesRepo}/package-lock.json`);
+  }
+}
 
 function validateCustomPackage(parentDir: string) {
   try {

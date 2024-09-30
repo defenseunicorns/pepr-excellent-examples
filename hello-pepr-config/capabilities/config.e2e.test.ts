@@ -84,6 +84,7 @@ describe("config.ts", () => {
         [`${cfg.pepr.uuid}.pepr.dev/hello-pepr-config`]: 'succeeded',
         pepr: "was here"
       })
+
       expect(ignored.metadata?.annotations).toBe(undefined)
     }, secs(10))
   })

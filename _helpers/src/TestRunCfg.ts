@@ -1,7 +1,7 @@
-import * as fs from 'fs';
 import * as path from 'node:path';
 import { parseAllDocuments } from 'yaml';
 import { readFile } from 'node:fs/promises';
+import { nearestAncestor } from './general';
 
 export class TestRunCfg {
   me: string;
@@ -61,21 +61,4 @@ export class TestRunCfg {
     }
     return resources
   }
-}
-
-function nearestAncestor(filename: string, fromPath: string): string {
-  let parts = fromPath.split(path.sep)
-  let starp = Array.from(parts).reverse()
-
-  let searchPaths = []
-  parts.forEach((_, idx) => searchPaths.push(
-    starp.slice(idx, parts.length).reverse().join(path.sep)
-  ))
-
-  for (const sp of searchPaths) {
-    const candidate = sp + path.sep + filename
-    if (fs.statSync(candidate, { throwIfNoEntry: false })) { return candidate }
-  }
-
-  throw `Can't find file "${filename}" in/above path "${fromPath}".`
 }

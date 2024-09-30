@@ -2,15 +2,20 @@ import 'dotenv/config';
 import { program, Option } from 'commander';
 import path, { resolve, basename } from 'node:path';
 import { chdir } from 'node:process';
-import { execFileSync, execSync, spawnSync } from 'node:child_process';
+import { execSync, spawnSync } from 'node:child_process';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
 import { findUpSync } from 'find-up'
 import {getPeprAlias} from '../src/pepr'
-import { mkdirSync } from 'fs';
+import { copyFileSync, mkdirSync, renameSync, rmSync } from 'fs';
 import { rmdirSync } from 'node:fs';
 import assert from 'node:assert';
+
+const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'});
+if(!peprExcellentExamplesRepo){
+  throw new Error('Could not find parent "pepr-excellent-examples" directory');
+}
 
 program.name('cli')
   .version('0.0.0', '-v, --version')
@@ -60,17 +65,6 @@ const test = program.command('test')
     )
   )
   .hook('preAction', (thisCommand) =>{
-    const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'});
-    if(!peprExcellentExamplesRepo){
-      throw new Error('Could not find parent "pepr-excellent-examples" directory');
-    }
-
-    try {
-      execSync('npm install', { cwd: peprExcellentExamplesRepo });
-    } catch (err) {
-      throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}: ${err.message}`);
-    }
-
     if(thisCommand.opts().customPackage){
       process.env.PEPR_PACKAGE = `${path.resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
       validateCustomPackage(peprExcellentExamplesRepo);
@@ -80,39 +74,29 @@ const test = program.command('test')
     }
     process.env.PEPR_IMAGE = thisCommand.opts().image
 
+    try {
+      backupPackageJSON();
+
+      execSync('npm install', { cwd: peprExcellentExamplesRepo });
+    } catch (err) {
+      throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}. Check package.json and package-lock.json. Error: ${err.message}`);
+    }
+
     printTestInfo() 
   })
   .action(async ({suite, passthru, image}) => {
-    passthru = passthru || []
-    switch (suite) {
-      case 'unit':  testUnit(passthru)      ; break
-      case 'e2e':   await testE2e(passthru) ; break
-      case 'all':   await testAll(passthru) ; break
+    try{
+      passthru = passthru || []
+      switch (suite) {
+        case 'unit':  testUnit(passthru)      ; break
+        case 'e2e':   await testE2e(passthru) ; break
+        case 'all':   await testAll(passthru) ; break
+      }
+    }
+    finally{
+      restorePackageJSON();
     }
   })
-
-const printTestInfo = () => {
-    if (process.env.PEPR_PACKAGE) {
-      console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`).toString()}`);
-    } else {
-      const peprVersion = execSync(`npx --yes ${getPeprAlias()} --version`).toString();
-      console.log(`Pepr Version under test: ${peprVersion}`);
-    }
-    console.log(`Pepr Image under test: ${execSync(`docker inspect --format="{{.Id}} {{.RepoTags}}" ${process.env.PEPR_IMAGE}`).toString()}`);
-}
-
-
-const buildLocalPepr = (outputDirectory: string) => {
-  const peprRepoLocation = findUpSync('pepr', { type: 'directory' });
-  if(!peprRepoLocation){
-    throw new Error('Could not find "pepr" repository. Unable to generate a local build.');
-  }
-  const peprBuild = 'pepr-0.0.0-development.tgz';
-  const suppressOutput = process.env.DEBUG ? '' : ' > /dev/null 2>&1';
-  execSync(`npm run build ${suppressOutput}`, { cwd: peprRepoLocation });
-  execFileSync('cp', [`${peprRepoLocation}/${peprBuild}`, `${outputDirectory}`]);
-  return `${outputDirectory}/${peprBuild}`;
-}
 
 const dpr = program.command('dpr')
   .description('utilities for dash-policyreport module')
@@ -125,6 +109,46 @@ const gen = dpr.command('gen')
 
 await program.parseAsync(process.argv);
 const opts = program.opts();
+
+function printTestInfo() {
+    if (process.env.PEPR_PACKAGE) {
+      console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`).toString()}`);
+    } else {
+      const peprVersion = execSync(`npx --yes ${getPeprAlias()} --version`).toString();
+      console.log(`Pepr Version under test: ${peprVersion}`);
+    }
+    console.log(`Pepr Image under test: ${execSync(`docker inspect --format="{{.Id}} {{.RepoTags}}" ${process.env.PEPR_IMAGE}`).toString()}`);
+}
+
+function buildLocalPepr(outputDirectory: string) {
+  const peprRepoLocation = findUpSync('pepr', { type: 'directory' });
+  if(!peprRepoLocation){
+    throw new Error('Could not find "pepr" repository. Unable to generate a local build.');
+  }
+  const peprBuild = 'pepr-0.0.0-development.tgz';
+  const suppressOutput = process.env.DEBUG ? '' : ' > /dev/null 2>&1';
+  execSync(`npm run build ${suppressOutput}`, { cwd: peprRepoLocation });
+  copyFileSync(`${peprRepoLocation}/${peprBuild}`, `${outputDirectory}/${peprBuild}`)
+  return `${outputDirectory}/${peprBuild}`;
+}
+
+function restorePackageJSON() {
+  if (path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr') {
+    renameSync(`${peprExcellentExamplesRepo}/package-lock.json.bak`, `${peprExcellentExamplesRepo}/package-lock.json`);
+    renameSync(`${peprExcellentExamplesRepo}/package.json.bak`, `${peprExcellentExamplesRepo}/package.json`);
+    renameSync(`${process.cwd()}/package.json.bak`, `${process.cwd()}/package.json`);
+  }
+}
+
+function backupPackageJSON() {
+  if (path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr') {
+    copyFileSync(`${peprExcellentExamplesRepo}/package-lock.json`, `${peprExcellentExamplesRepo}/package-lock.json.bak`);
+    copyFileSync(`${peprExcellentExamplesRepo}/package.json`, `${peprExcellentExamplesRepo}/package.json.bak`);
+    copyFileSync(`${process.cwd()}/package.json`, `${process.cwd()}/package.json.bak`);
+    execSync(`npm i ${getPeprAlias()}`);
+    rmSync(`${peprExcellentExamplesRepo}/package-lock.json`);
+  }
+}
 
 function validateCustomPackage(parentDir: string) {
   try {

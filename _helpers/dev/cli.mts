@@ -110,7 +110,7 @@ const gen = dpr.command('gen')
 await program.parseAsync(process.argv);
 const opts = program.opts();
 
-const printTestInfo = () => {
+function printTestInfo() {
     if (process.env.PEPR_PACKAGE) {
       console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`).toString()}`);
     } else {
@@ -120,7 +120,7 @@ const printTestInfo = () => {
     console.log(`Pepr Image under test: ${execSync(`docker inspect --format="{{.Id}} {{.RepoTags}}" ${process.env.PEPR_IMAGE}`).toString()}`);
 }
 
-const buildLocalPepr = (outputDirectory: string) => {
+function buildLocalPepr(outputDirectory: string) {
   const peprRepoLocation = findUpSync('pepr', { type: 'directory' });
   if(!peprRepoLocation){
     throw new Error('Could not find "pepr" repository. Unable to generate a local build.');

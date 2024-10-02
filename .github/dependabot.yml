@@ -1,0 +1,19 @@
+# Please see the documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: npm
+
+    # root dir + children; single level, non-recursive (recursive would be "**/*")
+    #   https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#directories
+    directories: [ "*" ]
+
+    schedule:
+      interval: daily
+
+    groups:
+      prod:
+        dependency-type: "production"
+      dev:
+        dependency-type: "development"

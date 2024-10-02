@@ -20,8 +20,8 @@ const trc = new TestRunCfg(__filename)
 describe("mutate.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2))
   afterAll(async () => {
-    await moduleDown()
     await clean(trc)
+    await moduleDown()
   }, mins(5))
 
   describe("mutate creates", () => {

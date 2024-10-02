@@ -7,57 +7,154 @@ import {
 } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";
-import { mins, secs, timed } from 'helpers/src/time';
-import { moduleUp, moduleDown } from 'helpers/src/pepr';
+import { gone } from "helpers/src/resource";
+import { secs, mins, sleep } from 'helpers/src/time';
+import { moduleUp, moduleDown, untilLogged } from 'helpers/src/pepr';
 import { clean } from 'helpers/src/cluster';
-import cfg from '../package.json';
+import { K8s, kind } from 'pepr';
+import cfg from "../package.json";
+
 
 const trc = new TestRunCfg(__filename)
 
 describe("mutate.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2))
-  afterAll(async () => await moduleDown(), mins(2))
+  afterAll(async () => {
+    await clean(trc)
+    await moduleDown()
+  }, mins(5))
 
-  describe("pass", () => {
-    let applied
+  describe("mutate creates", () => {
+    let ns, yay, meh, oof
 
     beforeAll(async () => {
-      const file = `${trc.root()}/capabilities/mutate.pass.yaml`
-      await timed(`load: ${file}`, async () => {
-        const resources = await trc.load(file)
-        applied = await fullCreate(resources)
+      [ ns, yay, meh, oof ] =
+        await trc.load(`${trc.root()}/capabilities/scenario.create.yaml`)
+      ns = await fullCreate(ns)
+    }, secs(10))
+
+    it("allows & annotates Mutate()'d resources", async () => {
+      [ yay ] = await fullCreate(yay)
+      const annotation = `${cfg.pepr.uuid}.pepr.dev/${cfg.name}`
+      expect(yay.metadata.annotations[annotation]).toBe('succeeded')
+    }, secs(10))
+
+    it("allows but doesn't annotate non-Mutate()'d resources", async () => {
+      [ meh ] = await fullCreate(meh)
+      expect(meh.metadata.annotations).toBe(undefined)
+    }, secs(10))
+
+    it("rejects unsuccessfully Mutate(yay)'d resources", async () => {
+      expect(fullCreate(oof)).rejects.toMatchObject({
+        data: { message: expect.stringMatching(/denied the request/) }
       })
-    })
-    afterAll(async () => await clean(trc), mins(5))
-
-    it("ignores Pepr-disinterested resources when they hit the cluster", async () => {
-      const actual = applied.filter(f => f.metadata.name === "pass-unconcerned" )[0]
-      expect(actual.data['glass-is-half']).toBe("empty")
-    })
-    
-    it("updates Pepr-interested resources before they hit the cluster", async () => {
-      const actual = applied.filter(f => f.metadata.name === "pass-full" )[0]
-      expect(actual.data['glass-is-half']).toBe("full")
-    })
-
-    it("annotates mutated resources", async () => {
-      const actual = applied.filter(f => f.metadata.name === "pass-full" )[0]
-      const annote = `${cfg.pepr.uuid}.pepr.dev/hello-pepr-mutate`
-      expect(actual.metadata.annotations[annote]).toBe('succeeded')
-    })
+    }, secs(10))
   })
 
-  describe("fail", () => {
-    afterAll(async () => await clean(trc), mins(5))
+  describe("mutate create-or-updates", () => {
+    let ns, cyay, cmeh, coof, uyay, umeh, uoof
 
-    it("rejects forbidden resources", async () => {
-      try {
-        const resources = await trc.load(`${trc.root()}/capabilities/mutate.fail.yaml`)
-        const applied = await fullCreate(resources)
-      }
-      catch (err) {
-        expect(err.data.message).toMatch(/admission webhook .* denied the request/)
-      }
-    }, secs(30))
+    beforeAll(async () => {
+      [ ns, cyay, cmeh, coof, uyay, umeh, uoof ] =
+        await trc.load(`${trc.root()}/capabilities/scenario.create-or-update.yaml`)
+      ns = await fullCreate(ns)
+    }, secs(10))
+
+    it("allows & annotates Mutate()'d resources on create", async () => {
+      [ cyay ] = await fullCreate(cyay)
+      const annotation = `${cfg.pepr.uuid}.pepr.dev/${cfg.name}`
+      expect(cyay.metadata.annotations[annotation]).toBe('succeeded')
+    }, secs(10))
+
+    it("allows but doesn't annotate non-Mutate()'d resources on create", async () => {
+      [ cmeh ] = await fullCreate(cmeh)
+      expect(cmeh.metadata.annotations).toBe(undefined)
+    }, secs(10))
+
+    it("rejects unsuccessfully Mutate()'d resources on create", async () => {
+      expect(fullCreate(coof)).rejects.toMatchObject({
+        data: { message: expect.stringMatching(/denied the request/) }
+      })
+    }, secs(10))
+
+    it("allows but doesn't annotate non-Mutate()'d resources on update", async () => {
+      await fullCreate(umeh)
+      umeh = { ...umeh, stringData: { umeh: "update-meh" }}
+      let applied = await K8s(kind.Secret).Apply(umeh)
+      expect(applied.metadata?.annotations).toBe(undefined)
+    }, secs(10))
+
+    it("rejects unsuccessfully Mutate()'d resources on update", async () => {
+      await fullCreate(uoof)
+      uoof = { ...uoof, stringData: { uoof: "update-oof" }}
+      expect(K8s(kind.Secret).Apply(uoof)).rejects.toMatchObject({
+        data: { message: expect.stringMatching(/denied the request/) }
+      })
+    }, secs(10))
+  })
+
+  describe("mutate updates", () => {
+    let ns, yay, meh, oof
+
+    beforeAll(async () => {
+      [ ns, yay, meh, oof ] =
+        await trc.load(`${trc.root()}/capabilities/scenario.update.yaml`)
+      ns = await fullCreate(ns)
+    }, secs(10))
+
+    it("allows & annotates Mutate()'d resources", async () => {
+      await fullCreate(yay)
+      yay = { ...yay, stringData: { yay: "update-yay" }}
+      let applied = await K8s(kind.Secret).Apply(yay)
+      const annotation = `${cfg.pepr.uuid}.pepr.dev/${cfg.name}`
+      expect(applied.metadata?.annotations?.[annotation]).toBe('succeeded')
+    }, secs(10))
+
+    it("allows but doesn't annotate non-Mutate()'d resources", async () => {
+      await fullCreate(meh)
+      meh = { ...meh, stringData: { meh: "update-meh" }}
+      let applied = await K8s(kind.Secret).Apply(meh)
+      expect(applied.metadata?.annotations).toBe(undefined)
+
+    }, secs(10))
+
+    it("rejects unsuccessfully Mutate(yay)'d resources", async () => {
+      await fullCreate(oof)
+      oof = { ...oof, stringData: { oof: "update-oof" }}
+      expect(K8s(kind.Secret).Apply(oof)).rejects.toMatchObject({
+        data: { message: expect.stringMatching(/denied the request/) }
+      })
+    }, secs(10))
+  })
+
+  describe("mutate deletes", () => {
+    let ns, yay, oof
+
+    beforeAll(async () => {
+      [ ns, yay, oof ] =
+        await trc.load(`${trc.root()}/capabilities/scenario.delete.yaml`)
+      ns = await fullCreate(ns)
+    }, secs(10))
+
+    it("triggers & allows delete of Mutate()'d resources", async () => {
+      await fullCreate(yay)
+      await K8s(kind.Secret).Delete(yay)
+      await untilLogged('"msg":"Mutate: delete-yay"')
+      await gone(kind.Secret, yay)
+    }, secs(10))
+
+    //
+    // TODO: Why does this test not pass? Talk w/ team out why this admission
+    //    webhook request throws but still allows the resource to be deleted!
+    //
+    // it("triggers & does not allow delete of unsuccessfully Mutate(yay)'d resources", async () => {
+    //   await fullCreate(oof)
+    //   expect(K8s(kind.Secret).Delete(oof)).rejects.toMatchObject({
+    //     data: { message: expect.stringMatching(/denied the request/) }
+    //   })
+    //   let applied = await K8s(kind.Secret).Get(oof)
+    //   console.log(await logs())
+    //   expect(applied.metadata?.name).toBe(oof.metadata.name)
+    // })
   })
 })

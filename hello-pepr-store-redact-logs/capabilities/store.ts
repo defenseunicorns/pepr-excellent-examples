@@ -13,7 +13,7 @@ const gone = key => () => Promise.resolve(!Store.getItem(key));
 
 Store.onReady(async () => {
   const [key, val] = ["password", "***SECRET***"];
-
+  Store.clear();
   await Store.setItemAndWait(key, val);
   const value = Store.getItem(key);
   Log.info({ password: `${value.replace("SECRET","DECLASSIFIED")}` }, "getItem");

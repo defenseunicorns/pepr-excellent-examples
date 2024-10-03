@@ -15,5 +15,3 @@ updates:
     groups:
       prod:
         dependency-type: "production"
-      dev:
-        dependency-type: "development"

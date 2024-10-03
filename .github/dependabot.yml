@@ -15,5 +15,7 @@ updates:
     groups:
       prod:
         dependency-type: "production"
-      dev:
-        dependency-type: "development"
+
+    # do NOT update development dependencies
+    allow:
+      - dependency-type: "production"

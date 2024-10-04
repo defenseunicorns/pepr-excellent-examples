@@ -4,7 +4,7 @@ import { resolve, basename } from 'node:path';
 import { chdir } from 'node:process';
 import { execSync, spawnSync } from 'node:child_process';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
-import { depsHandler } from '../src/deps';
+import { depsUpdater } from '../src/deps';
 import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
 import { findUpSync } from 'find-up'
@@ -41,7 +41,10 @@ const deps = program.command('deps')
   .addOption(
     new Option('-w, --write', 'write changes to disk').default(false)
   )
-  .action(async (path, opts, cmd) => { await depsHandler(path, opts, cmd) })
+  .action(async (path, opts, cmd) => {
+    const updates = await depsUpdater(path, opts, cmd)
+    console.log(updates)
+  })
 
 const test = program.command('test')
   .description('run tests')

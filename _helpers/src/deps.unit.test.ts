@@ -36,13 +36,13 @@ const deps = (obj) => ({ devDependencies: obj })
 const buffered = (obj) => Buffer.from(JSON.stringify(obj), 'utf-8')
 const resolved = (obj) => ((path) => Promise.resolve(buffered(obj))) as typeof fs.readFile
 
-describe("depsHandler()", () => {
+describe("depsUpdater()", () => {
   afterEach(() => { jest.resetAllMocks() })
 
   it("reject when not given an absolute path", async () => {
     isAbsolute.mockImplementation(() => false)
 
-    let result = sut.depsHandler('what/ever', {}, {})
+    let result = sut.depsUpdater('what/ever', {}, {})
 
     await expect(result).rejects.toMatch(/Arg error: 'path' must be absolute/)
   })
@@ -57,7 +57,7 @@ describe("depsHandler()", () => {
       .mockImplementationOnce(resolved(theirs))
       .mockImplementationOnce(resolved(mine))
 
-    let result = await sut.depsHandler('/what/ever', {}, {})
+    let result = await sut.depsUpdater('/what/ever', {}, {})
 
     expect(result.updates).toEqual([])
   })
@@ -79,7 +79,7 @@ describe("depsHandler()", () => {
       .mockImplementationOnce(resolved(theirs))
       .mockImplementationOnce(resolved(mine))
 
-    let result = await sut.depsHandler('/what/ever', {}, {})
+    let result = await sut.depsUpdater('/what/ever', {}, {})
 
     expect(result.updates).toEqual([
       { name: 'lscript', from: '1.0.0', to: '1.0.1' },
@@ -124,7 +124,7 @@ describe("depsHandler()", () => {
         },
       })))
 
-      let result = await sut.depsHandler('/what/ever', {}, {})
+      let result = await sut.depsUpdater('/what/ever', {}, {})
 
       expect(result.updates).toHaveLength(1)
       expect(result.updates).toEqual([

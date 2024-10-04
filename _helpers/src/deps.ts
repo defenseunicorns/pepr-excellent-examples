@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { parse } from 'semver';
 import { versions } from './deps.versions';
 
-export async function depsHandler(path, opts, cmd) {
+export async function depsUpdater(path, opts, cmd) {
   if (!isAbsolute(path)) { throw `Arg error: 'path' must be absolute, but given: '${path}'` }
 
   const them = resolve(path);
@@ -49,7 +49,10 @@ export async function depsHandler(path, opts, cmd) {
       return update(name, from, vers['dist-tags'][tag])
     }
   })
-  await Promise.all(renews).then(r => result.updates.push(...r))
+  await Promise.all(renews).then(renews => {
+    renews = renews.filter(r => r)
+    result.updates.push(...renews)
+  })
 
   return result
 }

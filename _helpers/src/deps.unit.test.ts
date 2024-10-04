@@ -5,8 +5,14 @@ import {
   it,
   jest
 } from '@jest/globals';
-import { Command } from 'commander';
 import * as sut from './deps';
+
+import * as depsVersions from './deps.versions';
+jest.mock('./deps.versions', () => {
+  const original = jest.requireActual('./deps.versions') as object;
+  return { ...original, versions: jest.fn() }
+})
+const { versions } = jest.mocked(depsVersions);
 
 import * as path from 'node:path';
 jest.mock('node:path', () => {
@@ -33,7 +39,7 @@ const resolved = (obj) => ((path) => Promise.resolve(buffered(obj))) as typeof f
 describe("depsHandler()", () => {
   afterEach(() => { jest.resetAllMocks() })
 
-  it("rejects when not given an absolute path", async () => {
+  it("reject when not given an absolute path", async () => {
     isAbsolute.mockImplementation(() => false)
 
     let result = sut.depsHandler('what/ever', {}, {})
@@ -41,7 +47,7 @@ describe("depsHandler()", () => {
     await expect(result).rejects.toMatch(/Arg error: 'path' must be absolute/)
   })
 
-  it("skips pinned deps that are current", async () => {
+  it("skip pinned deps that are current", async () => {
     const theirs = deps({ typescript: '5.3.3' })
     const mine = deps({ typescript: '5.3.3' })
 
@@ -56,7 +62,7 @@ describe("depsHandler()", () => {
     expect(result.updates).toEqual([])
   })
 
-  it("updates pinned deps that are not current", async () => {
+  it("update pinned deps that are not current", async () => {
     const theirs = deps({
       lscript: '1.0.1',
       mscript: '2.0.1',
@@ -75,38 +81,55 @@ describe("depsHandler()", () => {
 
     let result = await sut.depsHandler('/what/ever', {}, {})
 
-    expect(result.updates).toHaveLength(2)
     expect(result.updates).toEqual([
-      { from: '1.0.0', to: '1.0.1', name: 'lscript' },
-      { from: '3.0.2', to: '3.0.1', name: 'hscript' }
+      { name: 'lscript', from: '1.0.0', to: '1.0.1' },
+      { name: 'hscript', from: '3.0.2', to: '3.0.1' }
     ])
   })
 
-  it.skip("TODO: updates non-pinned deps via remote lookup ", async () => {
-    // const theirs = deps({ typescript: '5.3.3' })
-    // const mine = deps({ typescript: '5.3.3' })
+  it("update non-pinned deps from remote lookup ", async () => {
+    const theirs = deps({})
+    const mine = deps({ '@just/doit': '1.2.2' })
 
-    // isAbsolute.mockImplementation(() => true)
-    // resolve.mockImplementation(p => p)
-    // readFile
-    //   .mockImplementationOnce(resolved(theirs))
-    //   .mockImplementationOnce(resolved(mine))
+    isAbsolute.mockImplementation(() => true)
+    resolve.mockImplementation(p => p)
+    readFile
+      .mockImplementationOnce(resolved(theirs))
+      .mockImplementationOnce(resolved(mine))
 
-    // let result = await sut.depsHandler('/what/ever', {}, {})
-
-    // expect(result.updates).toEqual([])
+    versions.mockImplementation(() => Promise.resolve(({
+      "name": "@just/doit",
+      "dist-tags": {
+        "latest": "1.2.3"
+      }
+    })))
   })
 
   describe("@types/node", () => {
-    it.skip("updates based on version of 'typescript' dep", async () => {})
-    // npm view @types/node --json
-    // {
-    //   "dist-tags": {
-    //     "ts4.9": "22.7.4",
-    //     "ts5.3": "22.7.4",
-    //     "ts5.7": "22.7.4",
-    //     "latest": "22.7.4"
-    //   }
-    // }
+    it("update based on version of 'typescript' dep", async () => {
+      const theirs = deps({ typescript: '5.3.3' })
+      const mine = deps({ typescript: '5.3.3', '@types/node': '1.2.3' })
+
+      isAbsolute.mockImplementation(() => true)
+      resolve.mockImplementation(p => p)
+      readFile
+        .mockImplementationOnce(resolved(theirs))
+        .mockImplementationOnce(resolved(mine))
+
+      versions.mockImplementation(() => Promise.resolve(({
+        "name": "@types/node",
+        "dist-tags": {
+          "ts5.3": "22.7.3",
+          "latest": "22.7.4"
+        },
+      })))
+
+      let result = await sut.depsHandler('/what/ever', {}, {})
+
+      expect(result.updates).toHaveLength(1)
+      expect(result.updates).toEqual([
+        { name: '@types/node', from: '1.2.3', to: '22.7.3' },
+      ])
+    })
   })
 })

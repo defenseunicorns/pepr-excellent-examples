@@ -4,7 +4,7 @@ import { resolve, basename } from 'node:path';
 import { chdir } from 'node:process';
 import { execSync, spawnSync } from 'node:child_process';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
-import { depsUpdater } from '../src/deps';
+import { depsUpdater } from '../src/deps/deps';
 import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
 import { findUpSync } from 'find-up'

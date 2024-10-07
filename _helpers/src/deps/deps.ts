@@ -1,7 +1,7 @@
 import { resolve, isAbsolute } from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { parse } from 'semver';
-import { versions } from './deps.versions';
+import { versions } from './versions';
 
 export async function depsUpdater(path, opts, cmd) {
   if (!isAbsolute(path)) { throw `Arg error: 'path' must be absolute, but given: '${path}'` }

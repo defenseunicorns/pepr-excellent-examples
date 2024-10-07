@@ -5,7 +5,7 @@ import {
   it,
   jest
 } from '@jest/globals';
-import * as sut from './deps.versions';
+import * as sut from './versions';
 
 describe("versions()", () => {
   afterEach(() => { jest.resetAllMocks() })

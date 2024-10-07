@@ -7,9 +7,9 @@ import {
 } from '@jest/globals';
 import * as sut from './deps';
 
-import * as depsVersions from './deps.versions';
-jest.mock('./deps.versions', () => {
-  const original = jest.requireActual('./deps.versions') as object;
+import * as depsVersions from './versions';
+jest.mock('./versions', () => {
+  const original = jest.requireActual('./versions') as object;
   return { ...original, versions: jest.fn() }
 })
 const { versions } = jest.mocked(depsVersions);

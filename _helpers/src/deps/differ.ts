@@ -1,19 +1,12 @@
-import { resolve, isAbsolute } from 'node:path';
-import { readFile } from 'node:fs/promises';
 import { parse } from 'semver';
 import { versions } from './versions';
+import { reader } from './reader';
 
-export async function depsUpdater(path, opts, cmd) {
-  if (!isAbsolute(path)) { throw `Arg error: 'path' must be absolute, but given: '${path}'` }
+export async function differ(path) {
+  let deps = await reader(path);
 
-  const them = resolve(path);
-  const self = resolve('./package.json');
-
-  const theirs = await readFile(them).then(buf => JSON.parse(buf.toString()));
-  const mine = await readFile(self).then(buf => JSON.parse(buf.toString()));
-
-  const result = { theirs: theirs.devDependencies, mine: mine.devDependencies, updates: [] }
   const update = (name, mine, theirs) => ({ name, from: mine, to: theirs })
+  let result = { ...deps, updates: [] };
 
   let pinned = []
   let renews = []
@@ -47,6 +40,10 @@ export async function depsUpdater(path, opts, cmd) {
         : "latest"
 
       return update(name, from, vers['dist-tags'][tag])
+    }
+
+    else {
+      return update(name, from, vers['dist-tags']["latest"])
     }
   })
   await Promise.all(renews).then(renews => {

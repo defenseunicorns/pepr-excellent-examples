@@ -8,8 +8,6 @@ import {
 import * as sut from './versions';
 
 describe("versions()", () => {
-  afterEach(() => { jest.resetAllMocks() })
-
   it("pulls a version dump from npm", async () => {
     let dep = "@types/node"
     let result = await sut.versions(dep)

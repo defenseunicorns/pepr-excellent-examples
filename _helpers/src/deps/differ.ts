@@ -2,6 +2,20 @@ import { parse } from 'semver';
 import { versions } from './versions';
 import { reader } from './reader';
 
+export function splitRange(verSpec) {
+  verSpec = verSpec.trim()
+  if (!verSpec){ return ['', ''] }
+
+  const first = String.fromCodePoint(verSpec.codePointAt(0));
+  const range =
+    first === "~" ? first :
+    first === "^" ? first :
+    ""
+  const version = range === "" ? verSpec : verSpec.replace(first, "")
+
+  return [range, version]
+}
+
 export async function differ(path) {
   let deps = await reader(path);
 
@@ -23,6 +37,7 @@ export async function differ(path) {
   // "most recent" anything not found in "their" deps
   renews = renews.map(async renew => {
     const { name, from } = renew
+    const [ fromRng, fromVer ] = splitRange(from)
 
     const vers = await versions(name)
 
@@ -30,20 +45,27 @@ export async function differ(path) {
       const pin = pinned
         .filter(f => f.name === "typescript")
         .reduce((_, cur) => cur.to , "")
+
       const cur = Object.entries(result.mine)
         .filter(([key, _]) => key === "typescript" )
         .reduce((_, cur) => cur[1], "")
 
-      const ver = parse(pin ? pin : cur ? cur : "")
-      const tag = ver
-        ? `ts${ver.major}.${ver.minor}`
-        : "latest"
+      const toRaw = pin ? pin : cur ? cur : ""
+  
+      const [ toRng, toVer ] = splitRange(toRaw)
+      const ver = parse(toVer)
+      const tag = ver ? `ts${ver.major}.${ver.minor}` : "latest"
+      const newVer =
+        toRng ? `${toRng}${vers['dist-tags'][tag]}` :
+        fromRng ? `${fromRng}${vers['dist-tags'][tag]}` :
+        `${vers['dist-tags'][tag]}`
 
-      return update(name, from, vers['dist-tags'][tag])
+      return update(name, from, newVer)
     }
 
     else {
-      return update(name, from, vers['dist-tags']["latest"])
+      const newVer = `${fromRng}${vers['dist-tags']["latest"]}`
+      return newVer !== from ? update(name, from, newVer) : ""
     }
   })
   await Promise.all(renews).then(renews => {

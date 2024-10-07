@@ -8,18 +8,29 @@ import {
 import * as sut from './differ';
 
 import * as modReader from './reader';
-jest.mock('./reader', () => {
-  const original = jest.requireActual('./reader') as object;
-  return { ...original, reader: jest.fn() }
-})
-const { reader } = jest.mocked(modReader);
+jest.mock('./reader')
+const { reader } = jest.mocked(modReader)
 
 import * as modVersions from './versions';
-jest.mock('./versions', () => {
-  const original = jest.requireActual('./versions') as object;
-  return { ...original, versions: jest.fn() }
-})
+jest.mock('./versions');
 const { versions } = jest.mocked(modVersions);
+
+describe("splitRange()", () => {
+  it.each([
+    ['', ['', '']],
+    ['     ', ['', '']],
+    ['1.2.3', ['', '1.2.3']],
+    [' 1.2.3', ['', '1.2.3']],
+    ['~1.2.3', ['~', '1.2.3']],
+    ['^1.2.3', ['^', '1.2.3']],
+    ['🫠1.2.3', ['', '🫠1.2.3']],
+  ])(`separates range prefix from '%s' & returns '%j'`, async (given, expected) => {
+    const [range, version] = sut.splitRange(given)
+
+    expect(range).toBe(expected[0])
+    expect(version).toBe(expected[1])
+  })
+})
 
 describe("differ()", () => {
   afterEach(() => { jest.resetAllMocks() })

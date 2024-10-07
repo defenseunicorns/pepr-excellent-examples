@@ -14,13 +14,6 @@ jest.mock('node:path', () => {
 })
 const { isAbsolute, resolve } = jest.mocked(path);
 
-import * as general from '../general';
-jest.mock('../general', () => {
-  const original = jest.requireActual('../general') as object;
-  return { ...original, nearestAncestor: jest.fn() }
-})
-const { nearestAncestor } = jest.mocked(general);
-
 import * as fs from 'node:fs/promises';
 jest.mock('node:fs/promises', () => {
   const original = jest.requireActual('node:fs/promises') as object;
@@ -31,6 +24,10 @@ jest.mock('node:fs/promises', () => {
   }
 })
 const { readFile, access } = jest.mocked(fs);
+
+import * as general from '../general';
+jest.mock('../general');
+const { nearestAncestor } = jest.mocked(general);
 
 const deps = (obj) => ({ devDependencies: obj })
 const buffered = (obj) => Buffer.from(JSON.stringify(obj), 'utf-8')

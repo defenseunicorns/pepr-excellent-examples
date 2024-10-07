@@ -76,7 +76,7 @@ describe("differ()", () => {
     ])
   })
 
-  it("update non-pinned deps from remote lookup ", async () => {
+  it("update non-pinned deps from remote lookup", async () => {
     const theirs = {}
     const mine = { '@just/doit': '1.2.2' }
     reader.mockImplementation(() => Promise.resolve({
@@ -96,6 +96,71 @@ describe("differ()", () => {
 
     expect(result.updates).toEqual([
       { name: '@just/doit', from: '1.2.2', to: '1.2.3' }
+    ])
+  })
+
+  it("updates pinned deps to use range spec from pin", async () => {
+    const theirs = {
+      '@just/dothis': '^1.2.3',
+      '@just/dothat': '^3.2.1',
+    }
+    const mine = {
+      '@just/dothis': '~1.2.2',
+      '@just/dothat': '3.2.1',
+    }
+    reader.mockImplementation(() => Promise.resolve({
+      me: '/in/here',
+      mine,
+      them: '/out/there',
+      theirs,
+    }))
+
+    let result = await sut.differ('/out/there')
+
+    expect(result.updates).toEqual([
+      { name: '@just/dothis', from: '~1.2.2', to: '^1.2.3' },
+      { name: '@just/dothat', from: '3.2.1', to: '^3.2.1' },
+    ])
+  })
+
+  it("updates non-pinned deps & keeps pre-existing range specs", async () => {
+    const theirs = {}
+    const mine = {
+      '@just/dothis': '^1.2.3',
+      '@just/dothat': '~3.2.1',
+      '@just/dothur': '2.4.6',
+    }
+    reader.mockImplementation(() => Promise.resolve({
+      me: '/in/here',
+      mine,
+      them: '/out/there',
+      theirs,
+    }))
+    versions.mockImplementationOnce(() => Promise.resolve(({
+      "name": "@just/dothis",
+      "dist-tags": {
+        "latest": "1.2.4"
+      }
+    })))
+    versions.mockImplementationOnce(() => Promise.resolve(({
+      "name": "@just/dothat",
+      "dist-tags": {
+        "latest": "3.2.2"
+      }
+    })))
+    versions.mockImplementationOnce(() => Promise.resolve(({
+      "name": "@just/dothur",
+      "dist-tags": {
+        "latest": "2.4.7"
+      }
+    })))
+
+    let result = await sut.differ('/out/there')
+
+    expect(result.updates).toEqual([
+      { name: '@just/dothis', from: '^1.2.3', to: '^1.2.4' },
+      { name: '@just/dothat', from: '~3.2.1', to: '~3.2.2' },
+      { name: '@just/dothur', from: '2.4.6', to: '2.4.7' },
     ])
   })
 

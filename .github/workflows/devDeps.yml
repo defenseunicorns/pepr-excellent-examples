@@ -48,7 +48,7 @@ jobs:
         run: |
           cd "$PEPR"
           npm ci
-          npx pepr --version
+          ls -la 
           # npx pepr init \
           #   --name "pepr-test-module" \
           #   --description "for comparing devDependencies against" \

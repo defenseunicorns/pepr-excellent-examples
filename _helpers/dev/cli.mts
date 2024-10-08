@@ -44,7 +44,9 @@ const deps = program.command('deps')
   )
   .action(async (path, opts) => {
     const updates = await differ(path)
-    opts.write ? writer(updates) : console.log(updates)
+    opts.write ?
+      await writer(updates) :
+      console.log(updates)
   })
 
 const test = program.command('test')

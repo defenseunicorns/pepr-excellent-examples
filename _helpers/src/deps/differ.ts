@@ -37,10 +37,11 @@ export async function differ(path) {
   // "most recent" anything not found in "their" deps
   renews = renews.map(async renew => {
     const { name, from } = renew
-    const [ fromRng, fromVer ] = splitRange(from)
+    const [ fromRng ] = splitRange(from)
 
     const vers = await versions(name)
 
+    // special case: use ts<maj.min> dist-tag for @types/node version
     if (name === "@types/node") {
       const pin = pinned
         .filter(f => f.name === "typescript")
@@ -60,7 +61,7 @@ export async function differ(path) {
         fromRng ? `${fromRng}${vers['dist-tags'][tag]}` :
         `${vers['dist-tags'][tag]}`
 
-      return update(name, from, newVer)
+      return newVer !== from ? update(name, from, newVer) : ""
     }
 
     else {

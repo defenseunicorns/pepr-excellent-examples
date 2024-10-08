@@ -12,7 +12,6 @@ on:
 
 jobs:
   refresh:
-    name: refresh devDependencies
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
@@ -49,11 +48,12 @@ jobs:
         run: |
           cd "$PEPR"
           npm ci
-          npx pepr init \
-            --name "pepr-test-module" \
-            --description "for comparing devDependencies against" \
-            --skip-post-init \
-            --confirm
+          npx pepr --version
+          # npx pepr init \
+          #   --name "pepr-test-module" \
+          #   --description "for comparing devDependencies against" \
+          #   --skip-post-init \
+          #   --confirm
 
       - name: "set env: PEPR_MOD"
         run: echo "PEPR_MOD=${PEPR}/pepr-test-module" >> "$GITHUB_ENV"

@@ -48,12 +48,12 @@ jobs:
         run: |
           cd "$PEPR"
           npm ci
-          ls -la 
-          # npx pepr init \
-          #   --name "pepr-test-module" \
-          #   --description "for comparing devDependencies against" \
-          #   --skip-post-init \
-          #   --confirm
+          npm run build
+          npx --yes file://./pepr-0.0.0-development.tgz init \
+            --name "pepr-test-module" \
+            --description "for comparing devDependencies against" \
+            --skip-post-init \
+            --confirm
 
       - name: "set env: PEPR_MOD"
         run: echo "PEPR_MOD=${PEPR}/pepr-test-module" >> "$GITHUB_ENV"

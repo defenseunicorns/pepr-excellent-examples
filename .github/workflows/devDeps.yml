@@ -12,11 +12,7 @@ on:
 
 jobs:
   refresh:
-<<<<<<< Updated upstream
-    name: update devDependencies
-=======
-    name: Dev CLI-based Updates (devDependencies)
->>>>>>> Stashed changes
+    name: "Dev CLI-based Updates (devDependencies)"
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner

@@ -29,13 +29,14 @@
       "LOG_LEVEL": "debug"
     }
   },
-  "scripts": {
-    "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system"
-  },
   "dependencies": {
     "pepr": "^0.37.2"
   },
   "devDependencies": {
     "typescript": "5.3.3"
+  },
+  "scripts": {
+    "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
+    "k3d-setup": "k3d cluster delete pepr-dev && k3d cluster create pepr-dev --k3s-arg '--debug@server:0' --wait && kubectl rollout status deployment -n kube-system"
   }
 }

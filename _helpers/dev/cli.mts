@@ -1,13 +1,15 @@
 import 'dotenv/config';
 import { program, Option } from 'commander';
-import path, { resolve, basename } from 'node:path';
+import { resolve, basename } from 'node:path';
 import { chdir } from 'node:process';
 import { execSync, spawnSync } from 'node:child_process';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
+import { differ } from '../src/deps/differ';
+import { writer } from '../src/deps/writer';
 import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
 import { findUpSync } from 'find-up'
-import {getPeprAlias} from '../src/pepr'
+import { getPeprAlias } from '../src/pepr'
 import { copyFileSync, mkdirSync, renameSync, rmSync } from 'fs';
 import { rmdirSync } from 'node:fs';
 import assert from 'node:assert';
@@ -34,6 +36,19 @@ const env = program.command('env')
   .description('dump env')
   .action(async () => { console.log(process.env) })
 
+const deps = program.command('deps')
+  .description('sync module devDependencies with external package.json')
+  .argument('<path>', 'path to package.json to sync deps against')
+  .addOption(
+    new Option('-w, --write', 'write changes to disk').default(false)
+  )
+  .action(async (path, opts) => {
+    const updates = await differ(path)
+    opts.write ?
+      await writer(updates) :
+      console.log(updates)
+  })
+
 const test = program.command('test')
   .description('run tests')
   .addOption(
@@ -43,13 +58,13 @@ const test = program.command('test')
   )
   .addOption(
       new Option(
-      "-lp, --local-package",
+      "-l, --local-package",
       "build & test the pepr cli package from a local copy of the pepr repo",
       ).conflicts('customPackage')
   )
   .addOption(
     new Option(
-      "-cp, --custom-package <package>",
+      "-c, --custom-package <package>",
       "test a specified pepr cli .tgz package",
     ).conflicts('localPackage')
   )
@@ -65,11 +80,14 @@ const test = program.command('test')
     )
   )
   .hook('preAction', (thisCommand) =>{
-    if(thisCommand.opts().customPackage){
-      process.env.PEPR_PACKAGE = `${path.resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
+    // don't need to config pepr module/image overrides for unit testing
+    if (thisCommand.opts().suite === "unit" ){ return }
+
+    if (thisCommand.opts().customPackage){
+      process.env.PEPR_PACKAGE = `${resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
       validateCustomPackage(peprExcellentExamplesRepo);
     }
-    else if(thisCommand.opts().localPackage){
+    else if (thisCommand.opts().localPackage){
       process.env.PEPR_PACKAGE = buildLocalPepr(peprExcellentExamplesRepo)
     }
     process.env.PEPR_IMAGE = thisCommand.opts().image
@@ -133,7 +151,7 @@ function buildLocalPepr(outputDirectory: string) {
 }
 
 function restorePackageJSON() {
-  if (path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr') {
+  if (basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr') {
     renameSync(`${peprExcellentExamplesRepo}/package-lock.json.bak`, `${peprExcellentExamplesRepo}/package-lock.json`);
     renameSync(`${peprExcellentExamplesRepo}/package.json.bak`, `${peprExcellentExamplesRepo}/package.json`);
     renameSync(`${process.cwd()}/package.json.bak`, `${process.cwd()}/package.json`);
@@ -141,7 +159,7 @@ function restorePackageJSON() {
 }
 
 function backupPackageJSON() {
-  if (path.basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr') {
+  if (basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr') {
     copyFileSync(`${peprExcellentExamplesRepo}/package-lock.json`, `${peprExcellentExamplesRepo}/package-lock.json.bak`);
     copyFileSync(`${peprExcellentExamplesRepo}/package.json`, `${peprExcellentExamplesRepo}/package.json.bak`);
     copyFileSync(`${process.cwd()}/package.json`, `${process.cwd()}/package.json.bak`);

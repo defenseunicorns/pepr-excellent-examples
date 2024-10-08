@@ -12,7 +12,7 @@ on:
 
 jobs:
   refresh:
-    name: "Dev CLI-based Updates (devDependencies)"
+    name: refresh devDependencies
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
@@ -48,6 +48,7 @@ jobs:
       - name: create module (pepr init)
         run: |
           cd "$PEPR"
+          npm ci
           npx pepr init \
             --name "pepr-test-module" \
             --description "for comparing devDependencies against" \

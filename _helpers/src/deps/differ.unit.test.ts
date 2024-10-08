@@ -35,13 +35,15 @@ describe("splitRange()", () => {
 describe("differ()", () => {
   afterEach(() => { jest.resetAllMocks() })
 
+  const pkg = (obj) => ({ devDependencies: obj })
+
   it("skip pinned deps that are current", async () => {
     const theirs = { typescript: '5.3.3' }
     const mine = { typescript: '5.3.3' }
     reader.mockImplementation(() => Promise.resolve({
-      me: '/in/here',
+      me: { path: '/in/here', content: pkg(mine) },
       mine,
-      them: '/out/there',
+      them: { path: '/out/there', content: pkg(theirs) },
       theirs,
     }))
 
@@ -62,9 +64,9 @@ describe("differ()", () => {
       hscript: '3.0.2'
     }
     reader.mockImplementation(() => Promise.resolve({
-      me: '/in/here',
+      me: { path: '/in/here', content: pkg(mine) },
       mine,
-      them: '/out/there',
+      them: { path: '/out/there', content: pkg(theirs) },
       theirs,
     }))
 
@@ -80,9 +82,9 @@ describe("differ()", () => {
     const theirs = {}
     const mine = { '@just/doit': '1.2.2' }
     reader.mockImplementation(() => Promise.resolve({
-      me: '/in/here',
+      me: { path: '/in/here', content: pkg(mine) },
       mine,
-      them: '/out/there',
+      them: { path: '/out/there', content: pkg(theirs) },
       theirs,
     }))
     versions.mockImplementation(() => Promise.resolve(({
@@ -109,9 +111,9 @@ describe("differ()", () => {
       '@just/dothat': '3.2.1',
     }
     reader.mockImplementation(() => Promise.resolve({
-      me: '/in/here',
+      me: { path: '/in/here', content: pkg(mine) },
       mine,
-      them: '/out/there',
+      them: { path: '/out/there', content: pkg(theirs) },
       theirs,
     }))
 
@@ -131,9 +133,9 @@ describe("differ()", () => {
       '@just/dothur': '2.4.6',
     }
     reader.mockImplementation(() => Promise.resolve({
-      me: '/in/here',
+      me: { path: '/in/here', content: pkg(mine) },
       mine,
-      them: '/out/there',
+      them: { path: '/out/there', content: pkg(theirs) },
       theirs,
     }))
     versions.mockImplementationOnce(() => Promise.resolve(({
@@ -169,9 +171,9 @@ describe("differ()", () => {
       const theirs = { typescript: '5.3.3' }
       const mine = { typescript: '5.3.3', '@types/node': '1.2.3' }
       reader.mockImplementation(() => Promise.resolve({
-        me: '/in/here',
+        me: { path: '/in/here', content: pkg(mine) },
         mine,
-        them: '/out/there',
+        them: { path: '/out/there', content: pkg(theirs) },
         theirs,
       }))
       versions.mockImplementation(() => Promise.resolve(({

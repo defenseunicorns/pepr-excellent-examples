@@ -29,7 +29,7 @@ import * as general from '../general';
 jest.mock('../general');
 const { nearestAncestor } = jest.mocked(general);
 
-const deps = (obj) => ({ devDependencies: obj })
+const pkg = (obj) => ({ devDependencies: obj })
 const buffered = (obj) => Buffer.from(JSON.stringify(obj), 'utf-8')
 const resolved = (obj) => ((path) => Promise.resolve(buffered(obj))) as typeof fs.readFile
 
@@ -56,21 +56,26 @@ describe("reader()", () => {
   it("returns a found-dependency set", async () => {
     const them = "/out/there"
     const theirs = { abc: '1.2.3' }
-    const theirDeps = deps(theirs)
+    const theirPkg = pkg(theirs)
     const me = "/in/here"
     const mine = { xyz: '7.8.9' }
-    const myDeps = deps(mine)
+    const myPkg = pkg(mine)
 
     isAbsolute.mockImplementation(() => true)
     resolve.mockImplementation(p => p)
     access.mockImplementation(p => Promise.resolve())
     nearestAncestor.mockImplementation((f, d) => me)
     readFile
-      .mockImplementationOnce(resolved(theirDeps))
-      .mockImplementationOnce(resolved(myDeps))
+      .mockImplementationOnce(resolved(theirPkg))
+      .mockImplementationOnce(resolved(myPkg))
 
     let result = await sut.reader(them)
 
-    expect(result).toEqual({ me, mine, them, theirs })
+    expect(result).toEqual({
+      me: { path: me, content: myPkg },
+      mine,
+      them: { path: them, content: theirPkg },
+      theirs
+    })
   })
 })

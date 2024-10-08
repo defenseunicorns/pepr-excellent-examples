@@ -14,13 +14,13 @@ export async function reader(path) {
 
   const me = resolve( nearestAncestor('package.json', process.cwd()) );
 
-  const theirs = await readFile(them).then(buf => JSON.parse(buf.toString()));
-  const mine = await readFile(me).then(buf => JSON.parse(buf.toString()));
+  const theirCont = await readFile(them).then(buf => JSON.parse(buf.toString()));
+  const myCont = await readFile(me).then(buf => JSON.parse(buf.toString()));
 
   return {
-    me,
-    mine: mine.devDependencies,
-    them,
-    theirs: theirs.devDependencies,
+    me: { path: me, content: myCont },
+    mine: myCont.devDependencies,
+    them: { path: them, content: theirCont },
+    theirs: theirCont.devDependencies,
   }
 }

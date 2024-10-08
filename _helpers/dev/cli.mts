@@ -5,6 +5,7 @@ import { chdir } from 'node:process';
 import { execSync, spawnSync } from 'node:child_process';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { differ } from '../src/deps/differ';
+import { writer } from '../src/deps/writer';
 import { up, down } from '../src/cluster';
 import { Cmd } from '../src/Cmd';
 import { findUpSync } from 'find-up'
@@ -36,14 +37,14 @@ const env = program.command('env')
   .action(async () => { console.log(process.env) })
 
 const deps = program.command('deps')
-  .description('sync module devDepts with external package.json')
-  .argument('<path>', 'path to pepr module package.json to sync deps against')
+  .description('sync module devDependencies with external package.json')
+  .argument('<path>', 'path to package.json to sync deps against')
   .addOption(
     new Option('-w, --write', 'write changes to disk').default(false)
   )
-  .action(async (path, opts, cmd) => {
+  .action(async (path, opts) => {
     const updates = await differ(path)
-    console.log(updates)
+    opts.write ? writer(updates) : console.log(updates)
   })
 
 const test = program.command('test')

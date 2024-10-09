@@ -62,7 +62,7 @@ jobs:
         run: |
           cd "$PEPR_EXEX"
           npm ci
-          npm run --workspaces cli -- deps "${PEPR_MOD}/package.json"
+          npm run --workspaces cli -- deps "${PEPR_MOD}/package.json" --write
 
       - name: PR (if required)
         uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f #v7.0.5

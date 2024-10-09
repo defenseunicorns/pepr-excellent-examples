@@ -70,11 +70,16 @@ jobs:
           npm ci
           npm run --workspaces cli -- deps "${PEPR_MOD}/package.json" --write
 
-      - name: update package-lock.json
+      - name: package-lock.json
         run: |
           cd "$PEPR_EXEX"
           if git diff --quiet ; then return ; fi
+          
+          # npm install removes resolved and integrity properties from package-lock.json if installed from cache
+          # https://github.com/npm/cli/issues/4263
           rm ./package-lock.json
+          find . -maxdepth 2 -name node_modules -type d -exec rm -rf "{}" \;
+          npm cache clean --force
           npm install
 
       - name: PR (if required)

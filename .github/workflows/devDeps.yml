@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
@@ -63,11 +64,18 @@ jobs:
       - name: "set env: PEPR_MOD"
         run: echo "PEPR_MOD=${PEPR}/pepr-test-module" >> "$GITHUB_ENV"
 
-      - name: update scan
+      - name: scan for updates
         run: |
           cd "$PEPR_EXEX"
           npm ci
           npm run --workspaces cli -- deps "${PEPR_MOD}/package.json" --write
+
+      - name: update package-lock.json
+        run: |
+          cd "$PEPR_EXEX"
+          if git diff --quiet ; then return ; fi
+          rm ./package-lock.json
+          npm install
 
       - name: PR (if required)
         uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f #v7.0.5

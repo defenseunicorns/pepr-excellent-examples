@@ -78,7 +78,7 @@ jobs:
           # npm install removes resolved and integrity properties from package-lock.json if installed from cache
           # https://github.com/npm/cli/issues/4263
           rm ./package-lock.json
-          $( find . -maxdepth 2 -name node_modules -type d -exec [ -d "{}" ] && rm -rf "{}" \; )
+          find . -maxdepth 2 -name node_modules -type d -delete
           npm cache clean --force
           npm install
 

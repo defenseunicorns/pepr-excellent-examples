@@ -87,3 +87,4 @@ jobs:
         with:
           sign-commits: true
           path: ${{ steps.PEPR_EXEX.outputs.PEPR_EXEX }}
+          title: 'build(devDeps): bump the devDeps (via helper CLI)'

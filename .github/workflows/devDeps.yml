@@ -3,8 +3,8 @@ name: Update devDependencies
 permissions: read-all
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '30 4 * * *' # 12:30AM ET/9:30PM PT
+  schedule:
+    - cron: '30 4 * * *' # 12:30AM ET/9:30PM PT
   # push:
   #   branches: ["main"]
   # pull_request:

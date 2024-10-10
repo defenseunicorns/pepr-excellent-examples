@@ -86,7 +86,7 @@ export async function peprVersion() {
   // determine npx pepr@version from workspace root
   const root = (await new Cmd({ cmd: `npm root` }).run()).stdout[0]
   const workspace = dirname(root)
-  const version = (await new Cmd({ cwd: workspace, cmd: `npm run pepr -- --version` }).run())
+  const version = (await new Cmd({ cwd: workspace, cmd: `npx pepr --version` }).run())
     .stdout.filter(l => l !== '').slice(-1)[0]
 
   return version

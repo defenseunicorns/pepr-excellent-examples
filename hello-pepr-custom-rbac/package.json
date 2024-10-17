@@ -1,7 +1,7 @@
 {
-  "name": "hello-pepr-hooks",
+  "name": "hello-pepr-custom-rbac",
   "version": "0.0.1",
-  "description": "Pepr feature: Module Hook Features",
+  "description": "Pepr feature: Custom RBAC Features",
   "keywords": [
     "pepr",
     "k8s",
@@ -13,7 +13,7 @@
     "node": ">=18.0.0"
   },
   "pepr": {
-    "uuid": "d29ef33d-2b25-4148-9dca-6ebe588cae9f",
+    "uuid": "e43ef33d-2b25-4148-9dca-6ebe588caace",
     "onError": "reject",
     "webhookTimeout": 10,
     "customLabels": {},

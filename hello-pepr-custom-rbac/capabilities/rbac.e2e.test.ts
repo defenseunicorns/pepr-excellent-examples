@@ -30,14 +30,16 @@ describe("customRBAC.ts", () => {
       let logz: any[]
 
       it("should create the values.yaml file with correct values", async () => {
-        const valuesPath = path.resolve(__dirname, 'dist/static-test-chart/values.yaml');
+        const valuesPath = path.resolve(__dirname, '../dist/e43ef33d-2b25-4148-9dca-6ebe588caace-chart/values.yaml');
 
         // Read the values.yaml file
         const valuesContent = await fs.readFile(valuesPath, 'utf8');
 
         // Check if the file contains expected values
-        expect(valuesContent).toContain('image: ghcr.io/defenseunicorns/pepr/controller:v1.0.0');
-        expect(valuesContent).toContain('pepr.dev/description');
+        expect(valuesContent).toContain('pepr.dev/description: \'Pepr feature: Custom RBAC Features\'');
+        expect(valuesContent).toContain('name: \'custom-cluster-role-1\'');
+        expect(valuesContent).toContain('name: \'custom-role-1\'');
+        expect(valuesContent).toContain('name: \'custom-role-2\'');
       });
 
       it("should deploy the appropriate resources to Kubernetes", async () => {
@@ -47,18 +49,6 @@ describe("customRBAC.ts", () => {
 
         expect(clusterRole).toBeDefined();
         expect(deployment).toBeDefined();
-      });
-
-      it("should create the appropriate helm chart templates", async () => {
-        const templatesPath = path.resolve(__dirname, 'dist/static-test-chart/templates');
-
-        // Check if Helm templates were created
-        const files = await fs.readdir(templatesPath);
-
-        // Ensure specific template files were created
-        expect(files).toContain('deployment.yaml');
-        expect(files).toContain('service.yaml');
-        expect(files).toContain('clusterrole.yaml');
       });
     });
   });

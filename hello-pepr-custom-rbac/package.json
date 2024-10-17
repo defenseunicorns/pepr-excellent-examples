@@ -21,6 +21,45 @@
     "includedFiles": [],
     "env": {
       "LOG_LEVEL": "debug"
+    },
+    "rbac": {
+      "roles": [
+        {
+          "rules": [
+            {
+              "apiGroups": [""],
+              "resources": ["pods"],
+              "verbs": ["get", "list", "watch"]
+            },
+            {
+              "apiGroups": ["apps"],
+              "resources": ["deployments"],
+              "verbs": ["create", "update", "patch"]
+            }
+          ]
+        }
+      ],
+      "clusterRoles": [
+        {
+          "rules": [
+            {
+              "apiGroups": [""],
+              "resources": ["nodes"],
+              "verbs": ["get"]
+            },
+            {
+              "apiGroups": [""],
+              "resources": ["nodes"],
+              "verbs": ["list"]
+            },
+            {
+              "apiGroups": [""],
+              "resources": ["nodes"],
+              "verbs": ["list"]
+            }
+          ]
+        }
+      ]
     }
   },
   "dependencies": {

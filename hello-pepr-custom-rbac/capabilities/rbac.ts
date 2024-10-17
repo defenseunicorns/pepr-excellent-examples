@@ -1,18 +1,18 @@
 import { Capability, a } from "pepr";
 
-const name = "hello-pepr-hooks";
+const name = "hello-pepr-rbac";
 
-export const HelloPeprHooks = new Capability({
+export const HelloPeprRBAC = new Capability({
   name: name,
   description: name,
   namespaces: [name],
 });
-const { When } = HelloPeprHooks;
+const { When } = HelloPeprRBAC;
 
 When(a.Secret)
   .IsCreated()
   .InNamespace(name)
-  .WithName("mutate-only")
+  .WithName("rbac-test-secret")
   .Mutate(function mutateOnly() {});
 
 When(a.Secret)

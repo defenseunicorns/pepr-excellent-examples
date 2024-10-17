@@ -1,0 +1,29 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-hooks
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mutate-only
+  namespace: hello-pepr-hooks
+data: {}
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: validate-only
+  namespace: hello-pepr-hooks
+data: {}
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mutate-and-validate
+  namespace: hello-pepr-hooks
+data: {}

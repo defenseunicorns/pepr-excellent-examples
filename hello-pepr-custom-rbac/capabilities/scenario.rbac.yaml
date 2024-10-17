@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-rbac
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rbac-test-secret
+  namespace: hello-pepr-rbac
+data: {}

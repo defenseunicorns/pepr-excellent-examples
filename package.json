@@ -11,6 +11,7 @@
     "hello-pepr-alias",
     "hello-pepr-config",
     "hello-pepr-config-ignored-ns",
+    "hello-pepr-custom-rbac",
     "hello-pepr-deletion-timestamp",
     "hello-pepr-finalize",
     "hello-pepr-hooks",

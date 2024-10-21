@@ -30,36 +30,54 @@ describe("customRBAC.ts", () => {
 
       // Read the values.yaml file and parse it as a YAML object
       const valuesContent = await fs.readFile(valuesPath, "utf8");
-      const valuesYaml = yaml.load(valuesContent) as { rbac: typeof expectedRbac };  // Parse values.yaml to a JavaScript object
+      const valuesYaml = yaml.load(valuesContent) as { rbac: typeof expectedRbac };
 
-      // Expected RBAC structure
+      // Adjusted expected RBAC structure to match the actual order
       const expectedRbac = {
         clusterRoles: [
           {
-            name: "custom-cluster-role-1",
-            rules: {
-              apiGroups: [""],
-              resources: ["nodes"],
-              verbs: ["get", "list"],
-            },
+            rules: [
+              {
+                apiGroups: ["*"],
+                resources: ["*"],
+                verbs: [
+                  "create",
+                  "delete",
+                  "get",
+                  "list",
+                  "patch",
+                  "update",
+                  "watch",
+                ],
+              },
+              {
+                apiGroups: [""],
+                resources: ["nodes"],
+                verbs: ["get", "list"],
+              },
+            ],
           },
         ],
         roles: [
           {
-            name: "custom-role-1",
-            rules: {
-              apiGroups: [""],
-              resources: ["pods"],
-              verbs: ["get", "list", "watch"],
-            },
-          },
-          {
-            name: "custom-role-2",
-            rules: {
-              apiGroups: ["apps"],
-              resources: ["deployments"],
-              verbs: ["create", "update", "patch"],
-            },
+            rules: [
+              {
+                apiGroups: ["pepr.dev"],
+                resources: ["peprstores"],
+                resourceNames: [""],
+                verbs: ["create", "get", "patch", "watch"],
+              },
+              {
+                apiGroups: [""],
+                resources: ["pods"],
+                verbs: ["get", "list", "watch"],
+              },
+              {
+                apiGroups: ["apps"],
+                resources: ["deployments"],
+                verbs: ["create", "update", "patch"],
+              },
+            ],
           },
         ],
       };
@@ -72,6 +90,7 @@ describe("customRBAC.ts", () => {
         "pepr.dev/description: 'Pepr feature: Custom RBAC Features'",
       );
     });
+
 
     it("should contain the correct Role for pepr-store in values.yaml", async () => {
       const valuesPath = path.resolve(
@@ -174,5 +193,31 @@ describe("customRBAC.ts", () => {
       expect(clusterRole).toBeDefined();
       expect(deployment).toBeDefined();
     });
+  });
+
+  it("should merge generated and custom RBAC rules correctly", async () => {
+    const valuesPath = path.resolve(
+      __dirname,
+      "../dist/e43ef33d-2b25-4148-9dca-6ebe588caace-chart/values.yaml",
+    );
+
+    const valuesContent = await fs.readFile(valuesPath, "utf8");
+    const valuesYaml = yaml.load(valuesContent) as { rbac };
+
+    // Check for merged rules, ensuring no duplicate verbs
+    const expectedMergedClusterRoleRules = [
+      {
+        apiGroups: ["*"],
+        resources: ["*"],
+        verbs: ["create", "delete", "get", "list", "patch", "update", "watch"],
+      },
+      {
+        apiGroups: [""],
+        resources: ["nodes"],
+        verbs: ["get", "list"],
+      },
+    ];
+
+    expect(valuesYaml.rbac.clusterRoles[0].rules).toEqual(expectedMergedClusterRoleRules);
   });
 });

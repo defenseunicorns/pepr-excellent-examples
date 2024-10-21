@@ -23,7 +23,7 @@
       "LOG_LEVEL": "debug"
     },
     "rbac": {
-      "roles": [
+      "role": [
         {
           "rules": [
             {
@@ -39,7 +39,7 @@
           ]
         }
       ],
-      "clusterRoles": [
+      "clusterRole": [
         {
           "rules": [
             {

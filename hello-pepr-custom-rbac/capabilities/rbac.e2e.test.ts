@@ -4,7 +4,6 @@ import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";
 import { mins } from "helpers/src/time";
 import { moduleUp, moduleDown } from "helpers/src/pepr";
-import { clean } from "helpers/src/cluster";
 import { live } from "helpers/src/resource";
 import fs from "fs/promises";
 import path from "path";
@@ -32,7 +31,6 @@ describe("customRBAC.ts", () => {
       const valuesContent = await fs.readFile(valuesPath, "utf8");
       const valuesYaml = yaml.load(valuesContent) as { rbac: typeof expectedRbac };
 
-      // Adjusted expected RBAC structure to match the actual order
       const expectedRbac = {
         clusterRoles: [
           {
@@ -219,5 +217,73 @@ describe("customRBAC.ts", () => {
     ];
 
     expect(valuesYaml.rbac.clusterRoles[0].rules).toEqual(expectedMergedClusterRoleRules);
+  });
+
+  it("should create the values.yaml file with correct scoped RBAC values", async () => {
+    const valuesPath = path.resolve(
+      __dirname,
+      "../dist/e43ef33d-2b25-4148-9dca-6ebe588caace-chart/values.yaml",
+    );
+
+    // Read the values.yaml file and parse it as a YAML object
+    const valuesContent = await fs.readFile(valuesPath, "utf8");
+    const valuesYaml = yaml.load(valuesContent) as { rbac: typeof expectedRbac };
+
+    const expectedRbac = {
+      clusterRoles: [
+        {
+          rules: [
+            {
+              apiGroups: ["*"],
+              resources: ["*"],
+              verbs: [
+                "create",
+                "delete",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch",
+              ],
+            },
+            {
+              apiGroups: [""],
+              resources: ["nodes"],
+              verbs: ["get", "list"],
+            },
+          ],
+        },
+      ],
+      roles: [
+        {
+          rules: [
+            {
+              apiGroups: ["pepr.dev"],
+              resources: ["peprstores"],
+              resourceNames: [""],
+              verbs: ["create", "get", "patch", "watch"],
+            },
+            {
+              apiGroups: [""],
+              resources: ["pods"],
+              verbs: ["get", "list", "watch"],
+            },
+            {
+              apiGroups: ["apps"],
+              resources: ["deployments"],
+              verbs: ["create", "update", "patch"],
+            },
+          ],
+        },
+      ],
+    };
+
+    // Check if the rbac section in values.yaml matches the expected RBAC structure
+    expect(valuesYaml.rbac).toEqual(expectedRbac);
+
+    // Check if the file contains expected values
+    expect(valuesContent).toContain(
+      "pepr.dev/description: 'Pepr feature: Custom RBAC Features'",
+    );
   });
 });

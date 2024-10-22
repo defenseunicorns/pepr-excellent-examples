@@ -92,21 +92,21 @@ export async function peprVersion() {
   return version
 }
 
-export async function moduleBuild({ version = "", verbose = false } = {}) {
+export async function moduleBuild({ version = "", verbose = false, rbacMode = "admin" } = {}) {
   // can't have await expressions in default args, so gotta do it here
   if (version === "") { version = await peprVersion() }
 
   // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
   const pepr = { TS_NODE_PROJECT: "" }
 
-  let cmd = `npx --yes ${getPeprAlias()} build`
+  let cmd = `npx --yes ${getPeprAlias()} build --rbac-mode=${rbacMode}`
   console.time(cmd)
   const build = await new Cmd({ env: pepr, cmd }).run()
   if (verbose) { console.log(build) }
   console.timeEnd(cmd)
 }
 
-export async function moduleUp({ version = "", verbose = false } = {}) {
+export async function moduleUp({ version = "", verbose = false, rbacMode = "admin" } = {}) {
   let cmd: string = "";
   // can't have await expressions in default args, so gotta do it here
   if (version === "") { version = await peprVersion() }
@@ -116,7 +116,7 @@ export async function moduleUp({ version = "", verbose = false } = {}) {
   // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
   const pepr = { TS_NODE_PROJECT: "" }
 
-  await moduleBuild({ version, verbose })
+  await moduleBuild({ version, verbose, rbacMode })
 
   if (process.env.PEPR_IMAGE) {
     cmd = `npx --yes ${getPeprAlias()} deploy --image=${process.env.PEPR_IMAGE} --confirm`

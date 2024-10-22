@@ -21,10 +21,22 @@
     "includedFiles": [],
     "env": {
       "LOG_LEVEL": "debug"
-    }
+    },
+    "rbac": [
+      {
+        "apiGroups": [""],
+        "resources": ["pods"],
+        "verbs": ["get", "list", "watch"]
+      },
+      {
+        "apiGroups": ["apps"],
+        "resources": ["deployments"],
+        "verbs": ["create", "update", "patch"]
+      }
+    ]
   },
   "dependencies": {
-    "pepr": "file:../pepr-0.0.0-development.tgz"
+    "pepr": "^0.37.2"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

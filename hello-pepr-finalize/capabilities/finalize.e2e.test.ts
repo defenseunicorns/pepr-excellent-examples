@@ -18,7 +18,7 @@ describe("finalize.ts", () => {
   describe("create", () => {
     let logz: string[]
 
-     beforeAll(async () => {
+    beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.create.yaml`;
       await timed(`load: ${file}`, async () => {
         let [ ns, cmReconcile, cmWatch ] = await trc.load(file)
@@ -47,7 +47,7 @@ describe("finalize.ts", () => {
   describe("createorupdate", () => {
     let logz: string[]
 
-     beforeAll(async () => {
+    beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.create-or-update.yaml`;
       await timed(`load: ${file}`, async () => {
         let [ ns, cmWatch ] = await trc.load(file)
@@ -79,7 +79,7 @@ describe("finalize.ts", () => {
   describe("update", () => {
     let logz: string[]
 
-     beforeAll(async () => {
+    beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.update.yaml`;
       await timed(`load: ${file}`, async () => {
         let [ ns, cmWatch ] = await trc.load(file)
@@ -107,10 +107,41 @@ describe("finalize.ts", () => {
     }, secs(10));
   });
 
+  describe.skip("update, opt out of removing finalizer", () => {
+    // let logz: string[]
+
+    // beforeAll(async () => {
+    //   const file = `${trc.root()}/capabilities/scenario.update.yaml`;
+    //   await timed(`load: ${file}`, async () => {
+    //     let [ ns, cmWatch ] = await trc.load(file)
+    //     await fullCreate([ns, cmWatch])
+
+    //     await K8s(kind[cmWatch.kind]).Apply({...cmWatch, data: { note: "updated"}})
+    //     await K8s(kind[cmWatch.kind]).Delete(cmWatch)
+
+    //     await untilLogged("Removed finalizer 'pepr.dev/finalizer' from 'hello-pepr-finalize-update/")
+    //     logz = await logs();
+    //   });
+    // }, mins(2));
+
+    // it("triggers action and finalizer callbacks", async () => {
+    //   let results = logz.filter(l => l.includes('"msg":"external api call (update):'))
+      
+    //   let wants = [
+    //     "watch/callback",
+    //     "watch/finalize",
+    //   ]
+    //   wants.forEach((wanted, atIndex) => {
+    //     expect(results[atIndex]).toContain(wanted)
+    //   })
+
+    // }, secs(10));
+  });
+
   describe("delete", () => {
     let logz: string[]
 
-     beforeAll(async () => {
+    beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.delete.yaml`;
       await timed(`load: ${file}`, async () => {
         let [ ns, cmWatch ] = await trc.load(file)

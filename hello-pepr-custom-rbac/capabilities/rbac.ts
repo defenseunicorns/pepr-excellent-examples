@@ -1,4 +1,3 @@
-import { ok } from "assert";
 import {
   Capability,
   K8s,

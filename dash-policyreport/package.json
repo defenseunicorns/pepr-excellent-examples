@@ -36,7 +36,7 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "5.3.3",
-    "yaml": "2.5.1"
+    "yaml": "2.6.0"
   },
   "scripts": {
     "kfc": "kubernetes-fluent-client",

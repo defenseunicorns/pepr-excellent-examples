@@ -5,6 +5,7 @@ import { fullCreate } from "helpers/src/general";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";
 import { K8s, kind } from "pepr";
+import { KubernetesObject } from "kubernetes-fluent-client";
 
 const trc = new TestRunCfg(__filename);
 
@@ -18,7 +19,7 @@ describe("finalize.ts", () => {
   describe("create", () => {
     let logz: string[]
 
-     beforeAll(async () => {
+    beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.create.yaml`;
       await timed(`load: ${file}`, async () => {
         let [ ns, cmReconcile, cmWatch ] = await trc.load(file)
@@ -47,7 +48,7 @@ describe("finalize.ts", () => {
   describe("createorupdate", () => {
     let logz: string[]
 
-     beforeAll(async () => {
+    beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.create-or-update.yaml`;
       await timed(`load: ${file}`, async () => {
         let [ ns, cmWatch ] = await trc.load(file)
@@ -79,7 +80,7 @@ describe("finalize.ts", () => {
   describe("update", () => {
     let logz: string[]
 
-     beforeAll(async () => {
+    beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.update.yaml`;
       await timed(`load: ${file}`, async () => {
         let [ ns, cmWatch ] = await trc.load(file)
@@ -107,10 +108,60 @@ describe("finalize.ts", () => {
     }, secs(10));
   });
 
+  describe("update, opt out of removing finalizer", () => {
+    let logz: string[]
+    let ns, cmWatch;
+
+    beforeAll(async () => {
+      const file = `${trc.root()}/capabilities/scenario.update.opt-out.yaml`;
+      await timed(`load: ${file}`, async () => {
+        [ ns, cmWatch ] = await trc.load(file)
+        await fullCreate([ns, cmWatch])
+
+        await K8s(kind[cmWatch.kind]).Apply({...cmWatch, data: { note: "updated"}})
+        await K8s(kind[cmWatch.kind]).Delete(cmWatch)
+
+        await untilLogged("Skip removal of finalizer 'pepr.dev/finalizer' from 'hello-pepr-finalize-update-opt-out/")
+
+        logz = await logs();
+      });
+    }, mins(2));
+
+    it("triggers action and finalizer callbacks but skips removing finalizer", async () => {
+      let results = logz.filter(l => l.includes('"msg":"external api call (update-opt-out):'))
+
+      let wants = [
+        "watch/callback",
+        "watch/pre-finalize",
+      ]
+      wants.forEach((wanted, atIndex) => {
+        expect(results[atIndex]).toContain(wanted)
+      })
+
+      // pull fresh resource (to verify that finalizer still exists)
+      let resource: KubernetesObject = await K8s(kind[cmWatch.kind])
+        .InNamespace(cmWatch.metadata.namespace)
+        .Get(cmWatch.metadata.name);
+
+      // clear finalizers so that cleanup won't get blocked
+      await K8s(kind[cmWatch.kind], {
+        namespace: cmWatch.metadata.namespace,
+        name: cmWatch.metadata.name,
+      }).Patch([{
+        op: "replace",
+        path: `/metadata/finalizers`,
+        value: [],
+      }]);
+
+      // assert AFTER finalizer is cleared so that cleanup doesn't hang in failure case
+      expect(resource.metadata?.finalizers).toEqual(['pepr.dev/finalizer'])
+    }, secs(10));
+  });
+
   describe("delete", () => {
     let logz: string[]
 
-     beforeAll(async () => {
+    beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.delete.yaml`;
       await timed(`load: ${file}`, async () => {
         let [ ns, cmWatch ] = await trc.load(file)

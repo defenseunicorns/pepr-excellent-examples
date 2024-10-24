@@ -8,11 +8,14 @@ import { cwd } from 'node:process';
 import { readFile } from 'node:fs/promises';
 
 export function sift(stdout) {
+  const sansKnownBad = stdout
+    .filter(l => !l.includes('] DeprecationWarning: '))
+    .filter(l => !l.includes('--trace-deprecation'))
+    .filter(l => l)
+
   try {
-    const parsed = stdout
-      .filter(l => l !== '' && !l.includes('] DeprecationWarning: ')  && !l.includes('--trace-deprecation'))
+    const parsed = sansKnownBad
       .map(l => JSON.parse(l))
-      .filter(l => l)
       .filter(l => l.url !== "/healthz")
       .filter(l => l.msg !== "Pepr Store update")
       .filter(l => l.name !== "/kube-root-ca.crt")
@@ -22,11 +25,12 @@ export function sift(stdout) {
     return parsed.map(l => JSON.stringify(l))
 
   } catch (e) {
-    console.log(stdout);
-
-    if (e.message === "Unexpected end of JSON input") {
-      console.error("Unexpected end of JSON input. Offending lines:")
-      const offenders = stdout
+    if (
+      e.message.includes("Unexpected end of JSON input") ||
+      e.message.includes("Unterminated string in JSON ")
+    ) {
+      console.error("Unexpected JSON input. Offending lines:")
+      const offenders = sansKnownBad
         .filter(l => l.trim() !== '[' && l.trim() !== ']')
         .filter(l => {
           let fails = false

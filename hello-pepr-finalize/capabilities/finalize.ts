@@ -7,6 +7,7 @@ export const HelloPeprFinalize = new Capability({
     "hello-pepr-finalize-create",
     "hello-pepr-finalize-createorupdate",
     "hello-pepr-finalize-update",
+    "hello-pepr-finalize-update-opt-out",
     "hello-pepr-finalize-delete",
   ],
 });
@@ -61,6 +62,21 @@ When(a.ConfigMap)
   })
   .Finalize(function finalizeUpdate(cm) {
     Log.info(cm, "external api call (update): watch/finalize")
+  });
+
+  When(a.ConfigMap)
+  .IsUpdated()
+  .InNamespace("hello-pepr-finalize-update-opt-out")
+  .WithName("cm-watch-update-opt-out")
+  .Watch(function watchUpdateOptOut(cm) {
+    // delete with finalizer triggers an UPDATE to add deletionTimestamp; ignore it
+    if (cm.metadata?.deletionTimestamp) { return }
+
+    Log.info(cm, "external api call (update-opt-out): watch/callback")
+  })
+  .Finalize(function finalizeUpdateOptOut(cm) {
+    Log.info(cm, "external api call (update-opt-out): watch/pre-finalize")
+    return false;
   });
 
   When(a.ConfigMap)

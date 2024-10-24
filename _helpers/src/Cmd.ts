@@ -32,7 +32,8 @@ export class Cmd {
     return new Promise((resolve) => {
       const proc = exec(this.cmd, {
         cwd: this.cwd,
-        env: this.env as NodeJS.ProcessEnv
+        env: this.env as NodeJS.ProcessEnv,
+        maxBuffer: 1024 * 1024 * 100 // 100MiB
       })
 
       this.stdin.forEach(line => proc.stdin.write(`${line}\n`))

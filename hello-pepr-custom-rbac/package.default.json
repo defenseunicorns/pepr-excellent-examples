@@ -1,0 +1,43 @@
+{
+  "name": "hello-pepr-custom-rbac",
+  "version": "0.0.1",
+  "description": "Pepr feature: Custom RBAC Features",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "pepr-module",
+    "security"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "uuid": "e43ef33d-2b25-4148-9dca-6ebe588caace",
+    "onError": "reject",
+    "webhookTimeout": 10,
+    "customLabels": {},
+    "alwaysIgnore": {},
+    "includedFiles": [],
+    "env": {
+      "LOG_LEVEL": "debug"
+    }
+  },
+  "dependencies": {
+    "pepr": "^0.37.2"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/node": "^22.7.5",
+    "jest": "^29.7.0",
+    "kubernetes-fluent-client": "^3.0.4",
+    "typescript": "5.3.3"
+  },
+  "scripts": {
+    "pepr": "pepr",
+    "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
+    "test": "npm run cli -- test --suite all",
+    "test:e2e": "npm run cli -- test --suite e2e",
+    "test:unit": "npm run cli -- test --suite unit"
+  }
+}

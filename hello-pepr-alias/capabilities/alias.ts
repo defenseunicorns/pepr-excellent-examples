@@ -4,14 +4,12 @@ export const HelloPeprAlias = new Capability({
   name: "hello-pepr-alias",
   description: "hello-pepr-alias",
   namespaces: [
-    "hello-pepr-alias-create",
-    "hello-pepr-alias-createorupdate",
-    "hello-pepr-alias-update",
-    "hello-pepr-alias-delete",
+    "hello-pepr-alias-create"
   ],
 });
 
 const { When } = HelloPeprAlias;
+let alias = "";
 
 When(a.ConfigMap)
   .IsCreated()
@@ -114,7 +112,7 @@ When(a.ConfigMap)
   .Watch(function watchCreate(cm, phase, logger) {
     logger.info(
       cm,
-      "external api call (watch-create-default-alias): watch/callback",
+      "external api call (watch-create-alias): watch/callback",
     );
   });
 

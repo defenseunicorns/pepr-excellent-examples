@@ -59,14 +59,14 @@ describe("module lifecycle", () => {
     console.timeEnd(cmd)
   }
   
-  let mod = `${trc.root()}/pepr-test-module`
-  let ver
+  let module = `${trc.root()}/pepr-test-module`
+  let version: string
   
   beforeAll(async () => {
-    ver = await peprVersion()
-    await wipeMod(mod)
-    await makeMod(mod, ver)
-    await npmInst(mod)
+    version = await peprVersion()
+    await wipeMod(module)
+    await makeMod(module, version)
+    await npmInst(module)
   }, mins(2))
   
   afterEach(async () => await clean(trc), mins(5))
@@ -76,11 +76,11 @@ describe("module lifecycle", () => {
       let timeEnd = jest.spyOn(console, "timeEnd")
 
       const original = cwd()
-      chdir(mod)
-      await moduleUp({version: ver})
+      chdir(module)
+      await moduleUp({version})
       chdir(original)
 
-      expect(timeEnd).toHaveBeenCalledWith(`pepr@${ver} ready (total time)`)
+      expect(timeEnd).toHaveBeenCalledWith(`pepr@${version} ready (total time)`)
 
       timeEnd.mockRestore()
     }, mins(2))
@@ -90,7 +90,7 @@ describe("module lifecycle", () => {
   describe("moduleDown()", () => {
     beforeAll(async () => {
       const original = cwd()
-      chdir(mod)
+      chdir(module)
       await moduleDown()
       chdir(original)
     }, mins(5))
@@ -112,7 +112,7 @@ describe("module lifecycle", () => {
     }, secs(10))
 
     it("removes the \"pepr-${module-uuid}\" cluster role binding", async () => {
-      let cfg = await readPkg(mod)
+      let cfg = await readPkg(module)
       let name = `pepr-${cfg.pepr.uuid}`
 
       expect(
@@ -121,7 +121,7 @@ describe("module lifecycle", () => {
     }, secs(10))
 
     it("removes the \"pepr-${module-uuid}\" cluster role", async () => {
-      let cfg = await readPkg(mod)
+      let cfg = await readPkg(module)
       let name = `pepr-${cfg.pepr.uuid}`
 
       expect(

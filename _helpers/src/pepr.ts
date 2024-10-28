@@ -9,38 +9,38 @@ import { readFile } from 'node:fs/promises';
 
 export function sift(stdout) {
   const withoutKnownBad = stdout
-    .filter(l => !l.includes('] DeprecationWarning: '))
-    .filter(l => !l.includes('--trace-deprecation'))
-    .filter(l => l)
+    .filter(log => !log.includes('] DeprecationWarning: '))
+    .filter(log => !log.includes('--trace-deprecation'))
+    .filter(log => log)
 
   try {
     const parsed = withoutKnownBad
-      .map(l => JSON.parse(l))
-      .filter(l => l.url !== "/healthz")
-      .filter(l => l.msg !== "Pepr Store update")
-      .filter(l => l.name !== "/kube-root-ca.crt")
+      .map(log => JSON.parse(log))
+      .filter(log => log.url !== "/healthz")
+      .filter(log => log.msg !== "Pepr Store update")
+      .filter(log => log.name !== "/kube-root-ca.crt")
 
-    parsed.sort((l, r) => l.time - r.time)
+    parsed.sort((log, r) => log.time - r.time)
 
-    return parsed.map(l => JSON.stringify(l))
+    return parsed.map(log => JSON.stringify(log))
 
-  } catch (e) {
+  } catch (error) {
     if (
-      e.message.includes("Unexpected end of JSON input") ||
-      e.message.includes("Unterminated string in JSON ")
+      error.message.includes("Unexpected end of JSON input") ||
+      error.message.includes("Unterminated string in JSON ")
     ) {
       console.error("Unexpected JSON input. Offending lines:")
       const offenders = withoutKnownBad
-        .filter(l => l.trim() !== '[' && l.trim() !== ']')
-        .filter(l => {
+        .filter(log => log.trim() !== '[' && log.trim() !== ']')
+        .filter(log => {
           let fails = false
-          try { JSON.parse(l) } catch { fails = true }
+          try { JSON.parse(log) } catch { fails = true }
           return fails
         })
-      offenders.forEach(o => console.error(`-->${o}<--`))
+      offenders.forEach(offender => console.error(`-->${offender}<--`))
     }
     else {
-      console.error(e);
+      console.error(error);
     }
   }
 }
@@ -71,10 +71,10 @@ export async function untilLogged(needle: String | Function, count = 1) {
 
     let found = []
     if (typeof needle === 'string') {
-      found = logz.filter(l => l.includes(needle))
+      found = logz.filter(log => log.includes(needle))
     }
     else if (typeof needle === 'function') {
-      found = logz.filter(l => needle(l))
+      found = logz.filter(log => needle(log))
     }
 
     if (found.length >= count) { break }
@@ -93,7 +93,7 @@ export async function peprVersion(): Promise<string> {
     const root = (await new Cmd({ cmd: `npm root` }).run()).stdout[0]
     const workspace = dirname(root)
     version = (await new Cmd({ cwd: workspace, cmd: `npx pepr --version` }).run())
-      .stdout.filter(l => l !== '').slice(-1)[0]
+      .stdout.filter(log => log !== '').slice(-1)[0]
   } 
   else{
     // determine pepr version from local copy

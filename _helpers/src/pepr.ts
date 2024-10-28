@@ -8,13 +8,13 @@ import { cwd } from 'node:process';
 import { readFile } from 'node:fs/promises';
 
 export function sift(stdout) {
-  const sansKnownBad = stdout
+  const withoutKnownBad = stdout
     .filter(l => !l.includes('] DeprecationWarning: '))
     .filter(l => !l.includes('--trace-deprecation'))
     .filter(l => l)
 
   try {
-    const parsed = sansKnownBad
+    const parsed = withoutKnownBad
       .map(l => JSON.parse(l))
       .filter(l => l.url !== "/healthz")
       .filter(l => l.msg !== "Pepr Store update")
@@ -30,7 +30,7 @@ export function sift(stdout) {
       e.message.includes("Unterminated string in JSON ")
     ) {
       console.error("Unexpected JSON input. Offending lines:")
-      const offenders = sansKnownBad
+      const offenders = withoutKnownBad
         .filter(l => l.trim() !== '[' && l.trim() !== ']')
         .filter(l => {
           let fails = false
@@ -86,13 +86,19 @@ export function getPeprAlias(): string{
   return process.env.PEPR_PACKAGE ? `file:${process.env.PEPR_PACKAGE}` : 'pepr';
 }
 
-export async function peprVersion() {
-  // determine npx pepr@version from workspace root
-  const root = (await new Cmd({ cmd: `npm root` }).run()).stdout[0]
-  const workspace = dirname(root)
-  const version = (await new Cmd({ cwd: workspace, cmd: `npx pepr --version` }).run())
-    .stdout.filter(l => l !== '').slice(-1)[0]
-
+export async function peprVersion(): Promise<string> {
+  let version: string = ''
+  if (getPeprAlias() === "pepr") {
+    // determine npx pepr@version from workspace root
+    const root = (await new Cmd({ cmd: `npm root` }).run()).stdout[0]
+    const workspace = dirname(root)
+    version = (await new Cmd({ cwd: workspace, cmd: `npx pepr --version` }).run())
+      .stdout.filter(l => l !== '').slice(-1)[0]
+  } 
+  else{
+    // determine pepr version from local copy
+    version = getPeprAlias()
+  }
   return version
 }
 

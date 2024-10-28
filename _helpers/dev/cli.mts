@@ -217,7 +217,7 @@ async function testE2e(passthru) {
       "jest", [
         "--passWithNoTests",
         "--testPathPattern", "src/cluster\.e2e\.test\.ts",
-        "--runInBand",
+        "--detectOpenHandles",
         "--verbose",
         ...passthru
       ],
@@ -236,7 +236,7 @@ async function testE2e(passthru) {
           "--passWithNoTests",
           "--testPathIgnorePatterns", "src/cluster\.e2e\.test\.ts",
           "--testPathPattern", ".*\.e2e\.test\.ts",
-          "--runInBand",
+          "--detectOpenHandles",
           "--verbose",
           ...passthru
         ],
@@ -260,7 +260,7 @@ async function testE2e(passthru) {
           "--passWithNoTests",
           // eslint-disable-next-line no-useless-escape
           "--testPathPattern", ".*\.e2e\.test\.ts",
-          "--runInBand",
+          "--detectOpenHandles",
           "--verbose",
           ...passthru
         ],

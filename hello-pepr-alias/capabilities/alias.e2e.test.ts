@@ -24,10 +24,10 @@ describe("alias.ts", () => {
         let [ns, cmReconcile] = await trc.load(file);
         await fullCreate([ns, cmReconcile]);
         await K8s(kind[cmReconcile.kind]).Delete(cmReconcile);
-        logz = await logs();
         await untilLogged(
           '"msg":"external api call (reconcile-create-alias): reconcile/finalize"',
         );
+        logz = await logs();
       });
     }, mins(2));
 

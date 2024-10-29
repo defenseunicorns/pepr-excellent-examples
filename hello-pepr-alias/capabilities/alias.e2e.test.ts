@@ -51,23 +51,6 @@ describe("alias.ts", () => {
       },
       secs(10),
     );
-  });
-  /*
-  describe("reconcile - finalize", () => {
-    let logz: string[];
-
-    beforeAll(async () => {
-      const file = `${trc.root()}/capabilities/scenario.create.yaml`;
-      await timed(`load: ${file}`, async () => {
-        let [ns, cmReconcile] = await trc.load(file);
-        await fullCreate([ns, cmReconcile]);
-        await K8s(kind[cmReconcile.kind]).Delete(cmReconcile);
-        await untilLogged(
-          '"msg":"external api call (reconcile-create-no-alias): reconcile/callback"',
-        );
-        logz = await logs();
-      });
-    }, mins(2));
 
     it(
       "uses default alias when no alias provided",
@@ -85,7 +68,7 @@ describe("alias.ts", () => {
       secs(10),
     );
   });
-/*
+
   describe("create - watch - finalize", () => {
     let logz: string[];
 
@@ -119,22 +102,19 @@ describe("alias.ts", () => {
       secs(10),
     );
   });
-  /*
+
   describe("create - validate", () => {
     let logz: string[];
 
     beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.create.yaml`;
       await timed(`load: ${file}`, async () => {
-        let [ns, cmReconcile, cmWatch, cmValidate, cmMutate] =
-          await trc.load(file);
-        await fullCreate([ns, cmReconcile, cmWatch, cmValidate, cmMutate]);
-
-        await K8s(kind[cmReconcile.kind]).Delete(cmReconcile);
-        await K8s(kind[cmWatch.kind]).Delete(cmWatch);
+        let [ns, cmValidate] = await trc.load(file);
+        await fullCreate([ns, cmValidate]);
         await K8s(kind[cmValidate.kind]).Delete(cmValidate);
-        await K8s(kind[cmMutate.kind]).Delete(cmMutate);
-
+        await untilLogged(
+          '"msg":"external api call (validate-create-alias): validate/callback"',
+        );
         logz = await logs();
       });
     }, mins(2));
@@ -148,40 +128,8 @@ describe("alias.ts", () => {
 
         expect(results).toEqual(
           expect.arrayContaining([
-            expect.stringMatching("alias:create:validate"),
+            expect.stringMatching(/alias:create:validate.*validate\/callback/),
           ]),
-        );
-      },
-      secs(10),
-    );
-
-    it(
-      "uses default alias",
-      async () => {
-        let results = logz.filter(l =>
-          l.includes(
-            '"msg":"external api call (validate-create-default-alias):',
-          ),
-        );
-
-        expect(results).toEqual(
-          expect.arrayContaining([expect.stringMatching("no alias provided")]),
-        );
-      },
-      secs(10),
-    );
-
-    it(
-      "does not log alias if alias child logger not used",
-      async () => {
-        let results = logz.filter(l =>
-          l.includes(
-            '"msg":"external api call (validate-create-no-child-logger):',
-          ),
-        );
-
-        expect(results).toEqual(
-          expect.not.arrayContaining([expect.stringMatching('"alias":')]),
         );
       },
       secs(10),
@@ -193,18 +141,15 @@ describe("alias.ts", () => {
     beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.create.yaml`;
       await timed(`load: ${file}`, async () => {
-        let [ns, cmReconcile, cmWatch, cmValidate, cmMutate] =
+        let [ns, cmMutate] =
           await trc.load(file);
-        await fullCreate([ns, cmReconcile, cmWatch, cmValidate, cmMutate]);
-
-        await K8s(kind[cmReconcile.kind]).Delete(cmReconcile);
-        await K8s(kind[cmWatch.kind]).Delete(cmWatch);
-        await K8s(kind[cmValidate.kind]).Delete(cmValidate);
+        await fullCreate([ns, cmMutate]);
         await K8s(kind[cmMutate.kind]).Delete(cmMutate);
-
+        await untilLogged(
+          '"msg":"external api call (mutate-create-alias): mutate/callback"',
+        );
         logz = await logs();
       });
-
     }, mins(2));
 
     it(
@@ -216,42 +161,11 @@ describe("alias.ts", () => {
 
         expect(results).toEqual(
           expect.arrayContaining([
-            expect.stringMatching("alias:create:mutate"),
+            expect.stringMatching(/alias:create:mutate.*mutate\/callback/),
           ]),
         );
       },
       secs(10),
     );
-
-    it(
-      "uses default alias",
-      async () => {
-        let results = logz.filter(l =>
-          l.includes('"msg":"external api call (mutate-create-default-alias):'),
-        );
-
-        expect(results).toEqual(
-          expect.arrayContaining([expect.stringMatching("no alias provided")]),
-        );
-      },
-      secs(10),
-    );
-
-    it(
-      "does not log alias if alias child logger not used",
-      async () => {
-        let results = logz.filter(l =>
-          l.includes(
-            '"msg":"external api call (mutate-create-no-child-logger):',
-          ),
-        );
-
-        expect(results).toEqual(
-          expect.not.arrayContaining([expect.stringMatching('"alias":')]),
-        );
-      },
-      secs(10),
-    );
   });
-  */
 });

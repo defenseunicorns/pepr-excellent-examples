@@ -28,7 +28,7 @@ When(a.ConfigMap)
       "external api call (reconcile-create-alias): reconcile/finalize",
     );
   });
-/*
+
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace("hello-pepr-alias-create")
@@ -85,4 +85,3 @@ When(a.ConfigMap)
       "external api call (mutate-create-alias): mutate/callback",
     );
   })
- */

@@ -121,7 +121,7 @@ describe("finalize.ts", () => {
         await K8s(kind[cmWatch.kind]).Apply({...cmWatch, data: { note: "updated"}})
         await K8s(kind[cmWatch.kind]).Delete(cmWatch)
 
-        await untilLogged("Skip removal of finalizer 'pepr.dev/finalizer' from 'hello-pepr-finalize-update-opt-out/")
+        await untilLogged("Skipping removal of finalizer 'pepr.dev/finalizer' from 'hello-pepr-finalize-update-opt-out/")
 
         logz = await logs();
       });

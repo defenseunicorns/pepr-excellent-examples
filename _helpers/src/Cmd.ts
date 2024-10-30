@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 
 export interface Spec {
   cmd: string
@@ -29,29 +29,41 @@ export class Cmd {
   }
 
   runRaw(): Promise<Result> {
-    return new Promise((resolve) => {
-      const proc = exec(this.cmd, {
+    return new Promise((resolve, reject) => {
+      const proc = spawn(this.cmd, [], {
+        shell: true,
         cwd: this.cwd,
         env: this.env as NodeJS.ProcessEnv,
-        maxBuffer: 1024 * 1024 * 100 // 100MiB
       })
 
       this.stdin.forEach(line => proc.stdin.write(`${line}\n`))
       proc.stdin.end()
       
-      let stdout: string[] = []
-      proc.stdout.on("data", (chunk) => {
-        chunk.split(/[\r\n]+/).forEach(line => stdout.push(line))
+      let bufout: Buffer = Buffer.from("")
+      proc.stdout.on("data", (buf) => {
+        bufout = Buffer.concat([bufout, buf])
       })
 
-      let stderr: string[] = []
-      proc.stderr.on("data", (chunk) => {
-        chunk.split(/[\r\n]+/).forEach(line => stderr.push(line))
+      let buferr: Buffer = Buffer.from("")
+      proc.stderr.on("data", (buf) => {
+        buferr = Buffer.concat([buferr, buf])
       })
 
       proc.on("close", exitcode => {
+        let stdout = bufout.toString('utf8') === ""
+          ? []
+          : bufout.toString('utf8').split(/[\r\n]+/)
+
+        let stderr = buferr.toString('utf8') === ""
+          ? []
+          : buferr.toString('utf8').split(/[\r\n]+/)
+
         this.result = { stdout, stderr, exitcode }
         resolve(this.result)
+      })
+
+      proc.on("error", err => {
+        reject(err)
       })
     })
   }
@@ -62,5 +74,4 @@ export class Cmd {
       return result
     })
   }
-
 }

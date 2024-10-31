@@ -9,7 +9,6 @@ export const HelloPeprAlias = new Capability({
 });
 
 const { When } = HelloPeprAlias;
-let alias = "";
 
 When(a.ConfigMap)
   .IsCreated()

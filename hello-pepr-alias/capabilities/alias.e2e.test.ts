@@ -7,7 +7,6 @@ import { clean } from "helpers/src/cluster";
 import { K8s, kind } from "pepr";
 
 const trc = new TestRunCfg(__filename);
-const SECONDS = 1000;
 
 describe("alias.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2));

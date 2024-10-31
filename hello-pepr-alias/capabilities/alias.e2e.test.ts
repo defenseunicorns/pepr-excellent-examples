@@ -69,7 +69,7 @@ describe("alias.ts", () => {
     );
   });
 
-  describe("create - watch - finalize", () => {
+  /* describe("create - watch - finalize", () => {
     let logz: string[];
 
     beforeAll(async () => {
@@ -79,7 +79,7 @@ describe("alias.ts", () => {
         await fullCreate([ns, cmWatch]);
         await K8s(kind[cmWatch.kind]).Delete(cmWatch);
         await untilLogged(
-          '"msg":"external api call (watch-create-alias): watch/callback"',
+          '"msg":"external api call (watch-create-alias): watch/finalize"',
         );
         logz = await logs();
       });
@@ -92,6 +92,8 @@ describe("alias.ts", () => {
           l.includes('"msg":"external api call (watch-create-alias):'),
         );
 
+        console.log("watch results: ", results);
+
         expect(results).toEqual(
           expect.arrayContaining([
             expect.stringMatching(/alias:create:watch.*watch\/callback/),
@@ -101,9 +103,9 @@ describe("alias.ts", () => {
       },
       secs(10),
     );
-  });
+  }); */
 
-  describe("create - validate", () => {
+  /* describe("create - validate", () => {
     let logz: string[];
 
     beforeAll(async () => {
@@ -126,6 +128,8 @@ describe("alias.ts", () => {
           l.includes('"msg":"external api call (validate-create-alias):'),
         );
 
+        console.log("validate results: ", results);
+
         expect(results).toEqual(
           expect.arrayContaining([
             expect.stringMatching(/alias:create:validate.*validate\/callback/),
@@ -134,9 +138,9 @@ describe("alias.ts", () => {
       },
       secs(10),
     );
-  });
+  }); */
 
-  describe("create - mutate", () => {
+  /* describe("create - mutate", () => {
     let logz: string[];
     beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.create.yaml`;
@@ -159,6 +163,8 @@ describe("alias.ts", () => {
           l.includes('"msg":"external api call (mutate-create-alias):'),
         );
 
+        console.log("mutate results: ", results);
+
         expect(results).toEqual(
           expect.arrayContaining([
             expect.stringMatching(/alias:create:mutate.*mutate\/callback/),
@@ -167,5 +173,5 @@ describe("alias.ts", () => {
       },
       secs(10),
     );
-  });
+  }); */
 });

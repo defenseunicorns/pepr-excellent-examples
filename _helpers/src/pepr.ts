@@ -7,7 +7,7 @@ import { gone } from './resource'
 import { cwd } from 'node:process';
 import { readFile } from 'node:fs/promises';
 
-export function sift(stdout) {
+export function sift(stdout: string[]) {
   const withoutKnownBad = stdout
     .filter(log => !log.includes('] DeprecationWarning: '))
     .filter(log => !log.includes('--trace-deprecation'))
@@ -45,7 +45,7 @@ export function sift(stdout) {
   }
 }
 
-export async function logs() {
+export async function logs(): Promise<string[]> {
   const podsAdmission = await new Cmd({
     cmd: `kubectl get pods -A -l 'pepr.dev/controller=admission' --no-headers --output=name`
   }).run()

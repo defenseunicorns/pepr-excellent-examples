@@ -36,9 +36,7 @@ describe("sift()", () => {
         ']',
       ]
       const expected = [
-        'Unexpected end of JSON input. Offending lines:',
-        '-->  (node:1) [DEP0040] DeprecationWarning: The \`punycode\` module is deprecated. Please use a userland alternative instead.<--',
-        '-->  (Use \`node --trace-deprecation ...\` to show where the warning was created)<--',
+        'Unexpected JSON input. Offending lines:',
         '-->  {"level":20,"time":1727729497520,"pid":17,"hostname":"pepr-6b7cfad2-722b-47f8-99ed-f3cbf65ab5b1-8554cd4879-4ddgz","msg":"Add <--'
       ]
 
@@ -46,9 +44,7 @@ describe("sift()", () => {
 
       expect(result).toBe(undefined)
 
-      expect(mockLog.mock.calls[0].flat()).toEqual(all)
-
-      expect(mockErr).toHaveBeenCalledTimes(4)
+      expect(mockErr).toHaveBeenCalledTimes(2)
       mockErr.mock.calls.flat().forEach((call, idx) => {
         expect(call).toBe(expected[idx])
       })

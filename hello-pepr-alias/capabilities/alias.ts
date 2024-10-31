@@ -1,4 +1,4 @@
-import { Capability, Log, a } from "pepr";
+import { Capability, a } from "pepr";
 
 export const HelloPeprAlias = new Capability({
   name: "hello-pepr-alias",

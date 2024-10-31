@@ -48,7 +48,7 @@ describe("alias.ts", () => {
       },
       secs(10),
     );
-    
+
     it(
       "uses provided alias with reconcile",
       async () => {
@@ -84,7 +84,7 @@ describe("alias.ts", () => {
           ]),
         );
       },
-      secs(90),
+      secs(10),
     );
 
     it(

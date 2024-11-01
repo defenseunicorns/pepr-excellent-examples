@@ -29,6 +29,15 @@ describe("alias.ts", () => {
         await untilLogged(
           '"msg":"external api call (reconcile-create-alias): reconcile/finalize"',
         );
+        await untilLogged(
+          '"msg":"external api call (watch-create-alias): watch/finalize"',
+        );
+        await untilLogged(
+          '"msg":"external api call (validate-create-alias): validate/callback"',
+        );
+        await untilLogged(
+          '"msg":"external api call (mutate-create-alias): mutate/callback"',
+        );
         logz = await logs();
       });
     }, mins(2));

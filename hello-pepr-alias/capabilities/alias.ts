@@ -32,7 +32,7 @@ When(a.ConfigMap)
   .IsCreated()
   .InNamespace("hello-pepr-alias-create")
   .WithName("cm-reconcile-create")
-  .Reconcile(function reconcileCreate(cm, _, logger) {
+  .Reconcile(function reconcileCreate(cm, phase, logger) {
     logger.info(
       cm,
       "external api call (reconcile-create-no-alias): reconcile/callback",

@@ -37,7 +37,19 @@ program
   .command("env")
   .description("dump env")
   .action(async () => {
-    console.log(process.env);
+    
+    function sanitizeEnv(env) {
+      const sensitiveKeys = ["API_KEY", "KEY", "PRIVATE", "PASSWORD", "SECRET", "TOKEN"];
+      const sanitizedEnv = { ...env };
+      for (const key in sanitizedEnv) {
+        if (sensitiveKeys.some(sensitiveKey => key.includes(sensitiveKey))) {
+          sanitizedEnv[key] = "**[REDACTED]**"
+        }
+      }
+      return sanitizedEnv;
+    }
+
+    console.log(sanitizeEnv(process.env));
   });
 
 program

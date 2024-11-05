@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "esModuleInterop": true,
+    "lib": ["ES2022", "DOM"],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "rootDir": ".",
+    "strict": true,
+    "target": "ES2022",
+    "useUnknownInCatchVariables": false
+  },
+  "include": [
+    "hello-pepr/**/*.ts",
+    "hello-pepr-*/**/*.ts",
+    "_helpers/**/*.ts",
+    "_helpers/**/*.mts",
+    "_helpers/**/*.test.ts",
+    "pepr-cli/**/*.ts",
+    "pepr-operator/**/*.ts",
+    "test-specific-version/**/*.ts",
+    "dash-policyreport/**/*.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

@@ -2,6 +2,7 @@
   "name": "pepr-excellent-examples",
   "license": "Apache-2.0",
   "scripts": {
+    "prepare": "if [ \"$NODE_ENV\" != 'production' ]; then husky; fi",
     "test:e2e": "npm run --workspaces test:e2e"
   },
   "workspaces": [
@@ -36,5 +37,8 @@
     "hello-pepr-watch",
     "pepr-operator",
     "test-specific-version"
-  ]
+  ],
+  "devDependencies": {
+    "husky": "^9.1.6"
+  }
 }

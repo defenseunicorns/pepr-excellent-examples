@@ -38,7 +38,7 @@ program
   .description("dump env")
   .action(async () => {
     
-    function sanitizeEnv(env) {
+    function sanitizeEnv(env: NodeJS.ProcessEnv) {
       const sensitiveKeys = ["API_KEY", "KEY", "PRIVATE", "PASSWORD", "SECRET", "TOKEN"];
       const sanitizedEnv = { ...env };
       for (const key in sanitizedEnv) {

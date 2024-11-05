@@ -11,7 +11,7 @@ const apply = async res => {
   return await fullCreate(res, kind);
 };
 
-new TestRunCfg(__filename);
+const trc = new TestRunCfg(__filename);
 
 describe("namespace.ts", () => {
   beforeAll(async () => await moduleUp(), mins(2));

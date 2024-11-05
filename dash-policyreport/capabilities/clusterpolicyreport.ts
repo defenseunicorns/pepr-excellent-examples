@@ -80,12 +80,12 @@ const asExemptedResource = async (request) => {
 
     // locate / create result element
     const results = cpr.results.filter(r => r.policy === exm)
-    let result = results.length > 0
+    const result = results.length > 0
       ? { ...results[0] }
       : { policy: exm, resources: [] }
 
     // locate / create resource element
-    let found = result.resources.filter(r => (
+    const found = result.resources.filter(r => (
       r.kind === kind &&
       r.namespace === nspc &&
       r.name === name

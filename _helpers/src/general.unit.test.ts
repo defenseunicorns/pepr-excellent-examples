@@ -33,7 +33,7 @@ const { live } = jest.mocked(resource)
 
 describe("untilTrue()", () => {
   it("resolves when given predicate returns true", async () => {
-    let predicate = () => new Promise<boolean>(resolve => {
+    const predicate = () => new Promise<boolean>(resolve => {
       setTimeout(() => resolve(true), 250)
     })
     await untilTrue(predicate)
@@ -120,7 +120,7 @@ describe("halfCreate()", () => {
     const applied = await halfCreate(resources)
 
     expect(applied.length).toBe(resources.length)
-    for (let r of resources) {
+    for (const r of resources) {
       expect(K8s).toHaveBeenCalledWith(kind[r.kind])
       expect(Apply).toHaveBeenCalledWith(r)
       expect(applied).toContainEqual({...r, applied: true})
@@ -147,7 +147,7 @@ describe("fullCreate()", () => {
     const applied = await fullCreate(resources)
 
     expect(applied.length).toBe(resources.length)
-    for (let r of resources) {
+    for (const r of resources) {
       expect(K8s).toHaveBeenCalledWith(kind[r.kind])
       expect(Apply).toHaveBeenCalledWith(r)
       expect(applied).toContainEqual({...r, applied: true})

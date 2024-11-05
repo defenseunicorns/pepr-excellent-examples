@@ -50,11 +50,11 @@ export class Cmd {
       })
 
       proc.on("close", exitcode => {
-        let stdout = bufout.toString('utf8') === ""
+        const stdout = bufout.toString('utf8') === ""
           ? []
           : bufout.toString('utf8').split(/[\r\n]+/)
 
-        let stderr = buferr.toString('utf8') === ""
+        const stderr = buferr.toString('utf8') === ""
           ? []
           : buferr.toString('utf8').split(/[\r\n]+/)
 

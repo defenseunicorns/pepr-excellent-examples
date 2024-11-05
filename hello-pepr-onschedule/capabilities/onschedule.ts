@@ -36,7 +36,7 @@ OnSchedule({
   }
 });
 
-let want = new Date(Date.now())
+const want = new Date(Date.now())
 
 OnSchedule({
   name: "once-delayed",

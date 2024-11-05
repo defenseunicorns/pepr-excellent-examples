@@ -213,7 +213,7 @@ async function testE2e(passthru) {
   */
   if (process.env.INIT_CWD === process.env.PWD) {
     // run tests that create & destroy their own clusters
-    let result = spawnSync(
+    const result = spawnSync(
       "jest", [
         "--passWithNoTests",
         "--testPathPattern", "src/cluster\.e2e\.test\.ts",
@@ -231,7 +231,7 @@ async function testE2e(passthru) {
       const kubeConfig = await up(cluster)
   
       // run tests that require a pre-existing cluster (and/or don't care)
-      let result = spawnSync(
+      const result = spawnSync(
         "jest", [
           "--passWithNoTests",
           "--testPathIgnorePatterns", "src/cluster\.e2e\.test\.ts",

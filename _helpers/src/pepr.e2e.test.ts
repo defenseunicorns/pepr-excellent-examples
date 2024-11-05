@@ -19,26 +19,26 @@ import { peprVersion, moduleUp, moduleDown, getPeprAlias } from './pepr';
 const trc = new TestRunCfg(__filename)
 
 describe("module lifecycle", () => {
-  let wipeMod = async (mod) => {
+  const wipeMod = async (mod) => {
     await rm(mod, { recursive: true, force: true })
   }
   
-  let readPkg = async (mod) => {
+  const readPkg = async (mod) => {
     const pkg = `${mod}/package.json`
     return JSON.parse( (await readFile(pkg)).toString() )
   }
   
-  let writePkg = async (mod, cfg) => {
+  const writePkg = async (mod, cfg) => {
     const pkg = `${mod}/package.json`
     await writeFile(pkg, JSON.stringify(cfg, null, 2))
   }
   
-  let makeMod = async (mod, ver, verbose = false) => {
+  const makeMod = async (mod, ver, verbose = false) => {
     const env = { TEST_MODE: true, TS_NODE_PROJECT: `${mod}/tsconfig.json` }
   
-    let cmd = `npx --yes ${getPeprAlias()} init --skip-post-init`
+    const cmd = `npx --yes ${getPeprAlias()} init --skip-post-init`
     console.time(cmd)
-    let init = await new Cmd({env, cmd}).run()
+    const init = await new Cmd({env, cmd}).run()
     if (verbose) { console.log(init) }
   
     const cfg = await readPkg(mod)
@@ -48,18 +48,18 @@ describe("module lifecycle", () => {
     console.timeEnd(cmd)
   }
   
-  let npmInst = async (mod, verbose = false) => {
+  const npmInst = async (mod, verbose = false) => {
     const cmd = 'npm install'
     console.time(cmd)
     const original = cwd()
     chdir(mod)
-    let install = await new Cmd({cmd}).run()
+    const install = await new Cmd({cmd}).run()
     if (verbose) { console.log(install) }
     chdir(original)
     console.timeEnd(cmd)
   }
   
-  let module = `${trc.root()}/pepr-test-module`
+  const module = `${trc.root()}/pepr-test-module`
   let version: string
   
   beforeAll(async () => {
@@ -73,7 +73,7 @@ describe("module lifecycle", () => {
 
   describe("moduleUp()", () => {
     it("builds, deploys, and waits for local Pepr Module to come up", async () => {
-      let timeEnd = jest.spyOn(console, "timeEnd")
+      const timeEnd = jest.spyOn(console, "timeEnd")
 
       const original = cwd()
       chdir(module)
@@ -96,7 +96,7 @@ describe("module lifecycle", () => {
     }, mins(5))
 
     it("removes the \"pepr-system\" namespace", async () => {
-      let name = "pepr-system"
+      const name = "pepr-system"
 
       expect(
         await gone(kind.Namespace, { metadata: { name }})
@@ -104,7 +104,7 @@ describe("module lifecycle", () => {
     }, secs(10))
 
     it("removes the \"peprstores.pepr.dev\" custom resource definition", async () => {
-      let name = "peprstores.pepr.dev"
+      const name = "peprstores.pepr.dev"
 
       expect(
         await gone(kind.CustomResourceDefinition, { metadata: { name }})
@@ -112,8 +112,8 @@ describe("module lifecycle", () => {
     }, secs(10))
 
     it("removes the \"pepr-${module-uuid}\" cluster role binding", async () => {
-      let cfg = await readPkg(module)
-      let name = `pepr-${cfg.pepr.uuid}`
+      const cfg = await readPkg(module)
+      const name = `pepr-${cfg.pepr.uuid}`
 
       expect(
         await gone(kind.ClusterRoleBinding, { metadata: { name }})
@@ -121,8 +121,8 @@ describe("module lifecycle", () => {
     }, secs(10))
 
     it("removes the \"pepr-${module-uuid}\" cluster role", async () => {
-      let cfg = await readPkg(module)
-      let name = `pepr-${cfg.pepr.uuid}`
+      const cfg = await readPkg(module)
+      const name = `pepr-${cfg.pepr.uuid}`
 
       expect(
         await gone(kind.ClusterRole, { metadata: { name }})

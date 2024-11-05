@@ -17,10 +17,10 @@ export function splitRange(verSpec) {
 }
 
 export async function differ(path) {
-  let deps = await reader(path);
+  const deps = await reader(path);
 
   const update = (name, mine, theirs) => ({ name, from: mine, to: theirs })
-  let result = { ...deps, updates: [] };
+  const result = { ...deps, updates: [] };
 
   let pinned = []
   let renews = []

@@ -39,7 +39,7 @@ describe("reader()", () => {
   it("rejects when not given an absolute path", async () => {
     isAbsolute.mockImplementation(() => false)
 
-    let result = sut.reader('what/ever')
+    const result = sut.reader('what/ever')
 
     await expect(result).rejects.toMatch(/Arg error: 'path' must be absolute/)
   })
@@ -48,7 +48,7 @@ describe("reader()", () => {
     isAbsolute.mockImplementation(() => true)
     access.mockImplementation(() => Promise.reject())
 
-    let result = sut.reader('/what/ever')
+    const result = sut.reader('/what/ever')
 
     await expect(result).rejects.toMatch(/Arg error: 'path' must exist/)
   })
@@ -69,7 +69,7 @@ describe("reader()", () => {
       .mockImplementationOnce(resolved(theirPkg))
       .mockImplementationOnce(resolved(myPkg))
 
-    let result = await sut.reader(them)
+    const result = await sut.reader(them)
 
     expect(result).toEqual({
       me: { path: me, content: myPkg },

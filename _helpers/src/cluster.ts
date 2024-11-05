@@ -41,14 +41,14 @@ export async function down(name: string = 'pexex-helpers-cluster'): Promise<void
 export async function clean(trc: TestRunCfg): Promise<void> {
   const originalEnv = { ...process.env }
 
-  let msg = "clean test-owned resources"
+  const msg = "clean test-owned resources"
   console.time(msg)
   try {
     // config KFC to use test-specific kube config
     process.env.KUBECONFIG = trc.kubeConfig
 
     // K8s-native kinds
-    let kinds = Object.keys(kind)
+    const kinds = Object.keys(kind)
       .filter(k => k !== "GenericKind")
       .map(k => kind[k])
 
@@ -101,7 +101,7 @@ export async function clean(trc: TestRunCfg): Promise<void> {
 
     // delete test-labelled resources (in parallel)
     tbds.forEach(([k, o]) => K8s(k).Delete(o))
-    let terminating = tbds.map(tbd => untilTrue(() => gone(...tbd)))
+    const terminating = tbds.map(tbd => untilTrue(() => gone(...tbd)))
     await Promise.all(terminating)
 
   } finally {

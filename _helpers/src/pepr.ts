@@ -65,7 +65,7 @@ export async function logs(): Promise<string[]> {
   return sift(logs)
 }
 
-export async function untilLogged(needle: String | Function, count = 1) {
+export async function untilLogged(needle: string | Function, count = 1) {
   while (true) {
     const logz = await logs()
 
@@ -109,7 +109,7 @@ export async function moduleBuild({ version = "", verbose = false, rbacMode = "a
   // pepr cmds use default tsconfig.json (NOT the cli's tsconfig.json)
   const pepr = { TS_NODE_PROJECT: "" }
 
-  let cmd = `npx --yes ${getPeprAlias()} build --rbac-mode=${rbacMode}`
+  const cmd = `npx --yes ${getPeprAlias()} build --rbac-mode=${rbacMode}`
   console.time(cmd)
   const build = await new Cmd({ env: pepr, cmd }).run()
   if (verbose) { console.log(build) }

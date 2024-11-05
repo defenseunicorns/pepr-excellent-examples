@@ -47,7 +47,7 @@ describe("differ()", () => {
       theirs,
     }))
 
-    let result = await sut.differ('/out/there')
+    const result = await sut.differ('/out/there')
 
     expect(result.updates).toEqual([])
   })
@@ -70,7 +70,7 @@ describe("differ()", () => {
       theirs,
     }))
 
-    let result = await sut.differ('/out/there')
+    const result = await sut.differ('/out/there')
 
     expect(result.updates).toEqual([
       { name: 'lscript', from: '1.0.0', to: '1.0.1' },
@@ -94,7 +94,7 @@ describe("differ()", () => {
       }
     })))
 
-    let result = await sut.differ('/out/there')
+    const result = await sut.differ('/out/there')
 
     expect(result.updates).toEqual([
       { name: '@just/doit', from: '1.2.2', to: '1.2.3' }
@@ -117,7 +117,7 @@ describe("differ()", () => {
       theirs,
     }))
 
-    let result = await sut.differ('/out/there')
+    const result = await sut.differ('/out/there')
 
     expect(result.updates).toEqual([
       { name: '@just/dothis', from: '~1.2.2', to: '^1.2.3' },
@@ -157,7 +157,7 @@ describe("differ()", () => {
       }
     })))
 
-    let result = await sut.differ('/out/there')
+    const result = await sut.differ('/out/there')
 
     expect(result.updates).toEqual([
       { name: '@just/dothis', from: '^1.2.3', to: '^1.2.4' },
@@ -184,7 +184,7 @@ describe("differ()", () => {
         },
       })))
 
-      let result = await sut.differ('/out/there')
+      const result = await sut.differ('/out/there')
 
       expect(result.updates).toHaveLength(1)
       expect(result.updates).toEqual([

@@ -61,8 +61,8 @@ export async function halfCreate(resources, kinds = kind) {
 export async function fullCreate(resources, kinds = kind) {
   resources = [ resources ].flat()
 
-  let applied = []
-  for(let r of resources) {
+  const applied = []
+  for(const r of resources) {
     const kynd = kinds[r.kind]
     const appl = await K8s(kynd).Apply(r)
     await untilTrue(() => live(kynd, appl))
@@ -73,10 +73,10 @@ export async function fullCreate(resources, kinds = kind) {
 }
 
 export function nearestAncestor(filename: string, fromPath: string): string {
-  let parts = fromPath.split(path.sep)
-  let starp = Array.from(parts).reverse()
+  const parts = fromPath.split(path.sep)
+  const starp = Array.from(parts).reverse()
 
-  let searchPaths = []
+  const searchPaths = []
   parts.forEach((_, idx) => searchPaths.push(
     starp.slice(idx, parts.length).reverse().join(path.sep)
   ))

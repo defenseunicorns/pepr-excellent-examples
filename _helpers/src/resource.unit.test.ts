@@ -22,7 +22,7 @@ describe("live()", () => {
     ))
     const kobject = { metadata: { name: "test-name" } }
 
-    let result = await live(kind.GenericKind, kobject)
+    const result = await live(kind.GenericKind, kobject)
 
     expect(result).toBe(true)
     expect(InNamespace.mock.calls[0][0]).toBe("")
@@ -36,7 +36,7 @@ describe("live()", () => {
     ))
     const kobject = { metadata: { name: "test-name", namespace: "test-ns" } }
 
-    let result = await live(kind.GenericKind, kobject)
+    const result = await live(kind.GenericKind, kobject)
 
     expect(result).toBe(false)
     expect(InNamespace.mock.calls[0][0]).toBe(kobject.metadata.namespace)
@@ -52,7 +52,7 @@ describe("gone()", () => {
     ))
     const kobject = { metadata: { name: "test-name" } }
 
-    let result = await gone(kind.GenericKind, kobject)
+    const result = await gone(kind.GenericKind, kobject)
 
     expect(result).toBe(false)
     expect(InNamespace.mock.calls[0][0]).toBe("")
@@ -66,7 +66,7 @@ describe("gone()", () => {
     ))
     const kobject = { metadata: { name: "test-name", namespace: "test-ns" } }
 
-    let result = await gone(kind.GenericKind, kobject)
+    const result = await gone(kind.GenericKind, kobject)
 
     expect(result).toBe(true)
     expect(InNamespace.mock.calls[0][0]).toBe(kobject.metadata.namespace)

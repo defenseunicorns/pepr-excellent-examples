@@ -32,11 +32,11 @@ program.name('cli')
     }
   })
 
-const env = program.command('env')
+program.command('env')
   .description('dump env')
   .action(async () => { console.log(process.env) })
 
-const deps = program.command('deps')
+program.command('deps')
   .description('sync module devDependencies with external package.json')
   .argument('<path>', 'path to package.json to sync deps against')
   .addOption(
@@ -49,7 +49,7 @@ const deps = program.command('deps')
       console.log(updates)
   })
 
-const test = program.command('test')
+program.command('test')
   .description('run tests')
   .addOption(
     new Option('-s, --suite <suite>', 'suite type')
@@ -102,7 +102,7 @@ const test = program.command('test')
 
     printTestInfo() 
   })
-  .action(async ({suite, passthru, image}) => {
+  .action(async ({suite, passthru}) => {
     try{
       passthru = passthru || []
       switch (suite) {
@@ -119,14 +119,14 @@ const test = program.command('test')
 const dpr = program.command('dpr')
   .description('utilities for dash-policyreport module')
 
-const gen = dpr.command('gen')
+dpr.command('gen')
   .description('generate policyReport types from github crds')
   .action(async () => {
     await generateTypes()
   })
 
 await program.parseAsync(process.argv);
-const opts = program.opts();
+program.opts();
 
 function printTestInfo() {
     if (process.env.PEPR_PACKAGE) {
@@ -173,8 +173,8 @@ function validateCustomPackage(parentDir: string) {
     mkdirSync(`${parentDir}/custom-package`, { recursive: true });
     execSync(`tar -xzf ${process.env.PEPR_PACKAGE} -C custom-package`, { cwd: parentDir }).toString();
     const npmInfo = execSync(`npm view --json custom-package/package/`, { cwd: parentDir }).toString();
-    assert(npmInfo.includes('\"name\": \"pepr\"'));
-    assert(npmInfo.includes('\"pepr\": \"dist/cli.js\"'));
+    assert(npmInfo.includes('"name": "pepr"'));
+    assert(npmInfo.includes('"pepr": "dist/cli.js"'));
   }
   catch (error) {
     throw new Error(`Custom-Package (${process.env.PEPR_PACKAGE}) does not appear to be a pepr package, exiting.`);
@@ -189,7 +189,7 @@ function testUnit(passthru) {
     // eslint-disable-next-line no-useless-escape
     "jest", [
       "--passWithNoTests",
-      "--testPathPattern", ".*\.unit\.test\.ts",
+      "--testPathPattern", ".*.unit.test.ts",
       "--verbose",
       ...passthru
     ],
@@ -216,7 +216,7 @@ async function testE2e(passthru) {
     const result = spawnSync(
       "jest", [
         "--passWithNoTests",
-        "--testPathPattern", "src/cluster\.e2e\.test\.ts",
+        "--testPathPattern", "src/cluster.e2e.test.ts",
         "--detectOpenHandles",
         "--verbose",
         ...passthru
@@ -234,8 +234,8 @@ async function testE2e(passthru) {
       const result = spawnSync(
         "jest", [
           "--passWithNoTests",
-          "--testPathIgnorePatterns", "src/cluster\.e2e\.test\.ts",
-          "--testPathPattern", ".*\.e2e\.test\.ts",
+          "--testPathIgnorePatterns", "src/cluster.e2e.test.ts",
+          "--testPathPattern", ".*.e2e.test.ts",
           "--detectOpenHandles",
           "--verbose",
           ...passthru
@@ -297,7 +297,7 @@ async function generateTypes() {
     await writeFile(localYaml, content)
   
     // generate CRD types from manifest
-    const genTypes = await new Cmd({ cmd: `npm run kfc -- crd ${remoteYaml} ${typesDir}` }).run()
+    await new Cmd({ cmd: `npm run kfc -- crd ${remoteYaml} ${typesDir}` }).run()
   }
 
   // ignore eslint 'no explicit any' checks on gen'd CRDs
@@ -305,7 +305,7 @@ async function generateTypes() {
   for (const t of types ) {
     const typePath = resolve(typesDir, t)
     const content = [
-      `/* eslint-disable @typescript-eslint/no-explicit-any */`,,
+      `/* eslint-disable @typescript-eslint/no-explicit-any */`,
       ( await readFile( typePath ) ).toString()
     ].join("\n")
     await writeFile(typePath, content)

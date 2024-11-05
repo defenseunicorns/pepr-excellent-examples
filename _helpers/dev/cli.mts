@@ -232,10 +232,10 @@ function testUnit(passthru) {
 async function testE2e(passthru) {
   // k3d has a 32-char cluster name length limit
   const limit = 32;
-  const template = "pexex-*-e2e";
+  const template = "pexex-GenericClusterName-e2e";
   let unique = basename(process.env.PWD).substring(0, limit - (template.length - 1));
   unique = unique.replace("_", "-");
-  const cluster = template.replace("*", unique);
+  const cluster = template.replace("GenericClusterName", unique);
 
   /*
     Because the _helpers suite contains tests that create & destroy clusters (as

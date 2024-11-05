@@ -12,15 +12,15 @@ const { When } = HelloPeprConfig;
 When(a.Namespace)
   .IsCreated()
   .Mutate(async function mutateAll(request) {
-    request.SetAnnotation("pepr", "was here")
+    request.SetAnnotation("pepr", "was here");
   });
 
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
   .WithName("noop")
-  .Mutate(async function mutateEnv(request) {
-    Log.info({ITS: process.env.ITS}, "env")
+  .Mutate(async function mutateEnv() {
+    Log.info({ ITS: process.env.ITS }, "env");
   });
 
 When(a.ConfigMap)
@@ -28,6 +28,6 @@ When(a.ConfigMap)
   .InNamespace(name)
   .WithName("noop")
   .Validate(async function validateNoop(request) {
-    Log.info({}, "noop")
-    return request.Approve()
+    Log.info({}, "noop");
+    return request.Approve();
   });

@@ -6,9 +6,7 @@ import {
   expect,
   jest,
 } from "@jest/globals";
-import { kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { fullCreate } from "helpers/src/general";
 import { mins } from "helpers/src/time";
 import { moduleUp, moduleDown } from "helpers/src/pepr";
 import fs from "fs/promises";
@@ -17,11 +15,7 @@ import path from "path";
 import yaml from "js-yaml";
 import { execSync } from "child_process";
 
-const apply = async res => {
-  return await fullCreate(res, kind);
-};
-
-const trc = new TestRunCfg(__filename);
+new TestRunCfg(__filename);
 
 jest.setTimeout(120000);
 
@@ -44,21 +38,48 @@ describe("rbac generation with rbacMode=admin", () => {
 
   afterEach(async () => await moduleDown(), mins(2));
 
-    it("should create the yaml files with admin rbacMode and no custom rules", async () => {
-      await usePackageJson("default");
-      execSync(`npx pepr build`);
+  it("should create the yaml files with admin rbacMode and no custom rules", async () => {
+    await usePackageJson("default");
+    execSync(`npx pepr build`);
 
-      const valuesPath = path.resolve(
-        __dirname,
-        "../dist/e43ef33d-2b25-4148-9dca-6ebe588caace-chart/values.yaml",
-      );
+    const valuesPath = path.resolve(
+      __dirname,
+      "../dist/e43ef33d-2b25-4148-9dca-6ebe588caace-chart/values.yaml",
+    );
 
-      const valuesContent = await fs.readFile(valuesPath, "utf8");
-      const valuesYaml = yaml.load(valuesContent) as {
-        rbac: typeof expectedRbac;
-      };
+    const valuesContent = await fs.readFile(valuesPath, "utf8");
+    const valuesYaml = yaml.load(valuesContent) as {
+      rbac: typeof expectedRbac;
+    };
 
-      const expectedRbac = [
+    const expectedRbac = [
+      {
+        apiGroups: ["*"],
+        resources: ["*"],
+        verbs: ["create", "delete", "get", "list", "patch", "update", "watch"],
+      },
+    ];
+
+    expect(valuesYaml.rbac).toEqual(expectedRbac);
+
+    const staticYamlPath = path.resolve(
+      __dirname,
+      "../dist/pepr-module-e43ef33d-2b25-4148-9dca-6ebe588caace.yaml",
+    );
+
+    const staticYamlContent = await fs.readFile(staticYamlPath, "utf8");
+    const staticYamlDocs = yaml.loadAll(staticYamlContent) as Record<
+      string,
+      unknown
+    >[];
+
+    const expectedClusterRole = {
+      apiVersion: "rbac.authorization.k8s.io/v1",
+      kind: "ClusterRole",
+      metadata: {
+        name: "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
+      },
+      rules: [
         {
           apiGroups: ["*"],
           resources: ["*"],
@@ -72,130 +93,89 @@ describe("rbac generation with rbacMode=admin", () => {
             "watch",
           ],
         },
-      ];
+      ],
+    };
 
-      expect(valuesYaml.rbac).toEqual(expectedRbac);
+    const actualClusterRole = staticYamlDocs.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (doc: Record<string, any>) =>
+        doc.kind === "ClusterRole" &&
+        doc.metadata?.name === "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
+    );
 
-      const staticYamlPath = path.resolve(
-        __dirname,
-        "../dist/pepr-module-e43ef33d-2b25-4148-9dca-6ebe588caace.yaml",
-      );
-
-      const staticYamlContent = await fs.readFile(staticYamlPath, "utf8");
-      const staticYamlDocs = yaml.loadAll(staticYamlContent) as Record<
-        string,
-        any
-      >[];
-
-      const expectedClusterRole = {
-        apiVersion: "rbac.authorization.k8s.io/v1",
-        kind: "ClusterRole",
-        metadata: {
-          name: "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
-        },
-        rules: [
-          {
-            apiGroups: ["*"],
-            resources: ["*"],
-            verbs: [
-              "create",
-              "delete",
-              "get",
-              "list",
-              "patch",
-              "update",
-              "watch",
-            ],
-          },
-        ],
-      };
-
-      const actualClusterRole = staticYamlDocs.find(
-        (doc: Record<string, any>) =>
-          doc.kind === "ClusterRole" &&
-          doc.metadata?.name === "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
-      );
-
-      // Check if the static yaml file matches the expected RBAC structure
-      expect(actualClusterRole).toEqual(expectedClusterRole);
-    });
-
-    it("should create the yaml files with admin rbacMode and custom rules", async () => {
-      await usePackageJson("custom");
-      execSync(`npx pepr build`);
-
-      const valuesPath = path.resolve(
-        __dirname,
-        "../dist/e43ef33d-2b25-4148-9dca-6ebe588caace-chart/values.yaml",
-      );
-
-      const valuesContent = await fs.readFile(valuesPath, "utf8");
-      const valuesYaml = yaml.load(valuesContent) as {
-        rbac: typeof expectedRbac;
-      };
-
-      const expectedRbac = [
-        {
-          apiGroups: ["*"],
-          resources: ["*"],
-          verbs: [
-            "create",
-            "delete",
-            "get",
-            "list",
-            "patch",
-            "update",
-            "watch",
-          ],
-        },
-      ];
-
-      expect(valuesYaml.rbac).toEqual(expectedRbac);
-
-      const staticYamlPath = path.resolve(
-        __dirname,
-        "../dist/pepr-module-e43ef33d-2b25-4148-9dca-6ebe588caace.yaml",
-      );
-
-      const staticYamlContent = await fs.readFile(staticYamlPath, "utf8");
-      const staticYamlDocs = yaml.loadAll(staticYamlContent) as Record<
-        string,
-        any
-      >[];
-
-      const expectedClusterRole = {
-        apiVersion: "rbac.authorization.k8s.io/v1",
-        kind: "ClusterRole",
-        metadata: {
-          name: "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
-        },
-        rules: [
-          {
-            apiGroups: ["*"],
-            resources: ["*"],
-            verbs: [
-              "create",
-              "delete",
-              "get",
-              "list",
-              "patch",
-              "update",
-              "watch",
-            ],
-          },
-        ],
-      };
-
-      const actualClusterRole = staticYamlDocs.find(
-        (doc: Record<string, any>) =>
-          doc.kind === "ClusterRole" &&
-          doc.metadata?.name === "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
-      );
-
-      // Check if the static yaml file matches the expected RBAC structure
-      expect(actualClusterRole).toEqual(expectedClusterRole);
-    });
+    // Check if the static yaml file matches the expected RBAC structure
+    expect(actualClusterRole).toEqual(expectedClusterRole);
   });
+
+  it("should create the yaml files with admin rbacMode and custom rules", async () => {
+    await usePackageJson("custom");
+    execSync(`npx pepr build`);
+
+    const valuesPath = path.resolve(
+      __dirname,
+      "../dist/e43ef33d-2b25-4148-9dca-6ebe588caace-chart/values.yaml",
+    );
+
+    const valuesContent = await fs.readFile(valuesPath, "utf8");
+    const valuesYaml = yaml.load(valuesContent) as {
+      rbac: typeof expectedRbac;
+    };
+
+    const expectedRbac = [
+      {
+        apiGroups: ["*"],
+        resources: ["*"],
+        verbs: ["create", "delete", "get", "list", "patch", "update", "watch"],
+      },
+    ];
+
+    expect(valuesYaml.rbac).toEqual(expectedRbac);
+
+    const staticYamlPath = path.resolve(
+      __dirname,
+      "../dist/pepr-module-e43ef33d-2b25-4148-9dca-6ebe588caace.yaml",
+    );
+
+    const staticYamlContent = await fs.readFile(staticYamlPath, "utf8");
+    const staticYamlDocs = yaml.loadAll(staticYamlContent) as Record<
+      string,
+      unknown
+    >[];
+
+    const expectedClusterRole = {
+      apiVersion: "rbac.authorization.k8s.io/v1",
+      kind: "ClusterRole",
+      metadata: {
+        name: "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
+      },
+      rules: [
+        {
+          apiGroups: ["*"],
+          resources: ["*"],
+          verbs: [
+            "create",
+            "delete",
+            "get",
+            "list",
+            "patch",
+            "update",
+            "watch",
+          ],
+        },
+      ],
+    };
+
+    const actualClusterRole = staticYamlDocs.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (doc: Record<string, any>) =>
+        doc.kind === "ClusterRole" &&
+        doc.metadata?.name === "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
+    );
+
+    // Check if the static yaml file matches the expected RBAC structure
+    expect(actualClusterRole).toEqual(expectedClusterRole);
+  });
+});
 
 describe("rbac generation with rbacMode=scoped", () => {
   const version = "";
@@ -209,21 +189,63 @@ describe("rbac generation with rbacMode=scoped", () => {
 
   afterEach(async () => await moduleDown(), mins(2));
 
-    it("should create the yaml files with scoped rbacMode and no custom rules", async () => {
-      await usePackageJson("default");
-      execSync(`npx pepr build --rbac-mode=scoped`);
+  it("should create the yaml files with scoped rbacMode and no custom rules", async () => {
+    await usePackageJson("default");
+    execSync(`npx pepr build --rbac-mode=scoped`);
 
-      const valuesPath = path.resolve(
-        __dirname,
-        "../dist/e43ef33d-2b25-4148-9dca-6ebe588caace-chart/values.yaml",
-      );
+    const valuesPath = path.resolve(
+      __dirname,
+      "../dist/e43ef33d-2b25-4148-9dca-6ebe588caace-chart/values.yaml",
+    );
 
-      const valuesContent = await fs.readFile(valuesPath, "utf8");
-      const valuesYaml = yaml.load(valuesContent) as {
-        rbac: typeof expectedRbac;
-      };
+    const valuesContent = await fs.readFile(valuesPath, "utf8");
+    const valuesYaml = yaml.load(valuesContent) as {
+      rbac: typeof expectedRbac;
+    };
 
-      const expectedRbac = [
+    const expectedRbac = [
+      {
+        apiGroups: ["pepr.dev"],
+        resources: ["peprstores"],
+        verbs: ["create", "get", "patch", "watch"],
+      },
+      {
+        apiGroups: ["apiextensions.k8s.io"],
+        resources: ["customresourcedefinitions"],
+        verbs: ["patch", "create"],
+      },
+      {
+        apiGroups: [""],
+        resources: ["namespaces"],
+        verbs: ["watch"],
+      },
+      {
+        apiGroups: [""],
+        resources: ["configmaps"],
+        verbs: ["watch"],
+      },
+    ];
+
+    expect(valuesYaml.rbac).toEqual(expectedRbac);
+
+    const staticYamlPath = path.resolve(
+      __dirname,
+      "../dist/pepr-module-e43ef33d-2b25-4148-9dca-6ebe588caace.yaml",
+    );
+
+    const staticYamlContent = await fs.readFile(staticYamlPath, "utf8");
+    const staticYamlDocs = yaml.loadAll(staticYamlContent) as Record<
+      string,
+      unknown
+    >[];
+
+    const expectedClusterRole = {
+      apiVersion: "rbac.authorization.k8s.io/v1",
+      kind: "ClusterRole",
+      metadata: {
+        name: "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
+      },
+      rules: [
         {
           apiGroups: ["pepr.dev"],
           resources: ["peprstores"],
@@ -244,76 +266,87 @@ describe("rbac generation with rbacMode=scoped", () => {
           resources: ["configmaps"],
           verbs: ["watch"],
         },
-      ];
+      ],
+    };
 
-      expect(valuesYaml.rbac).toEqual(expectedRbac);
+    const actualClusterRole = staticYamlDocs.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (doc: Record<string, any>) =>
+        doc.kind === "ClusterRole" &&
+        doc.metadata?.name === "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
+    );
 
-      const staticYamlPath = path.resolve(
-        __dirname,
-        "../dist/pepr-module-e43ef33d-2b25-4148-9dca-6ebe588caace.yaml",
-      );
+    // Check if the static yaml file matches the expected RBAC structure
+    expect(actualClusterRole).toEqual(expectedClusterRole);
+  });
 
-      const staticYamlContent = await fs.readFile(staticYamlPath, "utf8");
-      const staticYamlDocs = yaml.loadAll(staticYamlContent) as Record<
-        string,
-        any
-      >[];
+  it("should create the yaml files with scoped rbacMode and custom rules", async () => {
+    await usePackageJson("custom");
+    execSync(`npx pepr build --rbac-mode=scoped`);
 
-      const expectedClusterRole = {
-        apiVersion: "rbac.authorization.k8s.io/v1",
-        kind: "ClusterRole",
-        metadata: {
-          name: "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
-        },
-        rules: [
-          {
-            apiGroups: ["pepr.dev"],
-            resources: ["peprstores"],
-            verbs: ["create", "get", "patch", "watch"],
-          },
-          {
-            apiGroups: ["apiextensions.k8s.io"],
-            resources: ["customresourcedefinitions"],
-            verbs: ["patch", "create"],
-          },
-          {
-            apiGroups: [""],
-            resources: ["namespaces"],
-            verbs: ["watch"],
-          },
-          {
-            apiGroups: [""],
-            resources: ["configmaps"],
-            verbs: ["watch"],
-          },
-        ],
-      };
+    const valuesPath = path.resolve(
+      __dirname,
+      "../dist/e43ef33d-2b25-4148-9dca-6ebe588caace-chart/values.yaml",
+    );
 
-      const actualClusterRole = staticYamlDocs.find(
-        (doc: Record<string, any>) =>
-          doc.kind === "ClusterRole" &&
-          doc.metadata?.name === "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
-      );
+    const valuesContent = await fs.readFile(valuesPath, "utf8");
+    const valuesYaml = yaml.load(valuesContent) as {
+      rbac: typeof expectedRbac;
+    };
 
-      // Check if the static yaml file matches the expected RBAC structure
-      expect(actualClusterRole).toEqual(expectedClusterRole);
-    });
+    const expectedRbac = [
+      {
+        apiGroups: [""],
+        resources: ["pods"],
+        verbs: ["get", "list", "watch"],
+      },
+      {
+        apiGroups: ["apps"],
+        resources: ["deployments"],
+        verbs: ["create", "update", "patch"],
+      },
+      {
+        apiGroups: ["pepr.dev"],
+        resources: ["peprstores"],
+        verbs: ["create", "get", "patch", "watch"],
+      },
+      {
+        apiGroups: ["apiextensions.k8s.io"],
+        resources: ["customresourcedefinitions"],
+        verbs: ["patch", "create"],
+      },
+      {
+        apiGroups: [""],
+        resources: ["namespaces"],
+        verbs: ["watch"],
+      },
+      {
+        apiGroups: [""],
+        resources: ["configmaps"],
+        verbs: ["watch"],
+      },
+    ];
 
-    it("should create the yaml files with scoped rbacMode and custom rules", async () => {
-      await usePackageJson("custom");
-      execSync(`npx pepr build --rbac-mode=scoped`);
+    expect(valuesYaml.rbac).toEqual(expectedRbac);
 
-      const valuesPath = path.resolve(
-        __dirname,
-        "../dist/e43ef33d-2b25-4148-9dca-6ebe588caace-chart/values.yaml",
-      );
+    const staticYamlPath = path.resolve(
+      __dirname,
+      "../dist/pepr-module-e43ef33d-2b25-4148-9dca-6ebe588caace.yaml",
+    );
 
-      const valuesContent = await fs.readFile(valuesPath, "utf8");
-      const valuesYaml = yaml.load(valuesContent) as {
-        rbac: typeof expectedRbac;
-      };
+    const staticYamlContent = await fs.readFile(staticYamlPath, "utf8");
+    const staticYamlDocs = yaml.loadAll(staticYamlContent) as Record<
+      string,
+      unknown
+    >[];
 
-      const expectedRbac = [
+    const expectedClusterRole = {
+      apiVersion: "rbac.authorization.k8s.io/v1",
+      kind: "ClusterRole",
+      metadata: {
+        name: "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
+      },
+      rules: [
         {
           apiGroups: [""],
           resources: ["pods"],
@@ -344,68 +377,17 @@ describe("rbac generation with rbacMode=scoped", () => {
           resources: ["configmaps"],
           verbs: ["watch"],
         },
-      ];
+      ],
+    };
 
-      expect(valuesYaml.rbac).toEqual(expectedRbac);
+    const actualClusterRole = staticYamlDocs.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (doc: Record<string, any>) =>
+        doc.kind === "ClusterRole" &&
+        doc.metadata?.name === "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
+    );
 
-      const staticYamlPath = path.resolve(
-        __dirname,
-        "../dist/pepr-module-e43ef33d-2b25-4148-9dca-6ebe588caace.yaml",
-      );
-
-      const staticYamlContent = await fs.readFile(staticYamlPath, "utf8");
-      const staticYamlDocs = yaml.loadAll(staticYamlContent) as Record<
-        string,
-        any
-      >[];
-
-      const expectedClusterRole = {
-        apiVersion: "rbac.authorization.k8s.io/v1",
-        kind: "ClusterRole",
-        metadata: {
-          name: "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
-        },
-        rules: [
-          {
-            apiGroups: [""],
-            resources: ["pods"],
-            verbs: ["get", "list", "watch"],
-          },
-          {
-            apiGroups: ["apps"],
-            resources: ["deployments"],
-            verbs: ["create", "update", "patch"],
-          },
-          {
-            apiGroups: ["pepr.dev"],
-            resources: ["peprstores"],
-            verbs: ["create", "get", "patch", "watch"],
-          },
-          {
-            apiGroups: ["apiextensions.k8s.io"],
-            resources: ["customresourcedefinitions"],
-            verbs: ["patch", "create"],
-          },
-          {
-            apiGroups: [""],
-            resources: ["namespaces"],
-            verbs: ["watch"],
-          },
-          {
-            apiGroups: [""],
-            resources: ["configmaps"],
-            verbs: ["watch"],
-          },
-        ],
-      };
-
-      const actualClusterRole = staticYamlDocs.find(
-        (doc: Record<string, any>) =>
-          doc.kind === "ClusterRole" &&
-          doc.metadata?.name === "pepr-e43ef33d-2b25-4148-9dca-6ebe588caace",
-      );
-
-      // Check if the static yaml file matches the expected RBAC structure
-      expect(actualClusterRole).toEqual(expectedClusterRole);
-    });
+    // Check if the static yaml file matches the expected RBAC structure
+    expect(actualClusterRole).toEqual(expectedClusterRole);
   });
+});

@@ -72,29 +72,33 @@ describe("soak-ci.ts", () => {
     expect(true).toBe(true);
   });
 
-  const testIntervals = [15, 30, 30, 30, 30]; 
+  const testIntervals = [15, 30, 30, 30, 30];
   testIntervals.forEach((interval, index) => {
-    it(`test run ${index + 1} after ${interval} minutes`, async () => {
-      await new Promise(resolve => setTimeout(resolve, mins(interval)));
+    it(
+      `test run ${index + 1} after ${interval} minutes`,
+      async () => {
+        await new Promise(resolve => setTimeout(resolve, mins(interval)));
 
-      const podList = await getPodsInPeprDemo();
-      updateMap(PodMap, podList);
+        const podList = await getPodsInPeprDemo();
+        updateMap(PodMap, podList);
 
-      // Run Tests
-      PodMap.forEach(value => {
-        expect(value).toBeLessThan(2);
-      });
+        // Run Tests
+        PodMap.forEach(value => {
+          expect(value).toBeLessThan(2);
+        });
 
-      // Get Metrics
-      runCommand(
-        "kubectl exec -it metrics-collector -n watch-auditor -- curl watch-auditor:8080/metrics  | grep watch_controller_failures_total >> logs/auditor-log.txt",
-      );
-      runCommand("cat logs/auditor-log.txt");
+        // Get Metrics
+        runCommand(
+          "kubectl exec -it metrics-collector -n watch-auditor -- curl watch-auditor:8080/metrics  | grep watch_controller_failures_total >> logs/auditor-log.txt",
+        );
+        runCommand("cat logs/auditor-log.txt");
 
-      runCommand(
-        'kubectl exec -it metrics-collector -n watch-auditor -- curl -k https://pepr-soak-ci-watcher.pepr-system.svc.cluster.local/metrics  | egrep -E "pepr_cache_miss|pepr_resync_failure_count" >> logs/informer-log.txt',
-      );
-      runCommand("cat logs/informer-log.txt");
-    }, mins(180));
+        runCommand(
+          'kubectl exec -it metrics-collector -n watch-auditor -- curl -k https://pepr-soak-ci-watcher.pepr-system.svc.cluster.local/metrics  | egrep -E "pepr_cache_miss|pepr_resync_failure_count" >> logs/informer-log.txt',
+        );
+        runCommand("cat logs/informer-log.txt");
+      },
+      mins(180),
+    );
   });
 });

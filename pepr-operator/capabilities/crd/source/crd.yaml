@@ -56,4 +56,4 @@ spec:
     singular: webapp
     kind: WebApp
     shortNames:
-    - wa
+      - wa

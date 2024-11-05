@@ -17,9 +17,9 @@ metadata:
   namespace: hello-pepr-deletion-timestamp1
 spec:
   containers:
-  - image: nginx
-    name: ns1-admission
-    resources: {}
+    - image: nginx
+      name: ns1-admission
+      resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 ---
@@ -32,9 +32,9 @@ metadata:
   namespace: hello-pepr-deletion-timestamp1
 spec:
   containers:
-  - image: nginx
-    name: ns1-watch
-    resources: {}
+    - image: nginx
+      name: ns1-watch
+      resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 ---
@@ -47,9 +47,9 @@ metadata:
   namespace: hello-pepr-deletion-timestamp2
 spec:
   containers:
-  - image: nginx
-    name: ns2-admission
-    resources: {}
+    - image: nginx
+      name: ns2-admission
+      resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 ---
@@ -62,9 +62,9 @@ metadata:
   namespace: hello-pepr-deletion-timestamp2
 spec:
   containers:
-  - image: nginx
-    name: ns2-watch
-    resources: {}
+    - image: nginx
+      name: ns2-watch
+      resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 ---
@@ -78,9 +78,9 @@ metadata:
   namespace: hello-pepr-deletion-timestamp2
 spec:
   containers:
-  - image: nginx
-    name: ns2-delete
-    resources: {}
+    - image: nginx
+      name: ns2-delete
+      resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 status: {}

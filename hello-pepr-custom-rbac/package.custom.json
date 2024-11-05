@@ -2,13 +2,7 @@
   "name": "hello-pepr-custom-rbac",
   "version": "0.0.1",
   "description": "Pepr feature: Custom RBAC Features",
-  "keywords": [
-    "pepr",
-    "k8s",
-    "policy-engine",
-    "pepr-module",
-    "security"
-  ],
+  "keywords": ["pepr", "k8s", "policy-engine", "pepr-module", "security"],
   "engines": {
     "node": ">=18.0.0"
   },

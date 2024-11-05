@@ -16,15 +16,12 @@
     "useUnknownInCatchVariables": false
   },
   "include": [
-    "hello-pepr/**/*.ts",
-    "hello-pepr-*/**/*.ts",
-    "_helpers/**/*.ts",
-    "_helpers/**/*.mts",
-    "_helpers/**/*.test.ts",
-    "pepr-cli/**/*.ts",
-    "pepr-operator/**/*.ts",
-    "test-specific-version/**/*.ts",
-    "dash-policyreport/**/*.ts"
+    "hello-pepr*/**/*",
+    "_helpers/**/*",
+    "pepr-cli/**/*",
+    "pepr-operator/**/*",
+    "test-specific-version/**/*",
+    "dash-policyreport/**/*"
   ],
   "exclude": ["node_modules", "dist"]
 }

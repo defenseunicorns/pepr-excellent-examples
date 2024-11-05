@@ -4,6 +4,7 @@
   "scripts": {
     "format:check": "eslint . && prettier . --check",
     "format:fix": "eslint . --fix && prettier . --write",
+    "lint": "eslint . --fix",
     "prepare": "if [ \"$NODE_ENV\" != 'production' ]; then husky; fi",
     "test:e2e": "npm run --workspaces test:e2e"
   },

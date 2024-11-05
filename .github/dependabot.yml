@@ -7,7 +7,7 @@ updates:
 
     # root dir + children; single level, non-recursive (recursive would be "**/*")
     #   https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#directories
-    directories: [ "*" ]
+    directories: ["*"]
 
     schedule:
       interval: daily

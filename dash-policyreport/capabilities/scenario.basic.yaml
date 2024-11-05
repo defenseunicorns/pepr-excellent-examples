@@ -27,7 +27,7 @@ spec:
   containers:
     - name: busybox
       image: busybox:latest
-      command: ['sh', '-c', 'sleep infinity']
+      command: ["sh", "-c", "sleep infinity"]
 
 ---
 apiVersion: v1
@@ -46,4 +46,4 @@ spec:
   containers:
     - name: busybox
       image: busybox:latest
-      command: ['sh', '-c', 'sleep infinity']
+      command: ["sh", "-c", "sleep infinity"]

@@ -33,4 +33,3 @@ When(a.ConfigMap)
   .IsCreated()
   .WithNameRegex(/^invisible/)
   .Mutate(cm => cm.SetAnnotation("not", "seen"));
-

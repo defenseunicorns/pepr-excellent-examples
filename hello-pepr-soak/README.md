@@ -8,21 +8,20 @@
   - [install istio](#install-istio)
   - [install kubeshark](#install-kubeshark)
 
-
 ## Background
 
-Pepr watches for `Pods` with labels `api` and `bug` and for `Secrets` with label `deletedeletedelete`  in `pepr-demo` namespace.
+Pepr watches for `Pods` with labels `api` and `bug` and for `Secrets` with label `deletedeletedelete` in `pepr-demo` namespace.
 
 A successful soak should result in:
+
 1. No pods in the `pepr-demo` namespace
 2. No secrets in the `pepr-demo` namespace
 
 The Watcher deployment is running at `LOG_LEVEL` debug while the admission deployment is on info to keep the irrelevant noise down.
 
-
 ## Cluster Setup
 
-#### k3d 
+#### k3d
 
 Create a k3d cluster with audit logging enabled
 
@@ -48,7 +47,7 @@ docker exec -it k3d-auditer-server-0 cat /var/log/kubernetes/audit.log
 
 #### Kind
 
-Create a kind cluster with auditing.  
+Create a kind cluster with auditing.
 
 ```yaml
 cat <<EOF > audit-policy.yaml
@@ -104,6 +103,7 @@ docker exec kind-control-plane ls /etc/kubernetes/policies
 ```
 
 expected
+
 ```bash
 audit-policy.yaml
 ```
@@ -125,17 +125,16 @@ expected
     name: audit-policies
 ```
 
-
-## Get Started 
+## Get Started
 
 #### Install Istio
+
 Download [istioctl](https://istio.io/latest/docs/setup/getting-started/#download)
 
 ```bash
 curl -L https://istio.io/downloadIstio | sh -
 sudo mv istio-*/bin/istioctl /usr/local/bin/
 ```
-
 
 ```bash
 istioctl install --set profile=demo -y
@@ -228,8 +227,7 @@ Logs
 
 ```bash
 kubectl logs -n pepr-system -l pepr.dev/controller=watcher -f | jq 'select(.url != "/healthz")'
-``` 
-
+```
 
 Create 10 `CronJob`(s) that produces 10 pods with sidecars every 60 seconds
 
@@ -546,7 +544,6 @@ spec:
 status: {}
 EOF
 ```
-
 
 Watch for secrets and pods, because if any stick around then you have reproduced the issue:
 

@@ -45,7 +45,7 @@ metadata:
   name: example-evil-cm
   namespace: pepr-demo
   annotations:
-    evil: 'true'
+    evil: "true"
 data:
   key: ex-evil-cm-val
 ---

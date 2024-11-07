@@ -10,7 +10,7 @@
     "ecmaVersion": 2022
   },
   "plugins": ["@typescript-eslint"],
-  "ignorePatterns": ["node_modules", "dist", "**/*.test.ts"],
+  "ignorePatterns": ["node_modules", "dist"],
   "root": true,
   "rules": {
     "@typescript-eslint/no-floating-promises": ["error"]

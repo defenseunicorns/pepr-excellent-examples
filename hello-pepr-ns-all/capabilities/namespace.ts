@@ -1,4 +1,4 @@
-import { Capability, a, Log } from "pepr";
+import { Capability, a } from "pepr";
 
 const name = "hello-pepr-ns-all";
 
@@ -13,18 +13,18 @@ When(a.ConfigMap)
   .IsCreated()
   .InNamespace("default")
   .Mutate(function mutateDef(request) {
-    request.SetAnnotation("def", "seen")
+    request.SetAnnotation("def", "seen");
   });
 
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
   .Mutate(function mutateNs(request) {
-    request.SetAnnotation("ns", "seen")
+    request.SetAnnotation("ns", "seen");
   });
 
 When(a.ConfigMap)
   .IsCreated()
   .Mutate(function mutateNon(request) {
-    request.SetAnnotation("non", "seen")
+    request.SetAnnotation("non", "seen");
   });

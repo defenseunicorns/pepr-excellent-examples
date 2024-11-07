@@ -1,4 +1,4 @@
-import { PeprModule, Log } from "pepr";
+import { PeprModule } from "pepr";
 import cfg from "./package.json";
 import { HelloPeprConfig } from "./capabilities/config";
 

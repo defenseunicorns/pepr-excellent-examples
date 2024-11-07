@@ -12,41 +12,45 @@ const { OnSchedule } = HelloPeprOnSchedule;
 
 OnSchedule({
   name: "forever",
-  every: 10, unit: "seconds",
+  every: 10,
+  unit: "seconds",
   run: async () => {
-    Log.info({schedule: "forever"})
-  }
+    Log.info({ schedule: "forever" });
+  },
 });
 
 OnSchedule({
   name: "n-times",
-  every: 10, unit: "seconds",
+  every: 10,
+  unit: "seconds",
   completions: 2,
   run: async () => {
-    Log.info({schedule: "n-times"})
-  }
+    Log.info({ schedule: "n-times" });
+  },
 });
 
 OnSchedule({
   name: "once-asap",
-  every: 10, unit: "seconds",
+  every: 10,
+  unit: "seconds",
   completions: 1,
   run: async () => {
-    Log.info({schedule: "once-asap"})
-  }
+    Log.info({ schedule: "once-asap" });
+  },
 });
 
-let want = new Date(Date.now())
+const want = new Date(Date.now());
 
 OnSchedule({
   name: "once-delayed",
-  every: 10, unit: "seconds",
+  every: 10,
+  unit: "seconds",
   startTime: want,
   completions: 1,
   run: async () => {
     Log.info({
       schedule: "once-delayed",
       want: want.valueOf(),
-    })
-  }
+    });
+  },
 });

@@ -4,7 +4,7 @@ permissions: read-all
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 4 * * *' # 12:30AM ET/9:30PM PT
+    - cron: "30 4 * * *" # 12:30AM ET/9:30PM PT
   # push:
   #   branches: ["main"]
   # pull_request:
@@ -74,7 +74,7 @@ jobs:
         run: |
           cd "$PEPR_EXEX"
           if git diff --quiet ; then return ; fi
-          
+
           # npm install removes resolved and integrity properties from package-lock.json if installed from cache
           # https://github.com/npm/cli/issues/4263
           rm ./package-lock.json
@@ -87,4 +87,4 @@ jobs:
         with:
           sign-commits: true
           path: ${{ steps.PEPR_EXEX.outputs.PEPR_EXEX }}
-          title: 'build(devDeps): bump the devDeps (via helper CLI)'
+          title: "build(devDeps): bump the devDeps (via helper CLI)"

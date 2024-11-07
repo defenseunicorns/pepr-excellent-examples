@@ -4,14 +4,13 @@ The WebApp Operator deploys the `CustomResourceDefinition` for WebApp, then watc
 
 The WebApp instance represents a `Deployment` object with confirgurable replicas, a `Service`, and a `ConfigMap` that has a `index.html` file that can be configured to a specific language, and theme. The resources the Operator deploys contain `ownerReferences`, causing a cascading delete effect when the WebApp instance is deleted.
 
-If any object deployed by the Operator is deleted for any reason, other than through the `ownerReference` mechanism, the Operator will abruptly redeploy the object. 
+If any object deployed by the Operator is deleted for any reason, other than through the `ownerReference` mechanism, the Operator will abruptly redeploy the object.
 
 ## Demo
 
 _Create an ephemeral cluster. (Kind or k3d will work)_
 
-
-Deploy the Operator 
+Deploy the Operator
 
 ```bash
 kubectl apply -f dist/pepr-module-774fab07-77fa-517c-b5f8-c682c96c20c0.yaml
@@ -61,9 +60,9 @@ metadata:
   name: webapp-light-en
   namespace: webapps
 spec:
-  theme: light 
+  theme: light
   language: en
-  replicas: 1 
+  replicas: 1
 EOF
 ```
 
@@ -87,7 +86,7 @@ deployment.apps/webapp-light-en   1/1     1            1           5s
 Get the Status of the WebApp
 
 ```json
-kubectl get wa webapp-light-en -n webapps -ojsonpath="{.status}" | jq  
+kubectl get wa webapp-light-en -n webapps -ojsonpath="{.status}" | jq
 
 # output
 {
@@ -132,15 +131,16 @@ Port-forward and look at the WebApp in the browser
 ```bash
 kubectl port-forward svc/webapp-light-en -n webapps 3000:80
 ```
+
 [WebApp](http://localhost:3000)
 ![WebApp](light.png)
 
 Delete the `ConfigMap` on the WebApp to watch it the operator reconcile it back
 
 ```bash
-kubectl delete cm -n webapps --all 
+kubectl delete cm -n webapps --all
 # wait a few seconds
-kubectl get cm -n webapps 
+kubectl get cm -n webapps
 
 # output
 configmap "kube-root-ca.crt" deleted
@@ -160,9 +160,9 @@ metadata:
   name: webapp-light-en
   namespace: webapps
 spec:
-  theme: dark 
+  theme: dark
   language: es
-  replicas: 1 
+  replicas: 1
 EOF
 #output
 webapp.pepr.io/webapp-light-en configured
@@ -173,6 +173,7 @@ Port-forward and look at the WebApp in the browser
 ```bash
 kubectl port-forward svc/webapp-light-en -n webapps 3000:80
 ```
+
 [WebApp](http://localhost:3000)
 
 ![WebApp](dark.png)

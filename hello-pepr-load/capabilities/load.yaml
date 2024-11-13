@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: hello-pepr-load
+  name: pod-UNIQUIFY-ME
+  labels:
+    test-transient: hello-pepr-load
+spec:
+  containers:
+  - name: look-busy
+    image: alpine
+    command: ["sh"]
+    args: ["-c", "while :; do sleep 0.25; done"]
+  restartPolicy: Never

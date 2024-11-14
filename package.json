@@ -29,7 +29,6 @@
     "hello-pepr-regex-ns-bounded",
     "hello-pepr-regex-ns-wrong",
     "hello-pepr-soak",
-    "hello-pepr-soak-ci",
     "hello-pepr-store",
     "hello-pepr-store-redact-logs",
     "hello-pepr-validate",

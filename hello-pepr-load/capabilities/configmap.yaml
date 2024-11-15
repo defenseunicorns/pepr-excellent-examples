@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: hello-pepr-load
+  name: cm-UNIQUIFY-ME
+  labels:
+    test-transient: hello-pepr-load
+data: {}

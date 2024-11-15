@@ -9,9 +9,12 @@ export const HelloPeprLoad = new Capability({
 });
 const { When } = HelloPeprLoad;
 
-When(a.Pod)
+When(a.ConfigMap)
   .IsCreatedOrUpdated()
   .InNamespace(ns)
-  .Reconcile(async pod => {
-    await K8s(a.Pod).InNamespace(ns).Delete(pod.metadata.name);
+  .Reconcile(async function immediatelyDelete(cm) {
+    const { name } = cm.metadata;
+    if (name === "kube-root-ca.crt") { return }
+
+    await K8s(a.ConfigMap).InNamespace(ns).Delete(name);
   });

@@ -1,0 +1,47 @@
+{
+  "name": "hello-pepr-load",
+  "version": "0.0.1",
+  "description": "Pepr load testable module",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "pepr-module",
+    "security",
+    "informer"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "uuid": "pepr-load",
+    "onError": "reject",
+    "webhookTimeout": 10,
+    "customLabels": {
+      "namespace": {
+        "pepr.dev": "",
+        "istio-injection": "enabled"
+      }
+    },
+    "alwaysIgnore": {
+      "namespaces": []
+    },
+    "includedFiles": [],
+    "env": {
+      "LOG_LEVEL": "debug"
+    }
+  },
+  "dependencies": {
+    "pepr": "^0.38.3"
+  },
+  "devDependencies": {
+    "typescript": "5.3.3"
+  },
+  "scripts": {
+    "pepr": "pepr",
+    "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
+    "test": "npm run cli -- test --suite all",
+    "test:soak": "npm run cli -- test --suite e2e",
+    "test:unit": "npm run cli -- test --suite unit"
+  }
+}

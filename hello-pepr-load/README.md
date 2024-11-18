@@ -60,5 +60,5 @@ This module isn't intended as a Module Author example: it has been designed to a
 1. Bring down test cluster:
 
     ```bash
-    npx ts-node hack/load.cli.ts graph
+    npx ts-node hack/load.cli.ts cluster down
     ```

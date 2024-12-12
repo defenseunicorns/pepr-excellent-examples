@@ -4,8 +4,8 @@
   "description": "excellent example helpers",
   "type": "module",
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "dotenv-cli": "^7.4.2"
+    "dotenv": "^16.4.7",
+    "dotenv-cli": "^7.4.4"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

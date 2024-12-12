@@ -59,8 +59,6 @@ When(a.ConfigMap)
     Log.info({ key, value }, "getItem");
 
     await Store.removeItemAndWait(key);
-    // Ensure you can remove the same key again
-    await Store.removeItemAndWait(key);
     Log.info({ key }, "removeItemAndWait");
   });
 

@@ -35,7 +35,7 @@
     "pepr": "^0.38.3"
   },
   "devDependencies": {
-    "typescript": "5.3.3"
+    "typescript": "5.7.2"
   },
   "scripts": {
     "pepr": "pepr",

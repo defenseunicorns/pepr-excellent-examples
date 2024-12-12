@@ -18,6 +18,8 @@ Store.onReady(async () => {
   // Ensure Store.clear() in an empty store creates no errors
   Store.clear();
   await Store.setItemAndWait(key, val);
+  // Ensure you can set the same key again
+  await Store.setItemAndWait(key, val);
   const value = Store.getItem(key);
   Log.info({ key, value }, "onReady");
 
@@ -56,6 +58,8 @@ When(a.ConfigMap)
     const value = Store.getItem(key);
     Log.info({ key, value }, "getItem");
 
+    await Store.removeItemAndWait(key);
+    // Ensure you can remove the same key again
     await Store.removeItemAndWait(key);
     Log.info({ key }, "removeItemAndWait");
   });

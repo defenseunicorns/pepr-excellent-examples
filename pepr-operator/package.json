@@ -24,7 +24,7 @@
     "env": {}
   },
   "dependencies": {
-    "pepr": "^0.38.3"
+    "pepr": "^0.42.0"
   },
   "devDependencies": {
     "typescript": "5.7.2"

@@ -28,9 +28,9 @@
     "env": {}
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "dotenv-cli": "^7.4.2",
-    "pepr": "^0.42.0"
+    "dotenv": "^16.4.7",
+    "dotenv-cli": "^7.4.4",
+    "pepr": "^0.42.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

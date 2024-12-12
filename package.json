@@ -2,8 +2,10 @@
   "name": "pepr-excellent-examples",
   "license": "Apache-2.0",
   "scripts": {
-    "format:check": "eslint --config eslint.config.mjs",
-    "format:fix": "eslint --config eslint.config.mjs --fix",
+    "format:check": "eslint --config eslint.config.mjs && prettier . --check",
+    "format:fix": "eslint --config eslint.config.mjs --fix && prettier . --write",
+    "lint": "eslint . --fix",
+    "prepare": "if [ \"$NODE_ENV\" != 'production' ]; then husky; fi",
     "test:e2e": "npm run --workspaces test:e2e"
   },
   "workspaces": [
@@ -43,5 +45,8 @@
   ],
   "dependencies": {
     "kubernetes-fluent-client": "^3.5.6"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }

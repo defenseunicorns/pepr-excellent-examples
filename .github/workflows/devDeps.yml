@@ -73,7 +73,7 @@ jobs:
       - name: package-lock.json
         run: |
           cd "$PEPR_EXEX"
-          if git diff --quiet ; then return ; fi
+          if git diff --quiet ; then exit 0 ; fi
           
           # npm install removes resolved and integrity properties from package-lock.json if installed from cache
           # https://github.com/npm/cli/issues/4263

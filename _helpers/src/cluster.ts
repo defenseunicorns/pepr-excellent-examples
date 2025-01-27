@@ -9,6 +9,7 @@ import {
 import { TestRunCfg } from './TestRunCfg';
 import { untilTrue } from './general';
 import { gone } from './resource';
+import { sleep } from './time';
 import { Cmd } from './Cmd';
 
 
@@ -99,8 +100,34 @@ export async function clean(trc: TestRunCfg): Promise<void> {
           .length > 0
     )
 
+    async function retryDelete(cls: GenericClass, obj: KubernetesObject, retries: number = 3): Promise<void> {
+      try {
+        return await K8s(cls).Delete(obj);
+      }
+      catch (err) {
+        let status = err.hasOwnProperty("status") ? err.status : undefined;
+
+        if (status === 429) {
+          let delay = err.data.details.retryAfterSeconds;
+          await sleep(delay);
+
+          retries -= 1;
+          if (retries > 0) {
+            return await retryDelete(cls, obj, retries);
+          }
+          else {
+            throw err;
+          }
+        }
+
+        else {
+          throw err;
+        }
+      }
+    }
+
     // delete test-labelled resources (in parallel)
-    tbds.forEach(([k, o]) => K8s(k).Delete(o))
+    tbds.forEach(async ([k, o]) => await retryDelete(k, o))
     let terminating = tbds.map(tbd => untilTrue(() => gone(...tbd)))
     await Promise.all(terminating)
 

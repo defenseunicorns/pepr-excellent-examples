@@ -100,47 +100,6 @@ export async function clean(trc: TestRunCfg): Promise<void> {
           .length > 0
     )
 
-    // // delete test-labelled resources (in parallel)
-    // tbds.forEach(([k, o]) => K8s(k).Delete(o))
-    // let terminating = tbds.map(tbd => untilTrue(() => gone(...tbd)))
-    // await Promise.all(terminating)
-
-    // PASS  src/cluster.e2e.test.ts (146.086 s)
-    // up()
-    //   ✓ creates a test k3d cluster (47548 ms)
-    // down()
-    //   ✓ deletes a test k3d cluster (45241 ms)
-    // clean()
-    //   ✓ removes resources with TestRunCfg-defined label (2357 ms)
-    //   ✓ removes CRD & CRs with TestRunCfg-defined label (2256 ms)
-
-    // FAIL src/cluster.e2e.test.ts (95.86 s)
-    // up()
-    //   ✓ creates a test k3d cluster (42246 ms)
-    // down()
-    //   ✓ deletes a test k3d cluster (24010 ms)
-    // clean()
-    //   ✕ removes resources with TestRunCfg-defined label (974 ms)
-    //   ✓ removes CRD & CRs with TestRunCfg-defined label (1975 ms)
-
-    // thrown: Object {
-    //   "data": Object {
-    //     "apiVersion": "v1",
-    //     "code": 429,
-    //     "details": Object {
-    //       "retryAfterSeconds": 1,
-    //     },
-    //     "kind": "Status",
-    //     "message": "storage is (re)initializing",
-    //     "metadata": Object {},
-    //     "reason": "TooManyRequests",
-    //     "status": "Failure",
-    //   },
-    //   "ok": false,
-    //   "status": 429,
-    //   "statusText": "Too Many Requests",
-    // }
-
     async function retryDelete(cls: GenericClass, obj: KubernetesObject, retries: number = 3): Promise<void> {
       try {
         return await K8s(cls).Delete(obj);

@@ -2,7 +2,6 @@ import {
   GenericClass,
   K8s,
   kind,
-  KubernetesListObject,
   KubernetesObject,
   RegisterKind
 } from "kubernetes-fluent-client";
@@ -12,6 +11,46 @@ import { gone } from './resource';
 import { sleep } from './time';
 import { Cmd } from './Cmd';
 
+type KfcErr = {
+  status: number
+  data: {
+    details?: any
+  }
+}
+
+type AsyncFunc<T> = (...args: any[]) => T;
+
+const noop: AsyncFunc<void> = () => {};
+
+async function retry<T, U>(action: AsyncFunc<T>, reactions: Record<string, AsyncFunc<U>>, retries: number = 3): Promise<T> {
+  try {
+    return await action();
+  }
+  catch (err) {
+    let status = err.hasOwnProperty("status") ? `${err.status}` : undefined;
+
+    if (status === '429') {
+      await reactions['429'](err);
+
+      retries -= 1;
+      if (retries > 0) {
+        return await retry(action, reactions, retries);
+      }
+      else {
+        console.error("retries exhausted!");
+        throw err;
+      }
+    }
+    else if (Object.keys(reactions).includes(status)) {
+      const res = await reactions[status](err);
+      if (res === undefined) { return; }
+      throw res;
+    }
+    else {
+      throw err;
+    }
+  }
+}
 
 export async function up(name: string = 'pexex-helpers-cluster'): Promise<string> {
   const create = await new Cmd({
@@ -25,6 +64,19 @@ export async function up(name: string = 'pexex-helpers-cluster'): Promise<string
     }).run()
     if (inject.exitcode > 0) { throw inject }
   }
+
+  // delay return until installed kinds are servable from cluster (i.e. no 429s)
+  let kinds = Object.keys(kind).filter(k => k !== "GenericKind").map(k => kind[k]);
+  await Promise.all(kinds.map(async (k) => await retry(
+    async () => await K8s(k).Get(),
+    {
+      '404': noop,
+      '405': noop,
+      '429': async (err: KfcErr) => {
+        await sleep(err.data.details ? err.data.details.retryAfterSeconds : 1);
+      },
+    }
+  )));
 
   const config = await new Cmd({
     cmd: `k3d kubeconfig write ${name}`
@@ -78,18 +130,26 @@ export async function clean(trc: TestRunCfg): Promise<void> {
       })
     })
 
-    // call cluster for all available (non-404) & authorized (non-405) resources
     const gets = await Promise.all(
-      kinds.map(k => K8s(k).Get()
-        .then(o => [k, o] as [GenericClass, KubernetesListObject<typeof k>])
-        .catch(e => { if ( ![404, 405].includes(e.status) ) { throw e } })
+      kinds.map(k => retry(
+        async () => [ k, await K8s(k).Get() ],
+        {
+          '404': noop,
+          '405': noop,
+          '429': async (err: KfcErr) => {
+            await sleep(err.data.details ? err.data.details.retryAfterSeconds : 1);
+          },
+        }
       ))
+    );
 
     // unwrap resource lists
-    const resources = gets.flatMap(g => g ? [g] : [])
-      .flatMap(([k, l]) => 
-        l.items.map(o => [k, o] as [GenericClass, KubernetesObject])
-      )
+    const resources = gets
+    .flatMap(g => g ? [g] : [])
+    .flatMap(([k, l]) => {
+      const res = l.items.map(o => [k, o])
+      return (res as [GenericClass, KubernetesObject][]);
+    })
 
     // isolate test-labelled resources
     const [prefix, ] = trc.labelKey().split("/")
@@ -100,38 +160,19 @@ export async function clean(trc: TestRunCfg): Promise<void> {
           .length > 0
     )
 
-    async function retryDelete(cls: GenericClass, obj: KubernetesObject, retries: number = 3): Promise<void> {
-      try {
-        return await K8s(cls).Delete(obj);
-      }
-      catch (err) {
-        let status = err.hasOwnProperty("status") ? err.status : undefined;
-
-        if (status === 429) {
-          let delay = err.data.details.retryAfterSeconds;
-          await sleep(delay);
-
-          retries -= 1;
-          if (retries > 0) {
-            return await retryDelete(cls, obj, retries);
-          }
-          else {
-            throw err;
-          }
-        }
-
-        else {
-          throw err;
-        }
-      }
-    }
-
     // delete test-labelled resources (in parallel)
-    tbds.forEach(async ([k, o]) => await retryDelete(k, o))
+    tbds.forEach(async ([k, o]) => await retry(
+      async () => await K8s(k).Delete(o),
+      {
+        '429': async (err: KfcErr) => {
+          await sleep(err.data.details ? err.data.details.retryAfterSeconds : 1);
+        }
+      }
+    ));
     let terminating = tbds.map(tbd => untilTrue(() => gone(...tbd)))
     await Promise.all(terminating)
-
-  } finally {
+  }
+  finally {
     process.env = { ...originalEnv }
   }
   console.timeEnd(msg)

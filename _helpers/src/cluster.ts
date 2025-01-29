@@ -2,7 +2,6 @@ import {
   GenericClass,
   K8s,
   kind,
-  KubernetesListObject,
   KubernetesObject,
   RegisterKind
 } from "kubernetes-fluent-client";
@@ -12,6 +11,46 @@ import { gone } from './resource';
 import { sleep } from './time';
 import { Cmd } from './Cmd';
 
+type KfcErr = {
+  status: number
+  data: {
+    details?: any
+  }
+}
+
+type AsyncFunc<T> = (...args: any[]) => T;
+
+const noop: AsyncFunc<void> = () => {};
+
+async function retry<T, U>(action: AsyncFunc<T>, reactions: Record<string, AsyncFunc<U>>, retries: number = 3): Promise<T> {
+  try {
+    return await action();
+  }
+  catch (err) {
+    let status = err.hasOwnProperty("status") ? `${err.status}` : undefined;
+
+    if (status === '429') {
+      await reactions['429'](err);
+
+      retries -= 1;
+      if (retries > 0) {
+        return await retry(action, reactions, retries);
+      }
+      else {
+        console.error("retries exhausted!");
+        throw err;
+      }
+    }
+    else if (Object.keys(reactions).includes(status)) {
+      const res = await reactions[status](err);
+      if (res === undefined) { return; }
+      throw res;
+    }
+    else {
+      throw err;
+    }
+  }
+}
 
 export async function up(name: string = 'pexex-helpers-cluster'): Promise<string> {
   const create = await new Cmd({
@@ -26,40 +65,18 @@ export async function up(name: string = 'pexex-helpers-cluster'): Promise<string
     if (inject.exitcode > 0) { throw inject }
   }
 
-  async function retryList(cls: GenericClass, retries: number = 3): Promise<void> {
-    try {
-      await K8s(cls).Get();
-      return;
-    }
-    catch (err) {
-      let status = err.hasOwnProperty("status") ? err.status : undefined;
-
-      if (status === 429) {
-        let delay = err.data.details.retryAfterSeconds;
-        await sleep(delay);
-
-        retries -= 1;
-        if (retries > 0) {
-          console.log(`Retrying (retries left: ${retries}).`);
-          return await retryList(cls, retries);
-        }
-        else {
-          console.error("retries exhausted!");
-          throw err;
-        }
-      }
-      else if ([404, 405].includes(status)) {
-        // if there are no resources to return (404), or
-        // if there are no resources allowed (405)
-        return;
-      }
-      else {
-        throw err;
-      }
-    }
-  }
+  // delay return until installed kinds are servable from cluster (i.e. no 429s)
   let kinds = Object.keys(kind).filter(k => k !== "GenericKind").map(k => kind[k]);
-  await Promise.all(kinds.map(k => retryList(k)));
+  await Promise.all(kinds.map(async (k) => await retry(
+    async () => await K8s(k).Get(),
+    {
+      '404': noop,
+      '405': noop,
+      '429': async (err: KfcErr) => {
+        await sleep(err.data.details ? err.data.details.retryAfterSeconds : 1);
+      },
+    }
+  )));
 
   const config = await new Cmd({
     cmd: `k3d kubeconfig write ${name}`
@@ -113,114 +130,18 @@ export async function clean(trc: TestRunCfg): Promise<void> {
       })
     })
 
-    const react404 = async (err: KfcErr): Promise<KfcErr|void> => {
-      err = err;  // noop
-      return;
-    }
-
-    const react405 = async (err: KfcErr): Promise<KfcErr|void> => {
-      err = err; // noop
-      return;
-    }
-
-    const react429 = async (err: KfcErr) => {
-      // let delay = err.data ? err.data.details.retryAfterSeconds : 1;
-      if (!err.data){ console.error(err) }
-      let delay = err.data.details.retryAfterSeconds;
-      await sleep(delay);
-    }
-
-    type KfcErr = {
-      status?: number
-      data?: {
-        details?: any
-      }
-    }
-    type AsyncFunc = (...args: any[]) => any;
-
-    async function retryable<T>(action: AsyncFunc, reactions: Record<string, AsyncFunc>, retries: number = 3): Promise<T> {
-      try { return await action(); }
-      catch (err) {
-        let status = err.hasOwnProperty("status") ? `${err.status}` : undefined;
-
-        if (status === '429') {
-          await reactions['429'](err);
-
-          retries -= 1;
-          if (retries > 0) {
-            return await retryable(action, reactions, retries);
-          }
-          else {
-            console.error("retries exhausted!");
-            throw err;
-          }
+    const gets = await Promise.all(
+      kinds.map(k => retry(
+        async () => [ k, await K8s(k).Get() ],
+        {
+          '404': noop,
+          '405': noop,
+          '429': async (err: KfcErr) => {
+            await sleep(err.data.details ? err.data.details.retryAfterSeconds : 1);
+          },
         }
-        else if (Object.keys(reactions).includes(status)) {
-          const res = await reactions[status](err);
-          if (res === undefined) { return; }
-          throw res;
-        }
-        else {
-          throw err;
-        }
-      }
-    }
-
-    const act = (cls: GenericClass): () => Promise<[GenericClass, KubernetesListObject<any>]> => {
-      return async () => {
-        const got = await K8s(cls).Get();
-        return [cls, got];
-      }
-    }
-
-    const gets = await Promise.all(kinds.map(k => retryable(
-      act(k),
-      {
-        '404': react404,
-        '405': react405,
-        '429': react429,
-      }
-    )));
-
-    // // call cluster for all available (non-404) & authorized (non-405) resources
-    // async function retryList(cls: GenericClass, retries: number = 3): Promise<[GenericClass, KubernetesListObject<any>]> {
-    //   try {
-    //     const got = await K8s(cls).Get();
-    //     return [cls, got];
-    //   }
-    //   catch (err) {
-    //     let status = err.hasOwnProperty("status") ? err.status : undefined;
-
-    //     if (status === 429) {
-    //       let delay = err.data.details.retryAfterSeconds;
-    //       await sleep(delay);
-
-    //       retries -= 1;
-    //       if (retries > 0) {
-    //         console.error("retries exhausted!");
-    //         return await retryList(cls, retries);
-    //       }
-    //       else {
-    //         throw err;
-    //       }
-    //     }
-    //     else if ([404, 405].includes(status)) {
-    //       // if there are no resources to return (404), or
-    //       // if there are no resources allowed (405)
-    //       return;
-    //     }
-    //     else {
-    //       throw err;
-    //     }
-    //   }
-    // }
-    // const gets = await Promise.all(kinds.map(k => retryList(k)));
-
-    // unwrap resource lists
-    // const resources = gets.flatMap(g => g ? [g] : [])
-    //   .flatMap(([k, l]) => 
-    //     l.items.map(o => [k, o] as [GenericClass, KubernetesObject])
-    //   )
+      ))
+    );
 
     // unwrap resource lists
     const resources = gets
@@ -239,35 +160,15 @@ export async function clean(trc: TestRunCfg): Promise<void> {
           .length > 0
     )
 
-    async function retryDelete(cls: GenericClass, obj: KubernetesObject, retries: number = 3): Promise<void> {
-      try {
-        return await K8s(cls).Delete(obj);
-      }
-      catch (err) {
-        let status = err.hasOwnProperty("status") ? err.status : undefined;
-
-        if (status === 429) {
-          let delay = err.data.details.retryAfterSeconds;
-          await sleep(delay);
-
-          retries -= 1;
-          if (retries > 0) {
-            return await retryDelete(cls, obj, retries);
-          }
-          else {
-            console.error("retries exhausted!");
-            throw err;
-          }
-        }
-
-        else {
-          throw err;
-        }
-      }
-    }
-
     // delete test-labelled resources (in parallel)
-    tbds.forEach(async ([k, o]) => await retryDelete(k, o))
+    tbds.forEach(async ([k, o]) => await retry(
+      async () => await K8s(k).Delete(o),
+      {
+        '429': async (err: KfcErr) => {
+          await sleep(err.data.details ? err.data.details.retryAfterSeconds : 1);
+        }
+      }
+    ));
     let terminating = tbds.map(tbd => untilTrue(() => gone(...tbd)))
     await Promise.all(terminating)
   }

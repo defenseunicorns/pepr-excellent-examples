@@ -29,8 +29,8 @@ async function retry<T, U>(action: AsyncFunc<T>, reactions: Record<string, Async
   catch (err) {
     let status = err.hasOwnProperty("status") ? `${err.status}` : undefined;
 
-    if (status === '429') {
-      await reactions['429'](err);
+    if (['400', '429'].includes(status)) {
+      await reactions[status](err);
 
       retries -= 1;
       if (retries > 0) {
@@ -70,6 +70,9 @@ export async function up(name: string = 'pexex-helpers-cluster'): Promise<string
   await Promise.all(kinds.map(async (k) => await retry(
     async () => await K8s(k).Get(),
     {
+      '400': async () => {
+        await sleep(5);
+      },
       '404': noop,
       '405': noop,
       '429': async (err: KfcErr) => {

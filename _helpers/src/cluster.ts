@@ -124,6 +124,8 @@ export async function clean(trc: TestRunCfg): Promise<void> {
     }
 
     const react429 = async (err: KfcErr) => {
+      // let delay = err.data ? err.data.details.retryAfterSeconds : 1;
+      if (!err.data){ console.error(err) }
       let delay = err.data.details.retryAfterSeconds;
       await sleep(delay);
     }
@@ -139,10 +141,10 @@ export async function clean(trc: TestRunCfg): Promise<void> {
     async function retryable<T>(action: AsyncFunc, reactions: Record<string, AsyncFunc>, retries: number = 3): Promise<T> {
       try { return await action(); }
       catch (err) {
-        let status = err.hasOwnProperty("status") ? err.status : undefined;
+        let status = err.hasOwnProperty("status") ? `${err.status}` : undefined;
 
-        if (status === 429) {
-          await reactions[429]();
+        if (status === '429') {
+          await reactions['429'](err);
 
           retries -= 1;
           if (retries > 0) {
@@ -154,7 +156,7 @@ export async function clean(trc: TestRunCfg): Promise<void> {
           }
         }
         else if (Object.keys(reactions).includes(status)) {
-          const res = reactions[status]();
+          const res = await reactions[status](err);
           if (res === undefined) { return; }
           throw res;
         }
@@ -174,9 +176,9 @@ export async function clean(trc: TestRunCfg): Promise<void> {
     const gets = await Promise.all(kinds.map(k => retryable(
       act(k),
       {
-        404: react404,
-        405: react405,
-        429: react429,
+        '404': react404,
+        '405': react405,
+        '429': react429,
       }
     )));
 
@@ -215,10 +217,18 @@ export async function clean(trc: TestRunCfg): Promise<void> {
     // const gets = await Promise.all(kinds.map(k => retryList(k)));
 
     // unwrap resource lists
-    const resources = gets.flatMap(g => g ? [g] : [])
-      .flatMap(([k, l]) => 
-        l.items.map(o => [k, o] as [GenericClass, KubernetesObject])
-      )
+    // const resources = gets.flatMap(g => g ? [g] : [])
+    //   .flatMap(([k, l]) => 
+    //     l.items.map(o => [k, o] as [GenericClass, KubernetesObject])
+    //   )
+
+    // unwrap resource lists
+    const resources = gets
+    .flatMap(g => g ? [g] : [])
+    .flatMap(([k, l]) => {
+      const res = l.items.map(o => [k, o])
+      return (res as [GenericClass, KubernetesObject][]);
+    })
 
     // isolate test-labelled resources
     const [prefix, ] = trc.labelKey().split("/")

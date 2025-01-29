@@ -26,6 +26,41 @@ export async function up(name: string = 'pexex-helpers-cluster'): Promise<string
     if (inject.exitcode > 0) { throw inject }
   }
 
+  async function retryList(cls: GenericClass, retries: number = 3): Promise<void> {
+    try {
+      await K8s(cls).Get();
+      return;
+    }
+    catch (err) {
+      let status = err.hasOwnProperty("status") ? err.status : undefined;
+
+      if (status === 429) {
+        let delay = err.data.details.retryAfterSeconds;
+        await sleep(delay);
+
+        retries -= 1;
+        if (retries > 0) {
+          console.log(`Retrying (retries left: ${retries}).`);
+          return await retryList(cls, retries);
+        }
+        else {
+          console.error("retries exhausted!");
+          throw err;
+        }
+      }
+      else if ([404, 405].includes(status)) {
+        // if there are no resources to return (404), or
+        // if there are no resources allowed (405)
+        return;
+      }
+      else {
+        throw err;
+      }
+    }
+  }
+  let kinds = Object.keys(kind).filter(k => k !== "GenericKind").map(k => kind[k]);
+  await Promise.all(kinds.map(k => retryList(k)));
+
   const config = await new Cmd({
     cmd: `k3d kubeconfig write ${name}`
   }).run()
@@ -79,11 +114,38 @@ export async function clean(trc: TestRunCfg): Promise<void> {
     })
 
     // call cluster for all available (non-404) & authorized (non-405) resources
-    const gets = await Promise.all(
-      kinds.map(k => K8s(k).Get()
-        .then(o => [k, o] as [GenericClass, KubernetesListObject<typeof k>])
-        .catch(e => { if ( ![404, 405].includes(e.status) ) { throw e } })
-      ))
+    async function retryList(cls: GenericClass, retries: number = 3): Promise<[GenericClass, KubernetesListObject<any>]> {
+      try {
+        const got = await K8s(cls).Get();
+        return [cls, got];
+      }
+      catch (err) {
+        let status = err.hasOwnProperty("status") ? err.status : undefined;
+
+        if (status === 429) {
+          let delay = err.data.details.retryAfterSeconds;
+          await sleep(delay);
+
+          retries -= 1;
+          if (retries > 0) {
+            console.error("retries exhausted!");
+            return await retryList(cls, retries);
+          }
+          else {
+            throw err;
+          }
+        }
+        else if ([404, 405].includes(status)) {
+          // if there are no resources to return (404), or
+          // if there are no resources allowed (405)
+          return;
+        }
+        else {
+          throw err;
+        }
+      }
+    }
+    const gets = await Promise.all(kinds.map(k => retryList(k)));
 
     // unwrap resource lists
     const resources = gets.flatMap(g => g ? [g] : [])
@@ -99,47 +161,6 @@ export async function clean(trc: TestRunCfg): Promise<void> {
           .filter(l => l.startsWith(`${prefix}/`))
           .length > 0
     )
-
-    // // delete test-labelled resources (in parallel)
-    // tbds.forEach(([k, o]) => K8s(k).Delete(o))
-    // let terminating = tbds.map(tbd => untilTrue(() => gone(...tbd)))
-    // await Promise.all(terminating)
-
-    // PASS  src/cluster.e2e.test.ts (146.086 s)
-    // up()
-    //   ✓ creates a test k3d cluster (47548 ms)
-    // down()
-    //   ✓ deletes a test k3d cluster (45241 ms)
-    // clean()
-    //   ✓ removes resources with TestRunCfg-defined label (2357 ms)
-    //   ✓ removes CRD & CRs with TestRunCfg-defined label (2256 ms)
-
-    // FAIL src/cluster.e2e.test.ts (95.86 s)
-    // up()
-    //   ✓ creates a test k3d cluster (42246 ms)
-    // down()
-    //   ✓ deletes a test k3d cluster (24010 ms)
-    // clean()
-    //   ✕ removes resources with TestRunCfg-defined label (974 ms)
-    //   ✓ removes CRD & CRs with TestRunCfg-defined label (1975 ms)
-
-    // thrown: Object {
-    //   "data": Object {
-    //     "apiVersion": "v1",
-    //     "code": 429,
-    //     "details": Object {
-    //       "retryAfterSeconds": 1,
-    //     },
-    //     "kind": "Status",
-    //     "message": "storage is (re)initializing",
-    //     "metadata": Object {},
-    //     "reason": "TooManyRequests",
-    //     "status": "Failure",
-    //   },
-    //   "ok": false,
-    //   "status": 429,
-    //   "statusText": "Too Many Requests",
-    // }
 
     async function retryDelete(cls: GenericClass, obj: KubernetesObject, retries: number = 3): Promise<void> {
       try {
@@ -157,6 +178,7 @@ export async function clean(trc: TestRunCfg): Promise<void> {
             return await retryDelete(cls, obj, retries);
           }
           else {
+            console.error("retries exhausted!");
             throw err;
           }
         }
@@ -171,8 +193,8 @@ export async function clean(trc: TestRunCfg): Promise<void> {
     tbds.forEach(async ([k, o]) => await retryDelete(k, o))
     let terminating = tbds.map(tbd => untilTrue(() => gone(...tbd)))
     await Promise.all(terminating)
-
-  } finally {
+  }
+  finally {
     process.env = { ...originalEnv }
   }
   console.timeEnd(msg)

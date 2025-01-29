@@ -113,39 +113,106 @@ export async function clean(trc: TestRunCfg): Promise<void> {
       })
     })
 
-    // call cluster for all available (non-404) & authorized (non-405) resources
-    async function retryList(cls: GenericClass, retries: number = 3): Promise<[GenericClass, KubernetesListObject<any>]> {
-      try {
-        const got = await K8s(cls).Get();
-        return [cls, got];
+    const react404 = async (err: KfcErr): Promise<KfcErr|void> => {
+      err = err;  // noop
+      return;
+    }
+
+    const react405 = async (err: KfcErr): Promise<KfcErr|void> => {
+      err = err; // noop
+      return;
+    }
+
+    const react429 = async (err: KfcErr) => {
+      let delay = err.data.details.retryAfterSeconds;
+      await sleep(delay);
+    }
+
+    type KfcErr = {
+      status?: number
+      data?: {
+        details?: any
       }
+    }
+    type AsyncFunc = (...args: any[]) => any;
+
+    async function retryable<T>(action: AsyncFunc, reactions: Record<string, AsyncFunc>, retries: number = 3): Promise<T> {
+      try { return await action(); }
       catch (err) {
         let status = err.hasOwnProperty("status") ? err.status : undefined;
 
         if (status === 429) {
-          let delay = err.data.details.retryAfterSeconds;
-          await sleep(delay);
+          await reactions[429]();
 
           retries -= 1;
           if (retries > 0) {
-            console.error("retries exhausted!");
-            return await retryList(cls, retries);
+            return await retryable(action, reactions, retries);
           }
           else {
+            console.error("retries exhausted!");
             throw err;
           }
         }
-        else if ([404, 405].includes(status)) {
-          // if there are no resources to return (404), or
-          // if there are no resources allowed (405)
-          return;
+        else if (Object.keys(reactions).includes(status)) {
+          const res = reactions[status]();
+          if (res === undefined) { return; }
+          throw res;
         }
         else {
           throw err;
         }
       }
     }
-    const gets = await Promise.all(kinds.map(k => retryList(k)));
+
+    const act = (cls: GenericClass): () => Promise<[GenericClass, KubernetesListObject<any>]> => {
+      return async () => {
+        const got = await K8s(cls).Get();
+        return [cls, got];
+      }
+    }
+
+    const gets = await Promise.all(kinds.map(k => retryable(
+      act(k),
+      {
+        404: react404,
+        405: react405,
+        429: react429,
+      }
+    )));
+
+    // // call cluster for all available (non-404) & authorized (non-405) resources
+    // async function retryList(cls: GenericClass, retries: number = 3): Promise<[GenericClass, KubernetesListObject<any>]> {
+    //   try {
+    //     const got = await K8s(cls).Get();
+    //     return [cls, got];
+    //   }
+    //   catch (err) {
+    //     let status = err.hasOwnProperty("status") ? err.status : undefined;
+
+    //     if (status === 429) {
+    //       let delay = err.data.details.retryAfterSeconds;
+    //       await sleep(delay);
+
+    //       retries -= 1;
+    //       if (retries > 0) {
+    //         console.error("retries exhausted!");
+    //         return await retryList(cls, retries);
+    //       }
+    //       else {
+    //         throw err;
+    //       }
+    //     }
+    //     else if ([404, 405].includes(status)) {
+    //       // if there are no resources to return (404), or
+    //       // if there are no resources allowed (405)
+    //       return;
+    //     }
+    //     else {
+    //       throw err;
+    //     }
+    //   }
+    // }
+    // const gets = await Promise.all(kinds.map(k => retryList(k)));
 
     // unwrap resource lists
     const resources = gets.flatMap(g => g ? [g] : [])

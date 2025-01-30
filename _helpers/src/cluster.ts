@@ -65,6 +65,16 @@ export async function up(name: string = 'pexex-helpers-cluster'): Promise<string
     if (inject.exitcode > 0) { throw inject }
   }
 
+  const config = await new Cmd({
+    cmd: `k3d kubeconfig write ${name}`
+  }).run()
+  if (config.exitcode > 0) { throw config }
+
+  const kubeConfig = config.stdout[0]
+
+  // config KFC to use test-specific kube config
+  process.env.KUBECONFIG = kubeConfig
+
   // delay return until installed kinds are servable from cluster (i.e. no 429s)
   let kinds = Object.keys(kind).filter(k => k !== "GenericKind").map(k => kind[k]);
   await Promise.all(kinds.map(async (k) => await retry(
@@ -80,13 +90,9 @@ export async function up(name: string = 'pexex-helpers-cluster'): Promise<string
       },
     }
   )));
+  delete process.env.KUBECONFIG
 
-  const config = await new Cmd({
-    cmd: `k3d kubeconfig write ${name}`
-  }).run()
-  if (config.exitcode > 0) { throw config }
-
-  return config.stdout[0]
+  return kubeConfig
 }
 
 export async function down(name: string = 'pexex-helpers-cluster'): Promise<void> {

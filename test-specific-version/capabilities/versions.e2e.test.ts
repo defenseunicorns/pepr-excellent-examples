@@ -10,7 +10,8 @@ describe('version tests', () => {
   describe(`when pepr version is defined the example's package.json (v${examplePeprVersion})`, () => { 
     it('shows the correct version', ()=>{
       rmSync('node_modules/pepr', {recursive: true, force: true})
-      const result = execSync(`npx pepr --version`).toString() //Use a published copy when PEPR_PACKAGE is not set
+      execSync(`npm install pepr@${examplePeprVersion}`)
+      const result = execSync(`npx pepr --version`).toString().trim() //Use a published copy when PEPR_PACKAGE is not set
       expect(result).toContain(examplePeprVersion);
     })
   })

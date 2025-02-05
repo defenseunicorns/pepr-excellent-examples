@@ -30,7 +30,7 @@
     }
   },
   "dependencies": {
-    "pepr": "0.44.0"
+    "pepr": "0.45.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

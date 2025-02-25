@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-watch
+
+---
+apiVersion: pepr.dev/v1
+kind: Unicorn
+metadata:
+  name: delete
+  namespace: hello-pepr-generic-kind
+spec:
+  message: Hello, Pepr!
+  counter: 1

@@ -13,6 +13,7 @@
     "hello-pepr-custom-rbac",
     "hello-pepr-deletion-timestamp",
     "hello-pepr-finalize",
+    "hello-pepr-generic-kind",
     "hello-pepr-hooks",
     "hello-pepr-mutate",
     "hello-pepr-ns-all",

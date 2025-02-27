@@ -1,0 +1,8 @@
+Starting migration log.
+
+/Users/sam.mayer/code/work/pepr-excellent-examples/hello-pepr/eslint.config.mjs
+  2:8  error  'globals' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 1 problem (1 error, 0 warnings)
+
+End of migration log.

@@ -9,12 +9,12 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
-    "@types/node": "^22.13.1",
+    "@types/node": "^22.13.9",
     "commander": "^13.1.0",
     "find-up": "^7.0.0",
     "jest": "^29.7.0",
-    "kubernetes-fluent-client": "^3.4.0",
-    "ts-jest": "^29.2.5",
+    "kubernetes-fluent-client": "^3.4.2",
+    "ts-jest": "^29.2.6",
     "ts-node": "^10.9.2",
     "typescript": "5.7.3",
     "yaml": "^2.7.0"

@@ -9,7 +9,7 @@ export const HelloPeprGenericKind = new Capability({
 });
 
 const { When } = HelloPeprGenericKind;
-When(a.CustomResourceDefinition)
+
 When(a.GenericKind, {
   group: "pepr.dev",
   version: "v1",

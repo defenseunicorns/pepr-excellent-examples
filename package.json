@@ -35,5 +35,9 @@
     "hello-pepr-watch",
     "pepr-operator",
     "test-specific-version"
-  ]
+  ],
+  "devDependencies": {
+    "@typescript-eslint/parser": "^8.23.0",
+    "eslint": "^9.21.0"
+  }
 }

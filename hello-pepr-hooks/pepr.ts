@@ -1,6 +1,6 @@
 import { PeprModule, Log } from "pepr";
 import { MutateResponse, ValidateResponse } from "pepr/src/lib/k8s";
-import { AdmissionRequest } from "pepr/src/lib/types";
+import { AdmissionRequest } from "pepr/src/lib/common-types";
 import cfg from "./package.json";
 import { HelloPeprHooks } from "./capabilities/hooks";
 

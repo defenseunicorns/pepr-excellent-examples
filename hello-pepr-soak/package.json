@@ -30,7 +30,7 @@
     }
   },
   "dependencies": {
-    "pepr": "^0.46.0"
+    "pepr": "^0.46.1"
   },
   "devDependencies": {
     "typescript": "5.7.3"

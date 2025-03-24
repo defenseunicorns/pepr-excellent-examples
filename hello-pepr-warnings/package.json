@@ -1,7 +1,7 @@
 {
   "name": "hello-pepr-warnings",
   "version": "0.0.1",
-  "description": "Testing warnings feature in Pepr validation",
+  "description": "Pepr feature: Validation Warnings",
   "keywords": [
     "pepr",
     "k8s",
@@ -9,14 +9,21 @@
     "security",
     "kubernetes"
   ],
-  "license": "Apache-2.0",
-  "scripts": {
-    "build": "pepr build",
-    "dev": "pepr dev",
-    "test": "jest"
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "uuid": "c1778444-5dfe-4a71-ab1a-9852304e5f97",
+    "onError": "reject",
+    "alwaysIgnore": {
+      "namespaces": [],
+      "labels": []
+    },
+    "includedFiles": [],
+    "env": {}
   },
   "dependencies": {
-    "pepr": "latest"
+    "pepr": "^0.46.2"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
@@ -25,5 +32,12 @@
     "jest": "^29.6.4",
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "pepr": "pepr",
+    "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
+    "test": "npm run cli -- test --suite all",
+    "test:e2e": "npm run cli -- test --suite e2e",
+    "test:unit": "npm run cli -- test --suite unit"
   }
 }

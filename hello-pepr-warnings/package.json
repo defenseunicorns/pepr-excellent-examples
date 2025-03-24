@@ -1,0 +1,29 @@
+{
+  "name": "hello-pepr-warnings",
+  "version": "0.0.1",
+  "description": "Testing warnings feature in Pepr validation",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "security",
+    "kubernetes"
+  ],
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "pepr build",
+    "dev": "pepr dev",
+    "test": "jest"
+  },
+  "dependencies": {
+    "pepr": "latest"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.4",
+    "@types/node": "^20.5.9",
+    "jest": "^29.6.4",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2"
+  }
+}

@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-pepr-warnings
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: warnings-deny
+  namespace: hello-pepr-warnings
+  labels:
+    app: "dangerous-app"
+  annotations:
+    description: "ConfigMap to test warnings feature - should be denied with warnings"
+data:
+  # This will trigger a denial with warnings
+  dangerous-setting: "true"
+  setting1: "value1"

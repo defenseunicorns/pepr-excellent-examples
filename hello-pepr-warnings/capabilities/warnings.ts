@@ -20,17 +20,23 @@ When(a.ConfigMap)
 
     // Check for deprecated fields
     if (request.Raw.data && request.Raw.data["deprecated-field"]) {
-      warnings.push("Warning: The 'deprecated-field' is being used and will be removed in future versions");
+      warnings.push(
+        "Warning: The 'deprecated-field' is being used and will be removed in future versions",
+      );
     }
 
     // Check for missing app label
     if (!request.HasLabel("app")) {
-      warnings.push("Warning: Best practice is to include an 'app' label for resource identification");
+      warnings.push(
+        "Warning: Best practice is to include an 'app' label for resource identification",
+      );
     }
 
     // Check for large number of configuration items
     if (request.Raw.data && Object.keys(request.Raw.data).length > 5) {
-      warnings.push("Warning: Large number of configuration items detected. Consider splitting into multiple ConfigMaps");
+      warnings.push(
+        "Warning: Large number of configuration items detected. Consider splitting into multiple ConfigMaps",
+      );
     }
 
     if (warnings.length > 0) {
@@ -52,18 +58,18 @@ When(a.ConfigMap)
     if (request.Raw.data && request.Raw.data["dangerous-setting"] === "true") {
       const warnings = [
         "Warning: The 'dangerous-setting' field is set to 'true'",
-        "Consider using a safer configuration option"
+        "Consider using a safer configuration option",
       ];
-      
+
       Log.info("Denying request with warnings:", warnings);
-      
+
       return request.Deny(
         "ConfigMap contains dangerous settings that are not allowed",
         422,
-        warnings
+        warnings,
       );
     }
-    
+
     Log.info("Approving request without warnings");
     return request.Approve();
   });
@@ -75,29 +81,33 @@ When(a.ConfigMap)
   .WithName("warnings-multiple")
   .Validate(function warningsMultiple(request) {
     const warnings = [];
-    
+
     // Add multiple warnings based on different conditions
     if (request.Raw.data && request.Raw.data["setting1"] === "deprecated") {
-      warnings.push("Warning: The value 'deprecated' for 'setting1' is deprecated");
+      warnings.push(
+        "Warning: The value 'deprecated' for 'setting1' is deprecated",
+      );
     }
-    
+
     if (request.Raw.data && request.Raw.data["setting2"] === "insecure") {
-      warnings.push("Warning: The value 'insecure' for 'setting2' is not recommended for production");
+      warnings.push(
+        "Warning: The value 'insecure' for 'setting2' is not recommended for production",
+      );
     }
-    
+
     if (!request.HasLabel("environment")) {
       warnings.push("Warning: Missing 'environment' label");
     }
-    
+
     if (!request.HasLabel("app")) {
       warnings.push("Warning: Missing 'app' label");
     }
-    
+
     if (warnings.length > 0) {
       Log.info("Approving request with multiple warnings:", warnings);
     } else {
       Log.info("Approving request without warnings");
     }
-    
+
     return request.Approve(warnings.length > 0 ? warnings : undefined);
   });

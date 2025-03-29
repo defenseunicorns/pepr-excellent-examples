@@ -64,6 +64,12 @@ const test = program.command('test')
   )
   .addOption(
     new Option(
+      "-r, --release-candidate <pepr-0.0.0-development.tgz>",
+      "use a release candidate for the pepr npm library"
+    )
+  )
+  .addOption(
+    new Option(
       "-c, --custom-package <package>",
       "test a specified pepr cli .tgz package",
     ).conflicts('localPackage')
@@ -96,6 +102,11 @@ const test = program.command('test')
       backupPackageJSON();
 
       execSync('npm install', { cwd: peprExcellentExamplesRepo });
+
+      // Override the Pepr npm module with a release candidate
+      if(thisCommand.opts().releaseCandidate){
+        execSync(`npm install --no-save ${thisCommand.opts().releaseCandidate}`, { cwd: peprExcellentExamplesRepo });
+      }
     } catch (err) {
       throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}. Check package.json and package-lock.json. Error: ${err.message}`);
     }

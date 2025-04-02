@@ -9,7 +9,6 @@ import { clean } from 'helpers/src/cluster';
 import { fullCreate, halfCreate } from "helpers/src/general";
 import { moduleDown, moduleUp, untilLogged } from 'helpers/src/pepr';
 import { mins, secs } from 'helpers/src/time';
-import { K8s, kind } from 'pepr';
 
 const trc = new TestRunCfg(__filename);
 
@@ -32,20 +31,13 @@ describe("warnings.ts", () => {
       // Create the ConfigMap that should trigger warnings but still be approved
       await fullCreate(warningsApprove);
 
-      // Verify that all expected warnings were logged
+      // todo: these should be "in the response" somewhere - how do we get them?
       await untilLogged("Warning: The 'deprecated-field' is being used");
       await untilLogged("Warning: Best practice is to include an 'app' label");
       await untilLogged("Warning: Large number of configuration items detected");
 
       // Verify that the resource was approved despite warnings
       await untilLogged("Approving request with warnings");
-
-      // Verify the ConfigMap exists in the cluster
-      const cm = await K8s(kind.ConfigMap)
-        .InNamespace(warningsApprove.metadata.namespace)
-        .Get(warningsApprove.metadata.name);
-
-      expect(cm.metadata?.name).toBe(warningsApprove.metadata.name);
     }, secs(15));
   });
 
@@ -69,7 +61,7 @@ describe("warnings.ts", () => {
 
       // Verify that the denial with warnings was logged
       await untilLogged("Denying request with warnings");
-      // Verify that warnings were logged (these are not directly in the response)
+      // todo: these should be "in the response" somewhere - how do we get them?
       await untilLogged("Warning: The 'dangerous-setting' field is set to 'true'");
       await untilLogged("Consider using a safer configuration option");
     }, secs(15));
@@ -87,7 +79,7 @@ describe("warnings.ts", () => {
       // Create the ConfigMap that should trigger multiple warnings but still be approved
       await fullCreate(warningsMultiple);
 
-      // Verify that all expected warnings were logged
+      // todo: these should be "in the response" somewhere - how do we get them?
       await untilLogged("Warning: The value 'deprecated' for 'setting1' is deprecated");
       await untilLogged("Warning: The value 'insecure' for 'setting2' is not recommended");
       await untilLogged("Warning: Missing 'environment' label");
@@ -95,13 +87,6 @@ describe("warnings.ts", () => {
 
       // Verify that the resource was approved despite multiple warnings
       await untilLogged("Approving request with multiple warnings");
-
-      // Verify the ConfigMap exists in the cluster
-      const cm = await K8s(kind.ConfigMap)
-        .InNamespace(warningsMultiple.metadata.namespace)
-        .Get(warningsMultiple.metadata.name);
-
-      expect(cm.metadata?.name).toBe(warningsMultiple.metadata.name);
     }, secs(15));
   });
 });

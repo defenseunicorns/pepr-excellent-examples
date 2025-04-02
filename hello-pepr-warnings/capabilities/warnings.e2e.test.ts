@@ -5,19 +5,20 @@ import {
   it
 } from "@jest/globals";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
+import { clean } from 'helpers/src/cluster';
 import { fullCreate, halfCreate } from "helpers/src/general";
-import { untilLogged } from 'helpers/src/pepr';
-import { secs } from 'helpers/src/time';
+import { moduleDown, moduleUp, untilLogged } from 'helpers/src/pepr';
+import { mins, secs } from 'helpers/src/time';
 import { K8s, kind } from 'pepr';
 
 const trc = new TestRunCfg(__filename);
 
 describe("warnings.ts", () => {
-  // beforeAll(async () => await moduleUp(), mins(2));
-  // afterAll(async () => {
-  //   await moduleDown();
-  //   await clean(trc);
-  // }, mins(5));
+  beforeAll(async () => await moduleUp(), mins(2));
+  afterAll(async () => {
+    await moduleDown();
+    await clean(trc);
+  }, mins(5));
 
   describe("warnings with approval", () => {
     let ns, warningsApprove;

@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: warnings-multiple
+  namespace: hello-pepr-warnings
+  # Missing both 'app' and 'environment' labels will trigger warnings
+data:
+  setting1: "deprecated"
+  setting2: "insecure"
+  setting3: "value3"
+  # This will trigger multiple warnings

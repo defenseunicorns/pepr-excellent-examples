@@ -34,6 +34,7 @@
     "hello-pepr-store",
     "hello-pepr-store-redact-logs",
     "hello-pepr-validate",
+    "hello-pepr-warnings",
     "hello-pepr-watch",
     "pepr-operator",
     "test-specific-version"

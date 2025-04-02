@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: warnings-approve
+  namespace: hello-pepr-warnings
+  # Missing 'app' label will trigger a warning
+data:
+  # This will trigger a warning about deprecated field
+  deprecated-field: "some-value"
+  setting1: "value1"
+  setting2: "value2"
+  setting3: "value3"
+  setting4: "value4"
+  setting5: "value5"
+  setting6: "value6"
+  # Having more than 5 settings will trigger a warning about too many items

@@ -4,9 +4,11 @@ import {
   expect,
   it
 } from "@jest/globals";
+// Note: spawnSync is required to capture stderr where the warnings end up
+import { execSync, spawnSync } from 'child_process';
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { clean } from 'helpers/src/cluster';
-import { fullCreate, halfCreate } from "helpers/src/general";
+import { clean } from "helpers/src/cluster";
+import { fullCreate } from "helpers/src/general";
 import { moduleDown, moduleUp, untilLogged } from 'helpers/src/pepr';
 import { mins, secs } from 'helpers/src/time';
 
@@ -20,72 +22,99 @@ describe("warnings.ts", () => {
   }, mins(5));
 
   describe("warnings with approval", () => {
-    let ns, warningsApprove;
+    let ns, scenarioFile;
 
     beforeAll(async () => {
-      [ns, warningsApprove] = await trc.load(`${trc.root()}/capabilities/scenario.warnings-approve.yaml`);
+      scenarioFile = `${trc.root()}/capabilities/scenario.warnings-approve.yaml`;
+      [ns] = await trc.load(`${trc.root()}/capabilities/ns.yaml`);
       await fullCreate(ns);
     }, secs(10));
 
     it("approves resource with warnings", async () => {
-      // Create the ConfigMap that should trigger warnings but still be approved
-      await fullCreate(warningsApprove);
+      // Delete the resource first to ensure we get a fresh creation with warnings
+      execSync(`kubectl delete -f ${scenarioFile} --ignore-not-found`, { encoding: 'utf-8' });
 
-      // todo: these should be "in the response" somewhere - how do we get them?
-      await untilLogged("Warning: The 'deprecated-field' is being used");
-      await untilLogged("Warning: Best practice is to include an 'app' label");
-      await untilLogged("Warning: Large number of configuration items detected");
+      // Apply the ConfigMap using kubectl and capture stdout and stderr separately
+      const result = spawnSync('kubectl', ['apply', '-f', scenarioFile], {
+        encoding: 'utf-8',
+        stdio: 'pipe'
+      });
 
-      // Verify that the resource was approved despite warnings
+      // Verify that warnings are present in stderr
+      expect(result.stderr).toContain("Warning: The 'deprecated-field' is being used");
+      expect(result.stderr).toContain("Warning: Best practice is to include an 'app' label");
+      expect(result.stderr).toContain("Warning: Large number of configuration items detected");
+
+      // Verify that the resource was created successfully in stdout
+      expect(result.stdout).toContain("configmap/warnings-approve created");
+
+      // Also verify that the warnings are logged
       await untilLogged("Approving request with warnings");
     }, secs(15));
   });
 
   describe("warnings with denial", () => {
-    let ns, warningsDeny;
+    let ns, scenarioFile;
 
     beforeAll(async () => {
-      [ns, warningsDeny] = await trc.load(`${trc.root()}/capabilities/scenario.warnings-deny.yaml`);
+      scenarioFile = `${trc.root()}/capabilities/scenario.warnings-deny.yaml`;
+      [ns] = await trc.load(`${trc.root()}/capabilities/ns.yaml`);
       await fullCreate(ns);
     }, secs(10));
 
     it("denies resource with warnings", async () => {
-      // Attempt to create the ConfigMap that should be denied with warnings
-      const reject = await halfCreate(warningsDeny).catch(e => e.data);
+      // Apply the ConfigMap using kubectl and expect it to fail
+      const result = spawnSync('kubectl', ['apply', '-f', scenarioFile], {
+        encoding: 'utf-8',
+        stdio: 'pipe'
+      });
 
-      // Verify that the request was denied
-      expect(reject.message).toMatch("ConfigMap contains dangerous settings that are not allowed");
+      // Verify that the denial message is in stderr
+      expect(result.stderr).toContain("ConfigMap contains dangerous settings that are not allowed");
 
-      // Verify the status code is 422
-      expect(reject.code).toBe(422);
+      // Verify that warnings are present in stderr
+      expect(result.stderr).toContain("Warning: The 'dangerous-setting' field is set to 'true'");
+      expect(result.stderr).toContain("Consider using a safer configuration option");
 
-      // Verify that the denial with warnings was logged
+      // Verify that the resource was denied (error code in stderr, no success in stdout)
+      expect(result.stderr).toContain("Error from server");
+      expect(result.stdout).not.toContain("configmap/warnings-deny created");
+      expect(result.status).not.toBe(0); // Non-zero exit code indicates failure
+
+      // Also verify that the warnings are logged
       await untilLogged("Denying request with warnings");
-      // todo: these should be "in the response" somewhere - how do we get them?
-      await untilLogged("Warning: The 'dangerous-setting' field is set to 'true'");
-      await untilLogged("Consider using a safer configuration option");
     }, secs(15));
   });
 
   describe("multiple warnings in approval", () => {
-    let ns, warningsMultiple;
+    let ns, scenarioFile;
 
     beforeAll(async () => {
-      [ns, warningsMultiple] = await trc.load(`${trc.root()}/capabilities/scenario.warnings-multiple.yaml`);
+      scenarioFile = `${trc.root()}/capabilities/scenario.warnings-multiple.yaml`;
+      [ns] = await trc.load(`${trc.root()}/capabilities/ns.yaml`);
       await fullCreate(ns);
     }, secs(10));
 
     it("approves resource with multiple warnings", async () => {
-      // Create the ConfigMap that should trigger multiple warnings but still be approved
-      await fullCreate(warningsMultiple);
+      // Delete the resource first to ensure we get a fresh creation with warnings
+      execSync(`kubectl delete -f ${scenarioFile} --ignore-not-found`, { encoding: 'utf-8' });
 
-      // todo: these should be "in the response" somewhere - how do we get them?
-      await untilLogged("Warning: The value 'deprecated' for 'setting1' is deprecated");
-      await untilLogged("Warning: The value 'insecure' for 'setting2' is not recommended");
-      await untilLogged("Warning: Missing 'environment' label");
-      await untilLogged("Warning: Missing 'app' label");
+      // Apply the ConfigMap using kubectl and capture stdout and stderr separately
+      const result = spawnSync('kubectl', ['apply', '-f', scenarioFile], {
+        encoding: 'utf-8',
+        stdio: 'pipe'
+      });
 
-      // Verify that the resource was approved despite multiple warnings
+      // Verify that warnings are present in stderr
+      expect(result.stderr).toContain("Warning: The value 'deprecated' for 'setting1' is deprecated");
+      expect(result.stderr).toContain("Warning: The value 'insecure' for 'setting2' is not recommended");
+      expect(result.stderr).toContain("Warning: Missing 'environment' label");
+      expect(result.stderr).toContain("Warning: Missing 'app' label");
+
+      // Verify that the resource was created successfully in stdout
+      expect(result.stdout).toContain("configmap/warnings-multiple created");
+
+      // Also verify that the warnings are logged
       await untilLogged("Approving request with multiple warnings");
     }, secs(15));
   });

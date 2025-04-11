@@ -84,6 +84,8 @@ const test = program.command('test')
     if (thisCommand.opts().suite === "unit" ){ return }
 
     if (thisCommand.opts().customPackage){
+      // install the custom package at the root
+      execSync(`npm install ${thisCommand.opts().customPackage}`, { cwd: peprExcellentExamplesRepo });
       process.env.PEPR_PACKAGE = `${resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
       validateCustomPackage(peprExcellentExamplesRepo);
     }

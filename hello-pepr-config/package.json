@@ -37,9 +37,9 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
-    "@types/node": "^22.13.10",
+    "@types/node": "^22.14.1",
     "jest": "^29.7.0",
-    "kubernetes-fluent-client": "^3.4.5",
+    "kubernetes-fluent-client": "^3.4.10",
     "typescript": "5.7.3"
   },
   "scripts": {

@@ -37,7 +37,7 @@ jobs:
       - name: create matrix
         run: |
           matrix=$(
-            node "$PEPR/.github/workflows/matrix.js" "$(pwd)"
+            node ".github/workflows/matrix.js" "$(pwd)"
           )
           echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
         id: create-matrix

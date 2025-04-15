@@ -68,7 +68,7 @@ const test = program.command('test')
       "test a specified pepr cli .tgz package",
     ).conflicts('localPackage')
   )
-  .requiredOption(
+  .option(
       "-i, --image <image>",
       "pepr controller image under test"
   )

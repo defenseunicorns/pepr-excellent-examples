@@ -91,7 +91,9 @@ const test = program.command('test')
     else if (thisCommand.opts().localPackage){
       process.env.PEPR_PACKAGE = buildLocalPepr(peprExcellentExamplesRepo)
     }
-    process.env.PEPR_IMAGE = thisCommand.opts().image
+    else if (thisCommand.opts().image){
+      process.env.PEPR_IMAGE = thisCommand.opts().image
+    }
 
     try {
       backupPackageJSON();

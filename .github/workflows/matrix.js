@@ -15,20 +15,16 @@ let examples = stdout.toLocaleString().trim().split("\n");
 
 // select those with 'test:e2e' scripts
 let e2es = examples
-  .map((ex) => [ex, require(`${ex}/package.json`)])
-  .filter(([ex, cfg]) => Object.hasOwn(cfg.scripts, "test:e2e"));
+  .map(ex => [ex, require(`${ex}/package.json`)])
+  .filter(([ex, cfg]) => Object.hasOwn(cfg.scripts, "test:e2e"))
+  .filter(([ex, cfg]) => cfg.name !== "test-specific-version") // requires package.json.bak which is only present when overriding the Pepr version
 
 // gen matrix spec
 let spec = {
-  include: e2es.map(([ex, cfg]) => {
-    // requires package.json.bak which is only present when overriding the version
-    if (cfg.name !== "test-specific-version") {
-      return {
-        name: cfg.name,
-        path: ex,
-      };
-    }
-  }),
+  include: e2es.map(([ex, cfg]) => ({
+    name: cfg.name,
+    path: ex,
+  })),
 };
-
+  
 console.log(JSON.stringify(spec));

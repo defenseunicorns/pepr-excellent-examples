@@ -91,7 +91,7 @@ const test = program.command('test')
     else if (thisCommand.opts().localPackage){
       process.env.PEPR_PACKAGE = buildLocalPepr(peprExcellentExamplesRepo)
     }
-    else if (thisCommand.opts().image){
+    if (thisCommand.opts().image){
       process.env.PEPR_IMAGE = thisCommand.opts().image
     }
 

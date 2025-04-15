@@ -70,8 +70,7 @@ const test = program.command('test')
   )
   .requiredOption(
       "-i, --image <image>",
-      "pepr controller image under test",
-      "pepr:dev"
+      "pepr controller image under test"
   )
   .addOption(
     new Option(
@@ -137,7 +136,9 @@ function printTestInfo() {
       const peprVersion = execSync(`npx --yes ${getPeprAlias()} --version`).toString();
       console.log(`Pepr Version under test: ${peprVersion}`);
     }
-    console.log(`Pepr Image under test: ${execSync(`docker inspect --format="{{.Id}} {{.RepoTags}}" ${process.env.PEPR_IMAGE}`).toString()}`);
+    if (process.env.PEPR_IMAGE) {
+      console.log(`Pepr Image under test: ${execSync(`docker inspect --format="{{.Id}} {{.RepoTags}}" ${process.env.PEPR_IMAGE}`).toString()}`);
+    }
 }
 
 function buildLocalPepr(outputDirectory: string) {

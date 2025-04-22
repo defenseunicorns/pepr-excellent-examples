@@ -24,7 +24,7 @@ When(WebApp)
       Store.setItem(instance.metadata.name, JSON.stringify(instance));
       await reconciler(instance);
     } catch (error) {
-      Log.info(`Error reconciling instance of WebApp`);
+      Log.error(error, `Error reconciling instance of WebApp`);
     }
   });
 

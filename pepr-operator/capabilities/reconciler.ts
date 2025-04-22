@@ -59,10 +59,12 @@ async function updateStatus(instance: WebApp, status: Status) {
   await writeEvent(
     instance,
     { message: status.phase },
-    "Normal",
-    "InstanceCreatedOrUpdated",
-    instance.metadata.name,
-    instance.metadata.name,
+    {
+      eventType: "Normal",
+      eventReason: "InstanceCreatedOrUpdated",
+      reportingComponent: instance.metadata.name,
+      reportingInstance: instance.metadata.name,
+    },
   );
   await K8s(WebApp).PatchStatus({
     metadata: {

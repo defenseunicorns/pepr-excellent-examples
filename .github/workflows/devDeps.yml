@@ -58,6 +58,8 @@ jobs:
           npx --yes file://./pepr-0.0.0-development.tgz init \
             --name "pepr-test-module" \
             --description "for comparing devDependencies against" \
+            --errorBehavior "ignore" \
+            --uuid "pepr-test-module" \
             --skip-post-init \
             --confirm
 

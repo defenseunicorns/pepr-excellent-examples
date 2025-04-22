@@ -68,10 +68,9 @@ const test = program.command('test')
       "test a specified pepr cli .tgz package",
     ).conflicts('localPackage')
   )
-  .requiredOption(
+  .option(
       "-i, --image <image>",
-      "pepr controller image under test",
-      "pepr:dev"
+      "pepr controller image under test"
   )
   .addOption(
     new Option(
@@ -84,13 +83,17 @@ const test = program.command('test')
     if (thisCommand.opts().suite === "unit" ){ return }
 
     if (thisCommand.opts().customPackage){
+      // install the custom package at the root
+      execSync(`npm install ${thisCommand.opts().customPackage}`, { cwd: peprExcellentExamplesRepo });
       process.env.PEPR_PACKAGE = `${resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
       validateCustomPackage(peprExcellentExamplesRepo);
     }
     else if (thisCommand.opts().localPackage){
       process.env.PEPR_PACKAGE = buildLocalPepr(peprExcellentExamplesRepo)
     }
-    process.env.PEPR_IMAGE = thisCommand.opts().image
+    if (thisCommand.opts().image){
+      process.env.PEPR_IMAGE = thisCommand.opts().image
+    }
 
     try {
       backupPackageJSON();
@@ -135,7 +138,9 @@ function printTestInfo() {
       const peprVersion = execSync(`npx --yes ${getPeprAlias()} --version`).toString();
       console.log(`Pepr Version under test: ${peprVersion}`);
     }
-    console.log(`Pepr Image under test: ${execSync(`docker inspect --format="{{.Id}} {{.RepoTags}}" ${process.env.PEPR_IMAGE}`).toString()}`);
+    if (process.env.PEPR_IMAGE) {
+      console.log(`Pepr Image under test: ${execSync(`docker inspect --format="{{.Id}} {{.RepoTags}}" ${process.env.PEPR_IMAGE}`).toString()}`);
+    }
 }
 
 function buildLocalPepr(outputDirectory: string) {

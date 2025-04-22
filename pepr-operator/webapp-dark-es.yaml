@@ -1,0 +1,9 @@
+kind: WebApp
+apiVersion: pepr.io/v1alpha1
+metadata:
+  name: webapp-light-en
+  namespace: webapps
+spec:
+  theme: dark 
+  language: es
+  replicas: 1 

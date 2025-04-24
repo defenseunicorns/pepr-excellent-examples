@@ -82,7 +82,7 @@ const test = program.command('test')
   .option(
     "-k, --kfc <package>",
     "test a specified kfc .tgz package"
-)
+  )
   .hook('preAction', (thisCommand) =>{
     // don't need to config pepr module/image overrides for unit testing
     if (thisCommand.opts().suite === "unit" ){ return }

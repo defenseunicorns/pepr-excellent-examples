@@ -14,6 +14,7 @@ import { copyFileSync, mkdirSync, renameSync, rmSync } from 'fs';
 import { rmdirSync } from 'node:fs';
 import assert from 'node:assert';
 
+
 const peprExcellentExamplesRepo = findUpSync('pepr-excellent-examples', {type: 'directory'});
 if(!peprExcellentExamplesRepo){
   throw new Error('Could not find parent "pepr-excellent-examples" directory');
@@ -78,6 +79,10 @@ const test = program.command('test')
       'args to pass to test runner (e.g. --passthru=\'--testNamePattern="testName()"\')'
     )
   )
+  .option(
+    "-k, --kfc <package>",
+    "test a specified kfc .tgz package"
+  )
   .hook('preAction', (thisCommand) =>{
     // don't need to config pepr module/image overrides for unit testing
     if (thisCommand.opts().suite === "unit" ){ return }
@@ -96,9 +101,12 @@ const test = program.command('test')
     }
 
     try {
+      process.env.KFC_PACKAGE = thisCommand.opts().kfc
       backupPackageJSON();
-
       execSync('npm install', { cwd: peprExcellentExamplesRepo });
+      if( thisCommand.opts().kfc){
+        execSync(`npm install ${thisCommand.opts().kfc}`, { cwd: peprExcellentExamplesRepo });
+      }
     } catch (err) {
       throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}. Check package.json and package-lock.json. Error: ${err.message}`);
     }
@@ -156,7 +164,7 @@ function buildLocalPepr(outputDirectory: string) {
 }
 
 function restorePackageJSON() {
-  if (basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr') {
+  if (basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr' || process.env.KFC_PACKAGE === "kubernetes-fluent-client-0.0.0-development.tgz") {
     renameSync(`${peprExcellentExamplesRepo}/package-lock.json.bak`, `${peprExcellentExamplesRepo}/package-lock.json`);
     renameSync(`${peprExcellentExamplesRepo}/package.json.bak`, `${peprExcellentExamplesRepo}/package.json`);
     renameSync(`${process.cwd()}/package.json.bak`, `${process.cwd()}/package.json`);
@@ -164,7 +172,7 @@ function restorePackageJSON() {
 }
 
 function backupPackageJSON() {
-  if (basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr') {
+  if (basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr' || process.env.KFC_PACKAGE === "kubernetes-fluent-client-0.0.0-development.tgz") {
     copyFileSync(`${peprExcellentExamplesRepo}/package-lock.json`, `${peprExcellentExamplesRepo}/package-lock.json.bak`);
     copyFileSync(`${peprExcellentExamplesRepo}/package.json`, `${peprExcellentExamplesRepo}/package.json.bak`);
     copyFileSync(`${process.cwd()}/package.json`, `${process.cwd()}/package.json.bak`);

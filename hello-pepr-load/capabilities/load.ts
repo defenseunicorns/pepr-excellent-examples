@@ -14,7 +14,9 @@ When(a.ConfigMap)
   .InNamespace(ns)
   .Reconcile(async function immediatelyDelete(cm) {
     const { name } = cm.metadata;
-    if (name === "kube-root-ca.crt") { return }
+    if (name === "kube-root-ca.crt") {
+      return;
+    }
 
     await K8s(a.ConfigMap).InNamespace(ns).Delete(name);
   });

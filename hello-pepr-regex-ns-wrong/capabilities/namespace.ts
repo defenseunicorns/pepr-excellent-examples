@@ -1,4 +1,4 @@
-import { Capability, a, Log } from "pepr";
+import { Capability, a } from "pepr";
 
 const name = "hello-pepr-namespace";
 
@@ -16,4 +16,3 @@ When(a.ConfigMap)
   .Validate(async function validateWrong(request) {
     return request.Approve();
   });
-

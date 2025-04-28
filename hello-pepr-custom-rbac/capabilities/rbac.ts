@@ -5,7 +5,6 @@ import {
   PeprMutateRequest,
   RegisterKind,
   a,
-  fetch,
   fetchStatus,
   kind,
 } from "pepr";
@@ -262,11 +261,6 @@ When(a.ConfigMap)
  * fetch("https://icanhazdadjoke.com")
  * ```
  */
-interface TheChuckNorrisJoke {
-  id: string;
-  joke: string;
-  status: number;
-}
 
 When(a.ConfigMap)
   .IsCreatedOrUpdated()

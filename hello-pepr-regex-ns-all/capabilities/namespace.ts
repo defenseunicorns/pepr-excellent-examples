@@ -21,7 +21,7 @@ When(a.ConfigMap)
 When(a.ConfigMap)
   .IsCreated()
   .InNamespaceRegex(/-ns-all$/)
-  .Watch(async cm =>  {
+  .Watch(async cm => {
     await K8s(kind.ConfigMap).Apply({
       metadata: {
         name: cm.metadata.name,

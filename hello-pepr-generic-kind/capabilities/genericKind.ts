@@ -81,4 +81,3 @@ When(a.GenericKind, {
   .Watch(() => {
     Log.info("GenericKind deleted watched");
   });
-

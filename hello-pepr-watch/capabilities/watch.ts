@@ -14,7 +14,7 @@ When(a.Secret)
   .IsCreated()
   .InNamespace(name)
   .WithName("create-me")
-  .Watch(instance => {
+  .Watch((instance) => {
     Log.info(`Watched ${instance.metadata?.name}: create`);
   });
 
@@ -30,7 +30,7 @@ When(a.Secret)
   .IsUpdated()
   .InNamespace(name)
   .WithName("update-me")
-  .Watch(instance => {
+  .Watch((instance) => {
     Log.info(`Watched ${instance.metadata?.name}: update`);
   });
 
@@ -38,6 +38,6 @@ When(a.Secret)
   .IsDeleted()
   .InNamespace(name)
   .WithName("delete-me")
-  .Watch(instance => {
+  .Watch((instance) => {
     Log.info(`Watched ${instance.metadata?.name}: delete`);
   });

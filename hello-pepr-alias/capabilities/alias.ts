@@ -3,9 +3,7 @@ import { Capability, a } from "pepr";
 export const HelloPeprAlias = new Capability({
   name: "hello-pepr-alias",
   description: "hello-pepr-alias",
-  namespaces: [
-    "hello-pepr-alias-create"
-  ],
+  namespaces: ["hello-pepr-alias-create"],
 });
 
 const { When } = HelloPeprAlias;
@@ -45,19 +43,11 @@ When(a.ConfigMap)
   .WithName("cm-watch-create")
   .Alias("alias:create:watch")
   .Watch(function watchCreate(cm, phase, logger) {
-    logger.info(
-      cm,
-      "external api call (watch-create-alias): watch/callback",
-    );
+    logger.info(cm, "external api call (watch-create-alias): watch/callback");
   })
   .Finalize(function finalizeCreate(cm, logger) {
-    logger.info(
-      cm,
-      "external api call (watch-create-alias): watch/finalize",
-    );
+    logger.info(cm, "external api call (watch-create-alias): watch/finalize");
   });
-
-
 
 When(a.ConfigMap)
   .IsCreated()
@@ -72,15 +62,11 @@ When(a.ConfigMap)
     return cm.Approve();
   });
 
-
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace("hello-pepr-alias-create")
   .WithName("cm-mutate-create")
   .Alias("alias:create:mutate")
   .Mutate(function mutateCreate(cm, logger) {
-    logger.info(
-      cm,
-      "external api call (mutate-create-alias): mutate/callback",
-    );
-  })
+    logger.info(cm, "external api call (mutate-create-alias): mutate/callback");
+  });

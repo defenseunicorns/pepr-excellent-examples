@@ -32,11 +32,6 @@ describe("store.ts", () => {
     await moduleUp(), mins(2);
   }, secs(90));
 
-  // afterAll(async () => {
-  //   await moduleDown();
-  //   await clean(trc);
-  // }, mins(5));
-
   describe("Store Resource", () => {
     let store: PeprStore;
     let logz;

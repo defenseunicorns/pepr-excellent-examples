@@ -1,0 +1,9 @@
+---
+apiVersion: pepr.dev/v1
+data:
+  __pepr_do_not_delete__: k-thx-bye
+  hello-pepr-store-resources-testing: "migrated"
+kind: PeprStore
+metadata:
+  name: pepr-store-resources-store
+  namespace: pepr-system

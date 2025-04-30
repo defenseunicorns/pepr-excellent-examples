@@ -32,6 +32,7 @@
     "hello-pepr-regex-ns-wrong",
     "hello-pepr-soak",
     "hello-pepr-store",
+    "hello-pepr-store-resources",
     "hello-pepr-store-redact-logs",
     "hello-pepr-validate",
     "hello-pepr-warnings",

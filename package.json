@@ -42,7 +42,6 @@
     "test-specific-version"
   ],
   "dependencies": {
-    "kubernetes-fluent-client": "^3.5.2",
-    "pepr": "file:pepr-0.0.0-development.tgz"
+    "kubernetes-fluent-client": "^3.5.2"
   }
 }

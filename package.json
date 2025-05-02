@@ -12,6 +12,7 @@
     "hello-pepr-alias",
     "hello-pepr-config",
     "hello-pepr-config-ignored-ns",
+    "hello-pepr-config-ignored-controller-ns",
     "hello-pepr-custom-rbac",
     "hello-pepr-deletion-timestamp",
     "hello-pepr-finalize",
@@ -41,6 +42,7 @@
     "test-specific-version"
   ],
   "dependencies": {
-    "kubernetes-fluent-client": "^3.5.2"
+    "kubernetes-fluent-client": "^3.5.2",
+    "pepr": "file:pepr-0.0.0-development.tgz"
   }
 }

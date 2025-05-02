@@ -44,22 +44,19 @@ describe("ignored-controller-ns.ts", () => {
     });
     
     it(
-      "ignores resources in admission.ignoredNamespaces for Mutate",
+      "ignores resources in admission.alwaysIgnore.namespaces for Mutate",
       async () => {
         const cm = await K8s(kind.ConfigMap)
           .InNamespace("mutate-ignored")
           .Get("mutate-ignored");
-        expect(cm.metadata?.labels).not.toEqual(
-          expect.objectContaining({
-            not: "seen",
-          }),
-        );
+        // no label was set during admission due to admission.alwaysIgnore.namespaces
+        expect(cm.metadata?.labels).toBeUndefined()
       },
       secs(10),
     );
 
     it(
-      "allows watch to operate on resources in admission.ignoredNamespaces",
+      "allows watch to operate on resources in admission.alwaysIgnore.namespaces",
       async () => {
         const cm = await K8s(kind.ConfigMap)
           .InNamespace("mutate-ignored")
@@ -74,31 +71,23 @@ describe("ignored-controller-ns.ts", () => {
     );
 
     it(
-      "allows mutate to operate on resources in watch.ignoredNamespaces",
+      "allows mutate to operate on resources in watch.alwaysIgnore.namespaces",
       async () => {
         const cm = await K8s(kind.ConfigMap)
           .InNamespace("watch-ignored")
           .Get("watch-ignored");
-        expect(cm.metadata?.labels).toEqual(
-          expect.objectContaining({
-            can: "seen",
-          }),
-        );
+        expect(cm.metadata?.labels['can']).toBe("see");
       },
       secs(10),
     );
 
     it(
-      "ignores resources in watch.ignoredNamespaces for Watch",
+      "ignores resources in watch.alwaysIgnore.namespaces for Watch",
       async () => {
         const cm = await K8s(kind.ConfigMap)
           .InNamespace("mutate-ignored")
           .Get("mutate-ignored");
-        expect(cm.metadata?.annotations).not.toEqual(
-          expect.objectContaining({
-            been: "seen",
-          }),
-        );
+        expect(cm.metadata?.labels?.['been']).toBeUndefined();
       },
       secs(10),
     );

@@ -49,7 +49,7 @@ When(a.ConfigMap)
       metadata: {
         name: cm.metadata.name,
         namespace: cm.metadata.namespace,
-        annotations: {
+        labels: {
           been: "seen",
         },
       },

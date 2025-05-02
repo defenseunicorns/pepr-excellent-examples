@@ -23,10 +23,14 @@
       "namespaces": []
     },
     "admission": {
-      "ignoredNamespaces": ["mutate-ignored"]
+      "alwaysIgnore": {
+        "namespaces": ["mutate-ignored"]
+       }
     },
-    "watcher": {
-      "ignoredNamespaces": ["watch-ignored"]
+    "watch": {
+       "alwaysIgnore": {
+         "namespaces": ["watch-ignored"]
+        }
     }
   },
   "dependencies": {

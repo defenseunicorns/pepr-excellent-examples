@@ -24,13 +24,17 @@
     },
     "admission": {
       "alwaysIgnore": {
-        "namespaces": ["mutate-ignored"]
-       }
+        "namespaces": [
+          "mutate-ignored"
+        ]
+      }
     },
     "watch": {
-       "alwaysIgnore": {
-         "namespaces": ["watch-ignored"]
-        }
+      "alwaysIgnore": {
+        "namespaces": [
+          "watch-ignored"
+        ]
+      }
     }
   },
   "dependencies": {

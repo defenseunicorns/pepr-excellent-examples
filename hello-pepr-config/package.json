@@ -33,7 +33,7 @@
     }
   },
   "dependencies": {
-    "pepr": "^0.49.0"
+    "pepr": "file://~/code/work/pepr/pepr-0.0.0-development.tgz"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

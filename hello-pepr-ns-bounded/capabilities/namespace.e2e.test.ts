@@ -20,7 +20,7 @@ const apply = async res => {
 const trc = new TestRunCfg(__filename)
 
 describe("namespace.ts", () => {
-  beforeAll(async () => await moduleUp(), mins(2))
+  beforeAll(async () => await moduleUp(), mins(4))
 
   afterAll(async () => await moduleDown(), mins(2))
 

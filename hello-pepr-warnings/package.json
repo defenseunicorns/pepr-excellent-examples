@@ -23,7 +23,7 @@
     "env": {}
   },
   "dependencies": {
-    "pepr": "file://~/code/work/pepr/pepr-0.0.0-development.tgz"
+    "pepr": "0.50.0-nightly.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

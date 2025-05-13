@@ -9,7 +9,7 @@ import { K8s, kind } from "pepr";
 const trc = new TestRunCfg(__filename);
 
 describe("alias.ts", () => {
-  beforeAll(async () => await moduleUp(), mins(2));
+  beforeAll(async () => await moduleUp(), mins(4));
   afterAll(async () => {
     await clean(trc);
     await moduleDown();

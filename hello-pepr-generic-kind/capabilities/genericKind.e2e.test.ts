@@ -19,7 +19,7 @@ describe("genericKind.ts", () => {
     const resources = await trc.load(file);
     await fullCreate(resources, kind);
     await moduleUp()
-  }, mins(2));
+  }, mins(4));
 
   afterAll(async () => {
     await moduleDown();

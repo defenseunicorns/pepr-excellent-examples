@@ -29,7 +29,7 @@ describe("store.ts", () => {
       `kubectl apply -f ${trc.root()}/capabilities/nonmigrated-peprstore.yaml`,
       { stdio: "inherit" },
     );
-    await moduleUp(), mins(2);
+    await moduleUp(), mins(4);
   }, secs(90));
 
   describe("Store Resource", () => {

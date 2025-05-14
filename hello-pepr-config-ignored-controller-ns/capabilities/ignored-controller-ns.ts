@@ -1,4 +1,4 @@
-import { Capability, a, kind, K8s, Log } from "pepr";
+import { Capability, a, kind, K8s } from "pepr";
 
 const name = "hello-pepr-config-ignored-ns";
 
@@ -13,13 +13,13 @@ const { When } = HelloPeprIgnoredNS;
 When(a.ConfigMap)
   .IsCreated()
   .WithNameRegex(/^mutate-ignored/)
-  .Mutate(po => po.SetLabel("not", "seen"))
+  .Mutate(po => po.SetLabel("not", "seen"));
 
 // https://regex101.com/r/JsQ8AT/1
 When(a.ConfigMap)
   .IsCreated()
   .WithNameRegex(/^mutate-ignored/)
-  .Watch(async (cm) => {
+  .Watch(async cm => {
     await K8s(kind.ConfigMap).Apply({
       metadata: {
         name: cm.metadata.name,
@@ -44,7 +44,7 @@ When(a.ConfigMap)
 When(a.ConfigMap)
   .IsCreated()
   .WithNameRegex(/^watch-ignored/)
-  .Watch(async (cm) => {
+  .Watch(async cm => {
     await K8s(kind.ConfigMap).Apply({
       metadata: {
         name: cm.metadata.name,

@@ -9,7 +9,6 @@ export const HelloPeprStoreResources = new Capability({
 });
 const { When, Store } = HelloPeprStoreResources;
 
-
 When(a.ConfigMap)
   .IsCreated()
   .WithName("observe")

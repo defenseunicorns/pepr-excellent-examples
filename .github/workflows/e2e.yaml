@@ -71,6 +71,9 @@ jobs:
 
       - name: install pepr-excellent-examples deps
         run: |
+          # Regenerate the package-lock.json to keep the demo PR diff smaller
+          rm package-lock.json
+          npm install
           npm ci
 
       - name: run e2e tests

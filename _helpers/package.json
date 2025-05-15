@@ -9,11 +9,11 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
-    "@types/node": "^22.15.17",
+    "@types/node": "^22.15.18",
     "commander": "^13.1.0",
     "find-up": "^7.0.0",
     "jest": "^29.7.0",
-    "ts-jest": "^29.3.2",
+    "ts-jest": "^29.3.3",
     "ts-node": "^10.9.2",
     "typescript": "5.8.3",
     "yaml": "^2.7.1"

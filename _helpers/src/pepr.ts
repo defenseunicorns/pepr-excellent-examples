@@ -85,12 +85,12 @@ export async function untilLogged(needle: String | Function, count = 1) {
 }
 
 export function getPeprAlias(): string{
-  return process.env.PEPR_PACKAGE ? `file:${process.env.PEPR_PACKAGE}` : 'pepr';
+  return process.env.PEPR_PACKAGE ? `file:${process.env.PEPR_PACKAGE}` : 'pepr@nightly';
 }
 
 export async function peprVersion(): Promise<string> {
   let version: string = ''
-  if (getPeprAlias() === "pepr") {
+  if (getPeprAlias().startsWith("pepr")) {
     // determine npx pepr@version from workspace root
     const root = (await new Cmd({ cmd: `npm root` }).run()).stdout[0]
     const workspace = dirname(root)

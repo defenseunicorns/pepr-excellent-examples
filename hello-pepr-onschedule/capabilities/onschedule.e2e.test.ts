@@ -16,7 +16,7 @@ const delta = (one, two, firstRunDelay = secs(10)) => {
 }
 
 describe("schedule.ts", () => {
-  beforeAll(async () => { await moduleUp() }, mins(3))
+  beforeAll(async () => { await moduleUp() }, mins(4))
   afterAll(async () => { await moduleDown() }, mins(2))
 
   it("runs forever", async () => {

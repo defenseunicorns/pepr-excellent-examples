@@ -16,7 +16,7 @@
     "ts-jest": "^29.3.3",
     "ts-node": "^10.9.2",
     "typescript": "5.8.3",
-    "yaml": "^2.7.1"
+    "yaml": "^2.8.0"
   },
   "scripts": {
     "pepr": "pepr",

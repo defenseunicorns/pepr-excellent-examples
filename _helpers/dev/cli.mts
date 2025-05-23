@@ -172,11 +172,11 @@ function restorePackageJSON() {
 }
 
 function backupPackageJSON() {
-  if (basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr' || process.env.KFC_PACKAGE === "kubernetes-fluent-client-0.0.0-development.tgz") {
+  if (basename(process.cwd()) !== '_helpers' && !getPeprAlias().startsWith('pepr') || process.env.KFC_PACKAGE === "kubernetes-fluent-client-0.0.0-development.tgz") {
     copyFileSync(`${peprExcellentExamplesRepo}/package-lock.json`, `${peprExcellentExamplesRepo}/package-lock.json.bak`);
     copyFileSync(`${peprExcellentExamplesRepo}/package.json`, `${peprExcellentExamplesRepo}/package.json.bak`);
     copyFileSync(`${process.cwd()}/package.json`, `${process.cwd()}/package.json.bak`);
-    execSync(`npm i ${getPeprAlias()}`);
+    execSync(`npm i ${getPeprAlias()} --force`);
     rmSync(`${peprExcellentExamplesRepo}/package-lock.json`);
   }
 }

@@ -176,7 +176,7 @@ function backupPackageJSON() {
     copyFileSync(`${peprExcellentExamplesRepo}/package-lock.json`, `${peprExcellentExamplesRepo}/package-lock.json.bak`);
     copyFileSync(`${peprExcellentExamplesRepo}/package.json`, `${peprExcellentExamplesRepo}/package.json.bak`);
     copyFileSync(`${process.cwd()}/package.json`, `${process.cwd()}/package.json.bak`);
-    execSync(`npm i ${getPeprAlias()} --force`);
+    execSync(`npm i ${getPeprAlias()}`);
     rmSync(`${peprExcellentExamplesRepo}/package-lock.json`);
   }
 }

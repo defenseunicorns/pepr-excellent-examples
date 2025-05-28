@@ -120,7 +120,7 @@ const test = program.command('test')
       }
     }
     finally{
-      if(process.env.CI === 'true') {
+      if(process.env.CI !== 'true') {
         restorePackageJSON();
       }
     }

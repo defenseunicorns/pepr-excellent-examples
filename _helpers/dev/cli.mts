@@ -102,8 +102,8 @@ const test = program.command('test')
 
     try {
       process.env.KFC_PACKAGE = thisCommand.opts().kfc
-      execSync('npm install', { cwd: peprExcellentExamplesRepo });
       backupPackageJSON();
+      execSync('npm install', { cwd: peprExcellentExamplesRepo });
     } catch (err) {
       throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}. Check package.json and package-lock.json. Error: ${err.message}`);
     }

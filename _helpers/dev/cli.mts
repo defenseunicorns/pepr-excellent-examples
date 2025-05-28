@@ -119,7 +119,9 @@ const test = program.command('test')
       }
     }
     finally{
-      restorePackageJSON();
+      if(process.env.CI === 'true') {
+        restorePackageJSON();
+      }
     }
   })
 

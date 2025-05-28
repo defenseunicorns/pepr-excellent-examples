@@ -177,7 +177,7 @@ function backupPackageJSON() {
     copyFileSync(`${process.cwd()}/package.json`, `${process.cwd()}/package.json.bak`);
     execSync(`npm i ${getPeprAlias()}`);
     if(process.env.KFC_PACKAGE === "kubernetes-fluent-client-0.0.0-development.tgz") {
-      execSync('npm install', { cwd: peprExcellentExamplesRepo });
+      execSync(`npm install ${process.env.KFC_PACKAGE}`, { cwd: peprExcellentExamplesRepo });
     }
     rmSync(`${peprExcellentExamplesRepo}/package-lock.json`);
   }

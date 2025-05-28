@@ -104,9 +104,6 @@ const test = program.command('test')
       process.env.KFC_PACKAGE = thisCommand.opts().kfc
       backupPackageJSON();
       execSync('npm install', { cwd: peprExcellentExamplesRepo });
-      if( thisCommand.opts().kfc){
-        execSync(`npm install ${thisCommand.opts().kfc}`, { cwd: peprExcellentExamplesRepo });
-      }
     } catch (err) {
       throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}. Check package.json and package-lock.json. Error: ${err.message}`);
     }
@@ -123,7 +120,9 @@ const test = program.command('test')
       }
     }
     finally{
-      restorePackageJSON();
+      if(process.env.CI !== 'true') {
+        restorePackageJSON();
+      }
     }
   })
 
@@ -177,6 +176,9 @@ function backupPackageJSON() {
     copyFileSync(`${peprExcellentExamplesRepo}/package.json`, `${peprExcellentExamplesRepo}/package.json.bak`);
     copyFileSync(`${process.cwd()}/package.json`, `${process.cwd()}/package.json.bak`);
     execSync(`npm i ${getPeprAlias()}`);
+    if(process.env.KFC_PACKAGE === "kubernetes-fluent-client-0.0.0-development.tgz") {
+      execSync(`npm install ${process.env.KFC_PACKAGE}`, { cwd: peprExcellentExamplesRepo });
+    }
     rmSync(`${peprExcellentExamplesRepo}/package-lock.json`);
   }
 }

@@ -103,7 +103,6 @@ const test = program.command('test')
     try {
       process.env.KFC_PACKAGE = thisCommand.opts().kfc
       backupPackageJSON();
-      execSync('npm install', { cwd: peprExcellentExamplesRepo });
       if( thisCommand.opts().kfc){
         execSync(`npm install ${thisCommand.opts().kfc}`, { cwd: peprExcellentExamplesRepo });
       }
@@ -177,6 +176,9 @@ function backupPackageJSON() {
     copyFileSync(`${peprExcellentExamplesRepo}/package.json`, `${peprExcellentExamplesRepo}/package.json.bak`);
     copyFileSync(`${process.cwd()}/package.json`, `${process.cwd()}/package.json.bak`);
     execSync(`npm i ${getPeprAlias()}`);
+    if(process.env.KFC_PACKAGE === "kubernetes-fluent-client-0.0.0-development.tgz") {
+      execSync('npm install', { cwd: peprExcellentExamplesRepo });
+    }
     rmSync(`${peprExcellentExamplesRepo}/package-lock.json`);
   }
 }

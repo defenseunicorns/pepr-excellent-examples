@@ -3,11 +3,9 @@ import { program, Option } from 'commander';
 import { resolve, basename } from 'node:path';
 import { chdir } from 'node:process';
 import { execSync, spawnSync } from 'node:child_process';
-import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { differ } from '../src/deps/differ';
 import { writer } from '../src/deps/writer';
 import { up, down } from '../src/cluster';
-import { Cmd } from '../src/Cmd';
 import { findUpSync } from 'find-up'
 import { getPeprAlias } from '../src/pepr'
 import { copyFileSync, mkdirSync, renameSync, rmSync } from 'fs';
@@ -126,14 +124,6 @@ const test = program.command('test')
     }
   })
 
-const dpr = program.command('dpr')
-  .description('utilities for dash-policyreport module')
-
-const gen = dpr.command('gen')
-  .description('generate policyReport types from github crds')
-  .action(async () => {
-    await generateTypes()
-  })
 
 await program.parseAsync(process.argv);
 const opts = program.opts();
@@ -293,47 +283,4 @@ async function testE2e(passthru) {
 async function testAll(passthru) {
   testUnit(passthru)
   await testE2e(passthru)
-}
-
-async function generateTypes() {
-  // create output dir
-  const typesDir = resolve(process.env.PWD, 'types')
-  await mkdir(typesDir, { recursive: true })
-
-  const remoteYamls = [
-    "https://raw.githubusercontent.com/kubernetes-sigs/wg-policy-prototypes/master/policy-report/crd/v1beta1/wgpolicyk8s.io_clusterpolicyreports.yaml",
-    "https://raw.githubusercontent.com/kubernetes-sigs/wg-policy-prototypes/master/policy-report/crd/v1beta1/wgpolicyk8s.io_policyreports.yaml"
-  ]
-  for (const remoteYaml of remoteYamls) {
-    const localYaml = resolve(typesDir, basename(remoteYaml))
-  
-    // save remote manifest
-    const content = await fetch(remoteYaml).then(resp => resp.text())
-    await writeFile(localYaml, content)
-  
-    // generate CRD types from manifest
-    const genTypes = await new Cmd({ cmd: `npm run kfc -- crd ${remoteYaml} ${typesDir}` }).run()
-  }
-
-  // ignore eslint 'no explicit any' checks on gen'd CRDs
-  const types = ( await readdir(typesDir) ).filter(m => m.endsWith('.ts'))
-  for (const t of types ) {
-    const typePath = resolve(typesDir, t)
-    const content = [
-      `/* eslint-disable @typescript-eslint/no-explicit-any */`,,
-      ( await readFile( typePath ) ).toString()
-    ].join("\n")
-    await writeFile(typePath, content)
-  }
-
-  // prevent TS ts(2612) in gen'd files (by adding 'declare' modifier)
-  //  ( but maybe this should be a patch to the KFC gen function? )
-  for (const t of types ) {
-    const typePath = resolve(typesDir, t)
-    let ts = ( await readFile( typePath ) ).toString()
-    ts = ts.replace("apiVersion?:", "declare apiVersion?:")
-    ts = ts.replace("kind?:", "declare kind?:")
-    ts = ts.replace("metadata?:", "declare metadata?:")
-    await writeFile(typePath, ts)
-  }
 }

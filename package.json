@@ -42,6 +42,6 @@
     "test-specific-version"
   ],
   "dependencies": {
-    "kubernetes-fluent-client": "^3.5.5"
+    "kubernetes-fluent-client": "^3.5.6"
   }
 }

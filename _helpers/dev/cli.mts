@@ -3,11 +3,9 @@ import { program, Option } from 'commander';
 import { resolve, basename } from 'node:path';
 import { chdir } from 'node:process';
 import { execSync, spawnSync } from 'node:child_process';
-import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { differ } from '../src/deps/differ';
 import { writer } from '../src/deps/writer';
 import { up, down } from '../src/cluster';
-import { Cmd } from '../src/Cmd';
 import { findUpSync } from 'find-up'
 import { getPeprAlias } from '../src/pepr'
 import { copyFileSync, mkdirSync, renameSync, rmSync } from 'fs';

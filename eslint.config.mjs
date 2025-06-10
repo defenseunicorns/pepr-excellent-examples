@@ -72,7 +72,7 @@ export default defineConfig([globalIgnores(["**/node_modules", "**/dist", "**/es
         sourceType: "script",
 
         parserOptions: {
-            project: ["tsconfig.json"],
+            project: ["eslint.tsconfig.json"],
         },
     },
 

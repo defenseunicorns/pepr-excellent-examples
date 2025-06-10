@@ -12,10 +12,13 @@ updates:
     schedule:
       interval: daily
 
+    # https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#groups--
     groups:
       prod:
         dependency-type: "production"
+      dev:
+        dependency-type: "development"
 
-    # do NOT update development dependencies
     allow:
       - dependency-type: "production"
+      - dependency-type: "development"

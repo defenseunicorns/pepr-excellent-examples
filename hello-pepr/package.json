@@ -22,7 +22,7 @@
     "includedFiles": []
   },
   "dependencies": {
-    "pepr": "0.51.3"
+    "pepr": "0.51.4"
   },
   "devDependencies": {
     "typescript": "5.8.3"

@@ -141,7 +141,7 @@ export async function moduleUp({ version = "", verbose = false, rbacMode = "admi
   if (verbose) { console.log(deploy) }
   console.timeEnd(cmd)
 
-  await untilLogged('✅ Scheduling processed', 2)
+  await untilLogged('✅ Module deployed successfully', 1)
   console.timeEnd(`pepr@${version} ready (total time)`)
 }
 

@@ -14,7 +14,7 @@ const apply = async res => {
 const trc = new TestRunCfg(__filename);
 
 describe("ignored-controller-ns.ts", () => {
-  beforeAll(async () => await moduleUp(), mins(4));
+  beforeAll(async () => await moduleUp(3), mins(4));
 
   afterAll(async () => await moduleDown(), mins(2));
 
@@ -37,12 +37,16 @@ describe("ignored-controller-ns.ts", () => {
         kind.MutatingWebhookConfiguration,
       ).Get("pepr-ignored-controller-ns");
 
-      const namespaceSelectorValues = mutatingWebhookConfiguration
-        .webhooks[0]
-        .namespaceSelector.matchExpressions[0].values;
-      expect(namespaceSelectorValues).toEqual(["kube-system","pepr-system","mutate-ignored"]);
+      const namespaceSelectorValues =
+        mutatingWebhookConfiguration.webhooks[0].namespaceSelector
+          .matchExpressions[0].values;
+      expect(namespaceSelectorValues).toEqual([
+        "kube-system",
+        "pepr-system",
+        "mutate-ignored",
+      ]);
     });
-    
+
     it(
       "ignores resources in admission.alwaysIgnore.namespaces for Mutate",
       async () => {
@@ -50,7 +54,7 @@ describe("ignored-controller-ns.ts", () => {
           .InNamespace("mutate-ignored")
           .Get("mutate-ignored");
         // no label was set during admission due to admission.alwaysIgnore.namespaces
-        expect(cm.metadata?.labels).toBeUndefined()
+        expect(cm.metadata?.labels).toBeUndefined();
       },
       secs(10),
     );
@@ -76,7 +80,7 @@ describe("ignored-controller-ns.ts", () => {
         const cm = await K8s(kind.ConfigMap)
           .InNamespace("watch-ignored")
           .Get("watch-ignored");
-        expect(cm.metadata?.labels['can']).toBe("see");
+        expect(cm.metadata?.labels["can"]).toBe("see");
       },
       secs(10),
     );
@@ -87,7 +91,7 @@ describe("ignored-controller-ns.ts", () => {
         const cm = await K8s(kind.ConfigMap)
           .InNamespace("mutate-ignored")
           .Get("mutate-ignored");
-        expect(cm.metadata?.labels?.['been']).toBeUndefined();
+        expect(cm.metadata?.labels?.["been"]).toBeUndefined();
       },
       secs(10),
     );

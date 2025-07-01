@@ -9,7 +9,7 @@ import { K8s, kind } from "pepr";
 const trc = new TestRunCfg(__filename);
 
 describe("alias.ts", () => {
-  beforeAll(async () => await moduleUp(), mins(4));
+  beforeAll(async () => await moduleUp(3), mins(4));
   afterAll(async () => {
     await clean(trc);
     await moduleDown();
@@ -20,7 +20,8 @@ describe("alias.ts", () => {
     beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.create.yaml`;
       await timed(`load: ${file}`, async () => {
-        let [ns, cmReconcile, cmWatch, cmValidate, cmMutate] = await trc.load(file);
+        const [ns, cmReconcile, cmWatch, cmValidate, cmMutate] =
+          await trc.load(file);
         await fullCreate([ns, cmReconcile, cmWatch, cmValidate, cmMutate]);
         await K8s(kind[cmReconcile.kind]).Delete(cmReconcile);
         await K8s(kind[cmWatch.kind]).Delete(cmWatch);
@@ -45,7 +46,7 @@ describe("alias.ts", () => {
     it(
       "uses default alias when no alias provided",
       async () => {
-        let results = logz.filter(l =>
+        const results = logz.filter(l =>
           l.includes('"msg":"external api call (reconcile-create-no-alias):'),
         );
 
@@ -61,7 +62,7 @@ describe("alias.ts", () => {
     it(
       "uses provided alias with reconcile",
       async () => {
-        let results = logz.filter(l =>
+        const results = logz.filter(l =>
           l.includes('"msg":"external api call (reconcile-create-alias):'),
         );
 
@@ -82,7 +83,7 @@ describe("alias.ts", () => {
     it(
       "uses provided alias with watch",
       async () => {
-        let results = logz.filter(l =>
+        const results = logz.filter(l =>
           l.includes('"msg":"external api call (watch-create-alias):'),
         );
 
@@ -99,7 +100,7 @@ describe("alias.ts", () => {
     it(
       "uses provided alias with validate",
       async () => {
-        let results = logz.filter(l =>
+        const results = logz.filter(l =>
           l.includes('"msg":"external api call (validate-create-alias):'),
         );
 
@@ -115,7 +116,7 @@ describe("alias.ts", () => {
     it(
       "uses provided alias with mutate",
       async () => {
-        let results = logz.filter(l =>
+        const results = logz.filter(l =>
           l.includes('"msg":"external api call (mutate-create-alias):'),
         );
 

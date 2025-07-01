@@ -13,7 +13,7 @@ const apply = async res => {
 const trc = new TestRunCfg(__filename);
 
 describe("store.ts", () => {
-  beforeAll(async () => await moduleUp(), mins(4));
+  beforeAll(async () => await moduleUp(1), mins(4));
 
   afterAll(async () => {
     await moduleDown();
@@ -31,9 +31,13 @@ describe("store.ts", () => {
         });
       }, mins(1));
 
-      it("does not display store values in logs", () => {
+      it(
+        "does not display store values in logs",
+        () => {
           expect(logz).not.toContain("***SECRET***");
-        },secs(10));
-      });
+        },
+        secs(10),
+      );
     });
+  });
 });

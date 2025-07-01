@@ -29,7 +29,7 @@ describe("store.ts", () => {
       `kubectl apply -f ${trc.root()}/capabilities/nonmigrated-peprstore.yaml`,
       { stdio: "inherit" },
     );
-    await moduleUp(), mins(4);
+    await moduleUp(1), mins(4);
   }, secs(90));
 
   describe("Store Resource", () => {
@@ -54,16 +54,22 @@ describe("store.ts", () => {
         .Get("pepr-store-resources-store");
       expect(store).toBeDefined();
       console.log(JSON.stringify(store, null, 2));
-      expect(store!.data!["hello-pepr-store-resources-v2-testing"]).toBe("migrated");
+      expect(store!.data!["hello-pepr-store-resources-v2-testing"]).toBe(
+        "migrated",
+      );
     });
     it("write the correct data to the store", () => {
       expect(true).toBe(true);
       console.log(JSON.stringify(store.data, null, 2));
-      expect(store!.data!["hello-pepr-store-resources-v2-testing"]).toBe("migrated");
+      expect(store!.data!["hello-pepr-store-resources-v2-testing"]).toBe(
+        "migrated",
+      );
       expect(store!.data!["hello-pepr-store-resources-v2-a"]).toBe("1");
       expect(store!.data!["hello-pepr-store-resources-v2-b"]).toBe("2");
       expect(store!.data!["hello-pepr-store-resources-v2-c"]).toBe("3");
-      expect(store!.data!["hello-pepr-store-resources-v2-https://observed"]).toBe("yay");
+      expect(
+        store!.data!["hello-pepr-store-resources-v2-https://observed"],
+      ).toBe("yay");
       expect(store!.data!["__pepr_do_not_delete__"]).toBe("k-thx-bye");
     });
   });

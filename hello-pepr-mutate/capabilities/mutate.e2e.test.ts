@@ -12,7 +12,7 @@ import { spawnSync } from "child_process";
 const trc = new TestRunCfg(__filename);
 
 describe("mutate.ts", () => {
-  beforeAll(async () => await moduleUp(), mins(4));
+  beforeAll(async () => await moduleUp(1), mins(4));
   afterAll(async () => {
     await clean(trc);
     await moduleDown();

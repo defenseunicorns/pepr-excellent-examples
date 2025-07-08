@@ -13,7 +13,7 @@ const apply = async res => {
 const trc = new TestRunCfg(__filename);
 
 describe("store.ts", () => {
-  beforeAll(async () => await moduleUp(), mins(4));
+  beforeAll(async () => await moduleUp(1), mins(4));
 
   afterAll(async () => {
     await moduleDown();
@@ -55,11 +55,7 @@ describe("store.ts", () => {
             .slice(3);
 
           // both controller pods + watcher pod run onReady!
-          expect(values).toEqual([
-            undefined,
-            undefined,
-            undefined
-          ]);
+          expect(values).toEqual([undefined, undefined, undefined]);
         },
         secs(10),
       );

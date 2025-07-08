@@ -26,7 +26,7 @@ describe("store.ts", () => {
 
       beforeAll(async () => {
         await timed("load+clear: default store data", async () => {
-          await untilLogged('"msg":"onReady"', 4);
+          await untilLogged('"msg":"onReady"', 1);
           logz = await logs();
         });
       }, mins(1));
@@ -40,7 +40,7 @@ describe("store.ts", () => {
             .map(o => o.value)
             .slice(0, 3);
 
-          expect(values).toEqual(["yep", "yep", "yep"]);
+          expect(values).toEqual(["yep"]);
         },
         secs(10),
       );
@@ -54,8 +54,8 @@ describe("store.ts", () => {
             .map(o => o.value)
             .slice(3);
 
-          // both controller pods + watcher pod run onReady!
-          expect(values).toEqual([undefined, undefined, undefined]);
+          // only watcher pod run onReady!
+          expect(values).toEqual([undefined]);
         },
         secs(10),
       );

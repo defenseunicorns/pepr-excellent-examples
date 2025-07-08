@@ -9,11 +9,12 @@ import { moduleUp, moduleDown, untilLogged } from "helpers/src/pepr";
 const trc = new TestRunCfg(__filename);
 
 describe("watch.ts", () => {
-  beforeAll(async () => await moduleUp(), mins(4));
-  // afterAll(async () => {
-  //   await moduleDown();
-  //   await clean(trc);
-  // }, mins(2));
+  beforeAll(async () => await moduleUp(1), mins(4));
+  afterAll(async () => {
+    await moduleDown();
+    await clean(trc);
+  }, mins(2));
+
 
   it(
     "watches resource creates",

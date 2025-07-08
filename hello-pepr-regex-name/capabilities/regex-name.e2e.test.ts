@@ -14,7 +14,7 @@ const apply = async res => {
 const trc = new TestRunCfg(__filename);
 
 describe("regex-name.ts", () => {
-  beforeAll(async () => await moduleUp(), mins(4));
+  beforeAll(async () => await moduleUp(1), mins(4));
 
   afterAll(async () => await moduleDown(), mins(2));
 

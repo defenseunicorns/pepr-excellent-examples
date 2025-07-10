@@ -149,7 +149,7 @@ export async function moduleUp(
   await moduleBuild({ version, verbose, rbacMode });
 
   if (process.env.PEPR_IMAGE) {
-    cmd = `npx --yes ${getPeprAlias()} deploy --image=${process.env.PEPR_IMAGE} --confirm`;
+    cmd = `npx --yes ${getPeprAlias()} deploy --image=${process.env.PEPR_IMAGE} --yes`;
   } else {
     cmd = `npx --yes ${getPeprAlias()} deploy --yes`;
   }

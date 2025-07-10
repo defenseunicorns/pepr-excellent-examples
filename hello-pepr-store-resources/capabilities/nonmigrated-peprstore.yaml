@@ -7,3 +7,5 @@ kind: PeprStore
 metadata:
   name: pepr-store-resources-store
   namespace: pepr-system
+  labels:
+    pepr.dev-cacheID: "123"

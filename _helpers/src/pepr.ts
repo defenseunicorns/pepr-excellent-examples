@@ -151,7 +151,7 @@ export async function moduleUp(
   if (process.env.PEPR_IMAGE) {
     cmd = `npx --yes ${getPeprAlias()} deploy --image=${process.env.PEPR_IMAGE} --confirm`;
   } else {
-    cmd = `npx --yes ${getPeprAlias()} deploy --confirm`;
+    cmd = `npx --yes ${getPeprAlias()} deploy --yes`;
   }
 
   console.time(cmd);

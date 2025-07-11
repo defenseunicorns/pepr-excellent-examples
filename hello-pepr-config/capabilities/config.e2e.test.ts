@@ -112,5 +112,19 @@ describe("config.ts", () => {
       },
       secs(10),
     );
+
+    it("should only deploy admission manifests if there are no watch bindings", async () => {
+      const controllerDeployments = await K8s(kind.Deployment)
+        .InNamespace("pepr-system")
+        .Get();
+      const controllerServices = await K8s(kind.Service)
+        .InNamespace("pepr-system")
+        .Get();
+
+      expect(controllerDeployments.items.length).toBe(1);
+      expect(controllerDeployments.items[0].metadata?.name).toBe(moduleName);
+      expect(controllerServices.items.length).toBe(1);
+      expect(controllerServices.items[0].metadata?.name).toBe(moduleName);
+    });
   });
 });

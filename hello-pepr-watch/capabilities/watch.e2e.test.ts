@@ -15,6 +15,7 @@ describe("watch.ts", () => {
     await clean(trc);
   }, mins(2));
 
+
   it(
     "watches resource creates",
     async () => {
@@ -76,4 +77,18 @@ describe("watch.ts", () => {
     },
     secs(10),
   );
+
+  it("should only deploy watch manifests if there are no admission bindings", async () => {
+    const controllerDeployments = await K8s(kind.Deployment).InNamespace("pepr-system").Get();
+    const controllerServices = await K8s(kind.Service).InNamespace("pepr-system").Get();
+
+    expect(controllerDeployments.items.length).toBe(1);
+    expect(controllerDeployments.items[0].metadata?.name).toBe(
+      "pepr-2dde1046-4b91-498f-b58f-6b371932e4b6-watcher",
+    );
+    expect(controllerServices.items.length).toBe(1);
+    expect(controllerServices.items[0].metadata?.name).toBe(
+      "pepr-2dde1046-4b91-498f-b58f-6b371932e4b6-watcher",
+    );
+  });
 });

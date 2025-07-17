@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, describe, it, expect } from "@jest/globals";
+import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { K8s, kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { halfCreate, fullCreate } from "helpers/src/general";

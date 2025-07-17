@@ -192,11 +192,12 @@ function validateCustomPackage(parentDir: string) {
 function testUnit(passthru) {
   spawnSync(
     // eslint-disable-next-line no-useless-escape
-    "jest", [
+    "vitest", [
+      "run",
       "--passWithNoTests",
-      "--testPathPattern", ".*\.unit\.test\.ts",
-      "--verbose",
-      ...passthru
+      "--reporter", "verbose",
+      ...passthru,
+      ".*\.unit\.test\.ts",
     ],
     { stdio: 'inherit' }
   )
@@ -219,12 +220,12 @@ async function testE2e(passthru) {
   if (process.env.INIT_CWD === process.env.PWD) {
     // run tests that create & destroy their own clusters
     let result = spawnSync(
-      "jest", [
+      "vitest", [
+        "run",
         "--passWithNoTests",
-        "--testPathPattern", "src/cluster\.e2e\.test\.ts",
-        "--detectOpenHandles",
-        "--verbose",
-        ...passthru
+        "--reporter", "verbose",
+        ...passthru,
+         "src/cluster\.e2e\.test\.ts",
       ],
       { stdio: 'inherit' }
     )
@@ -237,13 +238,12 @@ async function testE2e(passthru) {
   
       // run tests that require a pre-existing cluster (and/or don't care)
       let result = spawnSync(
-        "jest", [
+        "vitest", [
+          "run",
           "--passWithNoTests",
-          "--testPathIgnorePatterns", "src/cluster\.e2e\.test\.ts",
-          "--testPathPattern", ".*\.e2e\.test\.ts",
-          "--detectOpenHandles",
-          "--verbose",
-          ...passthru
+          "--reporter", "verbose",
+          ...passthru,
+          "src/cluster\.e2e\.test\.ts",
         ],
         {
           stdio: 'inherit',
@@ -261,13 +261,14 @@ async function testE2e(passthru) {
 
       // run tests that require a pre-existing cluster (and/or don't care)
       const result = spawnSync(
-        "jest", [
+        "vitest", [
+          "run",
           "--passWithNoTests",
+          "--reporter", "verbose",
+          ...passthru,
           // eslint-disable-next-line no-useless-escape
-          "--testPathPattern", ".*\.e2e\.test\.ts",
-          "--detectOpenHandles",
-          "--verbose",
-          ...passthru
+          ".*\.e2e\.test\.ts",
+
         ],
         {
           stdio: 'inherit',

@@ -153,7 +153,7 @@ function buildLocalPepr(outputDirectory: string) {
 }
 
 function restorePackageJSON() {
-  if (basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr' || process.env.KFC_PACKAGE === "kubernetes-fluent-client-0.0.0-development.tgz") {
+  if (basename(process.cwd()) !== '_helpers' && !getPeprAlias().startsWith('pepr') || process.env.KFC_PACKAGE === "kubernetes-fluent-client-0.0.0-development.tgz") {
     renameSync(`${peprExcellentExamplesRepo}/package-lock.json.bak`, `${peprExcellentExamplesRepo}/package-lock.json`);
     renameSync(`${peprExcellentExamplesRepo}/package.json.bak`, `${peprExcellentExamplesRepo}/package.json`);
     renameSync(`${process.cwd()}/package.json.bak`, `${process.cwd()}/package.json`);
@@ -265,14 +265,13 @@ async function testE2e(passthru) {
           "run",
           "--passWithNoTests",
           "--reporter", "verbose",
-          ...passthru,
-          // eslint-disable-next-line no-useless-escape
-          ".*\.e2e\.test\.ts",
+          ...passthru
 
         ],
         {
           stdio: 'inherit',
-          env: { ...process.env, KUBECONFIG: kubeConfig }
+          env: { ...process.env, KUBECONFIG: kubeConfig },
+          cwd: process.env.PWD,
         }
       )
       if (result.status !== 0) { throw result }

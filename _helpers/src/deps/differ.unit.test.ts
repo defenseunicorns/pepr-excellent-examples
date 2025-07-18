@@ -1,13 +1,13 @@
-import { afterEach, describe, expect, it, jest } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import * as sut from "./differ";
 
 import * as modReader from "./reader";
-jest.mock("./reader");
-const { reader } = jest.mocked(modReader);
+vi.mock("./reader");
+const { reader } = vi.mocked(modReader);
 
 import * as modVersions from "./versions";
-jest.mock("./versions");
-const { versions } = jest.mocked(modVersions);
+vi.mock("./versions");
+const { versions } = vi.mocked(modVersions);
 
 describe("splitRange()", () => {
   it.each([
@@ -28,7 +28,7 @@ describe("splitRange()", () => {
 
 describe("differ()", () => {
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   const pkg = obj => ({ devDependencies: obj });

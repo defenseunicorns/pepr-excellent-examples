@@ -1,27 +1,37 @@
-import { afterEach, describe, expect, it, jest } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import * as sut from "./reader";
 
 import * as path from "node:path";
-jest.mock("node:path", () => {
-  const original = jest.requireActual("node:path") as object;
-  return { ...original, isAbsolute: jest.fn(), resolve: jest.fn() };
-});
-const { isAbsolute, resolve } = jest.mocked(path);
-
-import * as fs from "node:fs/promises";
-jest.mock("node:fs/promises", () => {
-  const original = jest.requireActual("node:fs/promises") as object;
+vi.mock("node:path", async () => {
+  const actual = await vi.importActual<typeof import("node:path")>("node:path");
   return {
-    ...original,
-    readFile: jest.fn() as jest.MockedFunction<typeof fs.readFile>,
-    access: jest.fn(),
+    ...actual,
+    isAbsolute: vi.fn(),
+    resolve: vi.fn(),
   };
 });
-const { readFile, access } = jest.mocked(fs);
+const { isAbsolute, resolve } = vi.mocked(path);
+
+import * as fs from "node:fs/promises";
+vi.mock("node:fs/promises", async () => {
+  const actual = await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises");
+  return {
+    ...actual,
+    readFile: vi.fn(),
+    access: vi.fn(),
+  };
+});
+const { readFile, access } = vi.mocked(fs);
 
 import * as general from "../general";
-jest.mock("../general");
-const { nearestAncestor } = jest.mocked(general);
+vi.mock("../general", async () => {
+  const actual = await vi.importActual<typeof import("../general")>("../general");
+  return {
+    ...actual,
+    nearestAncestor: vi.fn(),
+  };
+});
+const { nearestAncestor } = vi.mocked(general);
 
 const pkg = obj => ({ devDependencies: obj });
 const buffered = obj => Buffer.from(JSON.stringify(obj), "utf-8");
@@ -29,7 +39,7 @@ const resolved = obj => (path => Promise.resolve(buffered(obj))) as typeof fs.re
 
 describe("reader()", () => {
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it("rejects when not given an absolute path", async () => {

@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, it, expect, jest } from "vitest";
+import { beforeEach, afterEach, describe, it, expect } from "vitest";
 import { kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";
@@ -15,8 +15,6 @@ const apply = async res => {
 };
 
 const trc = new TestRunCfg(__filename);
-
-jest.setTimeout(120000);
 
 async function usePackageJson(type: "default" | "custom") {
   const srcPath = path.resolve(__dirname, `../package.${type}.json`);

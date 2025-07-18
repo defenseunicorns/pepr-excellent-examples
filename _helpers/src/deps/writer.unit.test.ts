@@ -1,13 +1,13 @@
-import { afterEach, describe, expect, it, jest } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import * as sut from "./writer";
 
 import * as fs from "node:fs/promises";
-jest.mock("node:fs/promises");
-const { rename, writeFile } = jest.mocked(fs);
+vi.mock("node:fs/promises");
+const { rename, writeFile } = vi.mocked(fs);
 
 describe("writer()", () => {
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it("writes diff updates to package.json", async () => {

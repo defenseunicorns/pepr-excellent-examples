@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, jest } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import * as sut from "./versions";
 
 describe("versions()", () => {

@@ -101,7 +101,7 @@ describe("nearestAncestor()", () => {
 
 describe("halfCreate()", () => {
   it("resolves applied resources on successful apply to cluster", async () => {
-    const Apply = jest.fn((res: object) => Promise.resolve({ ...res, applied: true }));
+    const Apply = vi.fn((res: object) => Promise.resolve({ ...res, applied: true }));
     K8s.mockImplementation(() => ({ Apply }) as unknown as ReturnType<typeof K8s<any, any>>);
     const resources = [
       { kind: "ConfigMap", metadata: { name: "test-alpha" } },
@@ -122,7 +122,7 @@ describe("halfCreate()", () => {
 
 describe("fullCreate()", () => {
   it("resolves applied resources when Get-able from cluster", async () => {
-    const Apply = jest.fn((res: object) => Promise.resolve({ ...res, applied: true }));
+    const Apply = vi.fn((res: object) => Promise.resolve({ ...res, applied: true }));
     K8s.mockImplementation(() => ({ Apply }) as unknown as ReturnType<typeof K8s<any, any>>);
     live.mockImplementationOnce(() => Promise.resolve(false));
     live.mockImplementationOnce(() => Promise.resolve(false));

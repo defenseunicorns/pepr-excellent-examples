@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, describe, it, expect } from "@jest/globals";
+import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";
 import { gone } from "helpers/src/resource";

@@ -1,11 +1,4 @@
-import {
-  beforeEach,
-  afterEach,
-  describe,
-  it,
-  expect,
-  jest,
-} from "@jest/globals";
+import { beforeEach, afterEach, describe, it, expect, jest } from "vitest";
 import { kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";

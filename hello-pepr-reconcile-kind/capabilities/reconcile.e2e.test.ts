@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, describe, it, jest, expect } from "@jest/globals";
+import { beforeAll, afterAll, describe, it, jest, expect } from "vitest";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { mins, secs, timed } from "helpers/src/time";
 import { fullCreate } from "helpers/src/general";
@@ -60,7 +60,6 @@ describe("reconcile.ts", () => {
     it(
       "maintains callback order within a queue, paralellizes across queues",
       () => {
-         
         // Queue : Resource : 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
         //
         // 1     : cm-slow  : |+ A          -|        |+ B          -|        |+ C         - |
@@ -70,7 +69,7 @@ describe("reconcile.ts", () => {
         //
         // ^-- read: l-to-r (time), t-to-b (event @ time)
         //     remember: within a queue events complete (-) before subsequents start (+)
-         
+
         const results = logz.filter(l => l.includes("Callback: Reconciling"));
 
         const wants = [

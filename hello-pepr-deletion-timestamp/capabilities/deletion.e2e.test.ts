@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, describe, it, jest, expect } from "@jest/globals";
+import { beforeAll, afterAll, describe, it, jest, expect } from "vitest";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { mins, secs, timed } from "helpers/src/time";
 import { fullCreate } from "helpers/src/general";

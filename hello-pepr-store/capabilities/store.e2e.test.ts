@@ -55,7 +55,7 @@ describe("store.ts", () => {
             .slice(3);
 
           // only watcher pod run onReady!
-          expect(values).toEqual([undefined]);
+          expect(values).toEqual([]);
         },
         secs(10),
       );

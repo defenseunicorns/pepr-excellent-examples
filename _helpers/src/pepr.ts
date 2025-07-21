@@ -1,9 +1,9 @@
 import { dirname } from "node:path";
 import { K8s, kind } from "kubernetes-fluent-client";
-import { sleep } from "./time";
-import { Cmd } from "./Cmd";
-import { untilTrue } from "./general";
-import { gone } from "./resource";
+import { sleep } from "./time.js";
+import { Cmd } from "./Cmd.js";
+import { untilTrue } from "./general.js";
+import { gone } from "./resource.js";
 import { cwd } from "node:process";
 import { readFile } from "node:fs/promises";
 

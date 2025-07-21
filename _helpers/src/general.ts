@@ -2,9 +2,9 @@ import * as path from "path";
 import * as fs from "fs";
 import * as fsP from "fs/promises";
 import { K8s, kind } from "kubernetes-fluent-client";
-import { TestRunCfg } from "./TestRunCfg";
-import { live } from "./resource";
-import { sleep } from "./time";
+import { TestRunCfg } from "./TestRunCfg.js";
+import { live } from "./resource.js";
+import { sleep } from "./time.js";
 
 export async function untilTrue(predicate: () => Promise<boolean>) {
   while (true) {

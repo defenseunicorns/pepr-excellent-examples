@@ -1,5 +1,5 @@
-import { describe, expect, it } from '@jest/globals';
-import { heredoc } from './heredoc'
+import { describe, expect, it } from "vitest";
+import { heredoc } from "./heredoc";
 
 describe("heredoc", () => {
   it("trims head/tail empty lines & de-indents", () => {
@@ -8,13 +8,12 @@ describe("heredoc", () => {
       indented:
         like:
         - yaml
-    `
-    const expected =
-`---
+    `;
+    const expected = `---
 indented:
   like:
-  - yaml`
+  - yaml`;
 
-    expect(actual).toBe(expected)
-  })
-})
+    expect(actual).toBe(expected);
+  });
+});

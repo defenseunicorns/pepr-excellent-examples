@@ -1,11 +1,4 @@
-import {
-  beforeAll,
-  afterAll,
-  afterEach,
-  describe,
-  it,
-  expect,
-} from "@jest/globals";
+import { beforeAll, afterAll, afterEach, describe, it, expect } from "vitest";
 import { spawn } from "child_process";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { halfCreate, fullCreate } from "helpers/src/general";

@@ -1,11 +1,4 @@
-import {
-  beforeEach,
-  afterEach,
-  describe,
-  it,
-  expect,
-  jest,
-} from "@jest/globals";
+import { beforeEach, afterEach, describe, it, expect } from "vitest";
 import { kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";
@@ -22,8 +15,6 @@ const apply = async res => {
 };
 
 const trc = new TestRunCfg(__filename);
-
-jest.setTimeout(120000);
 
 async function usePackageJson(type: "default" | "custom") {
   const srcPath = path.resolve(__dirname, `../package.${type}.json`);
@@ -110,7 +101,7 @@ describe("rbac generation with rbacMode=admin", () => {
 
     // Check if the static yaml file matches the expected RBAC structure
     expect(actualClusterRole).toEqual(expectedClusterRole);
-  });
+  }, 30000);
 
   it("should create the yaml files with admin rbacMode and custom rules", async () => {
     await usePackageJson("custom");
@@ -178,7 +169,7 @@ describe("rbac generation with rbacMode=admin", () => {
 
     // Check if the static yaml file matches the expected RBAC structure
     expect(actualClusterRole).toEqual(expectedClusterRole);
-  });
+  }, 30000);
 });
 
 describe("rbac generation with rbacMode=scoped", () => {
@@ -281,7 +272,7 @@ describe("rbac generation with rbacMode=scoped", () => {
 
     // Check if the static yaml file matches the expected RBAC structure
     expect(actualClusterRole).toEqual(expectedClusterRole);
-  });
+  }, 20000);
 
   it("should create the yaml files with scoped rbacMode and custom rules", async () => {
     await usePackageJson("custom");
@@ -391,5 +382,5 @@ describe("rbac generation with rbacMode=scoped", () => {
 
     // Check if the static yaml file matches the expected RBAC structure
     expect(actualClusterRole).toEqual(expectedClusterRole);
-  });
+  }, 20000);
 });

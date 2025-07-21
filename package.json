@@ -47,6 +47,7 @@
     "kubernetes-fluent-client": "^3.8.0"
   },
   "devDependencies": {
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "vitest": "^3.2.4"
   }
 }

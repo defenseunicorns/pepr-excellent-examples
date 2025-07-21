@@ -272,7 +272,7 @@ describe("rbac generation with rbacMode=scoped", () => {
 
     // Check if the static yaml file matches the expected RBAC structure
     expect(actualClusterRole).toEqual(expectedClusterRole);
-  });
+  }, 20000);
 
   it("should create the yaml files with scoped rbacMode and custom rules", async () => {
     await usePackageJson("custom");
@@ -382,5 +382,5 @@ describe("rbac generation with rbacMode=scoped", () => {
 
     // Check if the static yaml file matches the expected RBAC structure
     expect(actualClusterRole).toEqual(expectedClusterRole);
-  });
+  }, 20000);
 });

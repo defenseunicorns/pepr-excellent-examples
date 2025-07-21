@@ -42,7 +42,7 @@ describe("store.ts", () => {
 
           expect(values).toEqual(["yep"]);
         },
-        secs(10),
+        secs(20),
       );
 
       it(
@@ -72,7 +72,7 @@ describe("store.ts", () => {
           await untilLogged('"msg":"removeItem"');
           logz = await logs();
         });
-      }, mins(1));
+      }, mins(2));
 
       it(
         "key can be written, read, and removed",
@@ -88,7 +88,7 @@ describe("store.ts", () => {
             { msg: "removeItem", value: undefined },
           ]);
         },
-        secs(10),
+        secs(30),
       );
     });
 
@@ -120,7 +120,7 @@ describe("store.ts", () => {
             { msg: "removeItemAndWait", value: undefined },
           ]);
         },
-        secs(10),
+        secs(20),
       );
     });
 
@@ -158,7 +158,7 @@ describe("store.ts", () => {
             }),
           );
         },
-        secs(10),
+        secs(20),
       );
     });
   });

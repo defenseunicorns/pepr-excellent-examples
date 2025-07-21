@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "@jest/globals";
+import { beforeAll, describe, expect, it, afterAll } from "vitest";
 // Note: spawnSync is required to capture stderr where the warnings end up
 import { execSync, spawnSync } from "child_process";
 import { TestRunCfg } from "helpers/src/TestRunCfg";

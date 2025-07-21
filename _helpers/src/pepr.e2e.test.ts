@@ -1,4 +1,4 @@
-import { beforeAll, afterEach, describe, expect, it, jest } from "@jest/globals";
+import { beforeAll, afterEach, describe, expect, it, vi } from "vitest";
 import { kind } from "kubernetes-fluent-client";
 import { mins, secs } from "./time";
 import { gone } from "./resource";
@@ -72,7 +72,7 @@ describe("module lifecycle", () => {
     it(
       "builds, deploys, and waits for local Pepr Module to come up",
       async () => {
-        const timeEnd = jest.spyOn(console, "timeEnd");
+        const timeEnd = vi.spyOn(console, "timeEnd");
 
         const original = cwd();
         chdir(module);

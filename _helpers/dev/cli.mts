@@ -153,7 +153,7 @@ function buildLocalPepr(outputDirectory: string) {
 }
 
 function restorePackageJSON() {
-  if (basename(process.cwd()) !== '_helpers' && getPeprAlias() !== 'pepr' || process.env.KFC_PACKAGE === "kubernetes-fluent-client-0.0.0-development.tgz") {
+  if (basename(process.cwd()) !== '_helpers' && !getPeprAlias().startsWith('pepr') || process.env.KFC_PACKAGE === "kubernetes-fluent-client-0.0.0-development.tgz") {
     renameSync(`${peprExcellentExamplesRepo}/package-lock.json.bak`, `${peprExcellentExamplesRepo}/package-lock.json`);
     renameSync(`${peprExcellentExamplesRepo}/package.json.bak`, `${peprExcellentExamplesRepo}/package.json`);
     renameSync(`${process.cwd()}/package.json.bak`, `${process.cwd()}/package.json`);
@@ -192,11 +192,12 @@ function validateCustomPackage(parentDir: string) {
 function testUnit(passthru) {
   spawnSync(
     // eslint-disable-next-line no-useless-escape
-    "jest", [
+    "vitest", [
+      "run",
       "--passWithNoTests",
-      "--testPathPattern", ".*\.unit\.test\.ts",
-      "--verbose",
-      ...passthru
+      "--reporter", "verbose",
+      ...passthru,
+      ".*\.unit\.test\.ts",
     ],
     { stdio: 'inherit' }
   )
@@ -219,12 +220,12 @@ async function testE2e(passthru) {
   if (process.env.INIT_CWD === process.env.PWD) {
     // run tests that create & destroy their own clusters
     let result = spawnSync(
-      "jest", [
+      "vitest", [
+        "run",
         "--passWithNoTests",
-        "--testPathPattern", "src/cluster\.e2e\.test\.ts",
-        "--detectOpenHandles",
-        "--verbose",
-        ...passthru
+        "--reporter", "verbose",
+        ...passthru,
+         "src/cluster\.e2e\.test\.ts",
       ],
       { stdio: 'inherit' }
     )
@@ -237,13 +238,12 @@ async function testE2e(passthru) {
   
       // run tests that require a pre-existing cluster (and/or don't care)
       let result = spawnSync(
-        "jest", [
+        "vitest", [
+          "run",
           "--passWithNoTests",
-          "--testPathIgnorePatterns", "src/cluster\.e2e\.test\.ts",
-          "--testPathPattern", ".*\.e2e\.test\.ts",
-          "--detectOpenHandles",
-          "--verbose",
-          ...passthru
+          "--reporter", "verbose",
+          ...passthru,
+          "src/cluster\.e2e\.test\.ts",
         ],
         {
           stdio: 'inherit',
@@ -261,17 +261,17 @@ async function testE2e(passthru) {
 
       // run tests that require a pre-existing cluster (and/or don't care)
       const result = spawnSync(
-        "jest", [
+        "vitest", [
+          "run",
           "--passWithNoTests",
-          // eslint-disable-next-line no-useless-escape
-          "--testPathPattern", ".*\.e2e\.test\.ts",
-          "--detectOpenHandles",
-          "--verbose",
+          "--reporter", "verbose",
           ...passthru
+
         ],
         {
           stdio: 'inherit',
-          env: { ...process.env, KUBECONFIG: kubeConfig }
+          env: { ...process.env, KUBECONFIG: kubeConfig },
+          cwd: process.env.PWD,
         }
       )
       if (result.status !== 0) { throw result }

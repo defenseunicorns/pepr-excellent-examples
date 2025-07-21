@@ -18,11 +18,6 @@ updates:
         dependency-type: "production"
       dev:
         dependency-type: "development"
-    ignore:
-      - dependency-name: "jest"
-        versions: ["30"]
-      - dependency-name: "@jest/globals"
-        versions: ["30"]
 
     allow:
       - dependency-type: "production"

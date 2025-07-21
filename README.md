@@ -22,10 +22,10 @@ To run a single example suite, specify which to run using `-w` flag:
 npm run test:e2e -w hello-pepr-validate
 ```
 
-To run a subset of tests, give Jest the specifics via the `--passthru` flag:
+To run a subset of tests, give Vitest the specifics via the `--passthru` flag:
 
 ```sh
-# npm run test:e2e -w <npm module name> -- --passthru="<jest flags>"
+# npm run test:e2e -w <npm module name> -- --passthru="<flags>"
 
 npm run test:e2e -w hello-pepr-validate -- --passthru="--testNamePattern='validate creates'"
 ```

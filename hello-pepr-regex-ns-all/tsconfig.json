@@ -5,11 +5,9 @@
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
-    "lib": [
-      "ES2022"
-    ],
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "lib": ["ES2022"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "outDir": "dist",
     "resolveJsonModule": true,
     "rootDir": ".",
@@ -17,7 +15,5 @@
     "target": "ES2022",
     "useUnknownInCatchVariables": false
   },
-  "include": [
-    "**/*.ts"
-  ]
+  "include": ["**/*.ts"]
 }

@@ -21,16 +21,44 @@
     "includedFiles": [],
     "env": {
       "LOG_LEVEL": "debug"
-    }
+    },
+    "rbac": [
+      {
+        "apiGroups": [
+          ""
+        ],
+        "resources": [
+          "pods"
+        ],
+        "verbs": [
+          "get",
+          "list",
+          "watch"
+        ]
+      },
+      {
+        "apiGroups": [
+          "apps"
+        ],
+        "resources": [
+          "deployments"
+        ],
+        "verbs": [
+          "create",
+          "update",
+          "patch"
+        ]
+      }
+    ]
   },
   "dependencies": {
-    "pepr": "0.51.3"
+    "pepr": "0.51.0"
   },
   "devDependencies": {
-    "@jest/globals": "^29.7.0",
-    "@types/node": "^22.15.21",
-    "jest": "^29.7.0",
-    "typescript": "5.8.3"
+    "vitest": "^3.2.4",
+    "@types/node": "^22.7.5",
+    "kubernetes-fluent-client": "^3.0.4",
+    "typescript": "5.3.3"
   },
   "scripts": {
     "pepr": "pepr",

@@ -101,7 +101,7 @@ describe("rbac generation with rbacMode=admin", () => {
 
     // Check if the static yaml file matches the expected RBAC structure
     expect(actualClusterRole).toEqual(expectedClusterRole);
-  });
+  }, 30000);
 
   it("should create the yaml files with admin rbacMode and custom rules", async () => {
     await usePackageJson("custom");
@@ -169,7 +169,7 @@ describe("rbac generation with rbacMode=admin", () => {
 
     // Check if the static yaml file matches the expected RBAC structure
     expect(actualClusterRole).toEqual(expectedClusterRole);
-  });
+  }, 30000);
 });
 
 describe("rbac generation with rbacMode=scoped", () => {

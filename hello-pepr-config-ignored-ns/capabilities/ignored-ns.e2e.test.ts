@@ -2,8 +2,8 @@ import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { kind, K8s } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg.js";
 import { fullCreate } from "helpers/src/general.js";
-import { secs, mins, sleep, timed } from "helpers/src/time.js";
-import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr.js";
+import { secs, mins, timed } from "helpers/src/time.js";
+import { moduleUp, moduleDown } from "helpers/src/pepr.js";
 import { clean } from "helpers/src/cluster.js";
 import { live } from "helpers/src/resource.js";
 

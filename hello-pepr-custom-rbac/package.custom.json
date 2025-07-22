@@ -30,13 +30,13 @@
     ]
   },
   "dependencies": {
-    "pepr": "0.51.0"
+    "pepr": "0.51.6"
   },
   "devDependencies": {
     "vitest": "^3.2.4",
     "@types/node": "^22.7.5",
     "kubernetes-fluent-client": "^3.0.4",
-    "typescript": "5.3.3"
+    "typescript": "5.8.3"
   },
   "scripts": {
     "pepr": "pepr",

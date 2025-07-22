@@ -28,9 +28,9 @@
     "env": {}
   },
   "dependencies": {
-    "dotenv": "^16.5.0",
+    "dotenv": "^17.2.0",
     "dotenv-cli": "^8.0.0",
-    "pepr": "0.51.3"
+    "pepr": "0.51.6"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",

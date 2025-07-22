@@ -52,7 +52,7 @@
     ]
   },
   "dependencies": {
-    "pepr": "0.51.0"
+    "pepr": "0.51.6"
   },
   "devDependencies": {
     "vitest": "^3.2.4",

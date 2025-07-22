@@ -45,7 +45,6 @@
   ],
   "dependencies": {
     "kubernetes-fluent-client": "^3.8.0",
-    "pepr": "file:pepr-0.0.0-development.tgz"
   },
   "devDependencies": {
     "husky": "^9.1.7",

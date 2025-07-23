@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "dotenv": "^17.2.0",
-    "dotenv-cli": "^8.0.0"
+    "dotenv-cli": "^9.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",

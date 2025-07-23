@@ -37,6 +37,7 @@ describe("store.ts", () => {
           const values = logz
             .filter(l => l.includes('"key":"https://onReady"'))
             .map(l => JSON.parse(l))
+            .filter(o => "value" in o)
             .map(o => o.value)
             .slice(0, 3);
 

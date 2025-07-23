@@ -12,7 +12,9 @@ describe("version tests", () => {
       rmSync("node_modules/pepr", { recursive: true, force: true });
       execSync(`npm install pepr@${examplePeprVersion}`);
       const result = execSync(`npx pepr --version`).toString().trim(); //Use a published copy when PEPR_PACKAGE is not set
-      expect(result).toContain(examplePeprVersion);
+      // https://regex101.com/r/7be4fk/1
+      const cleanVersion = examplePeprVersion.replace(/^[~^]/, "");
+      expect(result).toContain(cleanVersion);
     });
   });
   describe("when pepr is a development copy (--local-package or --custom-package)", () => {

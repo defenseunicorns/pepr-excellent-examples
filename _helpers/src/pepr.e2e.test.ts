@@ -27,7 +27,7 @@ describe("module lifecycle", () => {
   };
 
   const makeMod = async (mod, ver, verbose = false) => {
-    const env = { TEST_MODE: true, TS_NODE_PROJECT: `${mod}/tsconfig.json` };
+    const env = { TS_NODE_PROJECT: `${mod}/tsconfig.json` };
 
     const cmd = `npx --yes ${getPeprAlias()} init --skip-post-init`;
     console.time(cmd);

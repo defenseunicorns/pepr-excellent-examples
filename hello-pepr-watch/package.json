@@ -28,7 +28,7 @@
     "env": {}
   },
   "dependencies": {
-    "dotenv": "^17.2.0",
+    "dotenv": "^17.2.1",
     "dotenv-cli": "^9.0.0",
     "pepr": "0.52.1"
   },

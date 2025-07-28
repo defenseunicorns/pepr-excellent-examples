@@ -30,7 +30,7 @@
   "dependencies": {
     "dotenv": "^17.2.1",
     "dotenv-cli": "^9.0.0",
-    "pepr": "0.52.1"
+    "pepr": "0.52.2"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",

@@ -149,9 +149,9 @@ export async function moduleUp(
   await moduleBuild({ version, verbose, rbacMode });
 
   if (process.env.PEPR_IMAGE) {
-    cmd = `npx --yes ${getPeprAlias()} deploy --image=${process.env.PEPR_IMAGE} --yes`;
+    cmd = `LOG_LEVEL=debug npx --yes ${getPeprAlias()} deploy --image=${process.env.PEPR_IMAGE} --yes`;
   } else {
-    cmd = `npx --yes ${getPeprAlias()} deploy --yes`;
+    cmd = `LOG_LEVEL=debug npx --yes ${getPeprAlias()} deploy --yes`;
   }
 
   console.time(cmd);
@@ -161,7 +161,7 @@ export async function moduleUp(
   }
   console.timeEnd(cmd);
 
-  await untilLogged("✅ Controller startup complete", times);
+  await untilLogged("Controller startup complete", times);
   console.timeEnd(`pepr@${version} ready (total time)`);
 }
 

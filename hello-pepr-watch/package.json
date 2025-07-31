@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "dotenv": "^17.2.1",
-    "dotenv-cli": "^9.0.0",
+    "dotenv-cli": "^10.0.0",
     "pepr": "0.52.2"
   },
   "devDependencies": {

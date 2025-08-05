@@ -1,9 +1,6 @@
 import { afterAll, beforeAll, describe, it, expect } from "vitest";
-import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { mins, secs, sleep } from "helpers/src/time";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
-
-const trc = new TestRunCfg(__filename);
 
 const delta = (one, two, firstRunDelay = secs(10)) => {
   // firstRunDelay --> { every: 10, unit: "seconds" }
@@ -67,7 +64,7 @@ describe("schedule.ts", () => {
       const { time: startup } = JSON.parse(
         logz.filter(
           f =>
-            f.includes(`"msg":"✅ Scheduling processed"`) &&
+            f.includes(`"msg":"Scheduling processed"`) &&
             f.includes(`"hostname":"${host}"`),
         )[0],
       );

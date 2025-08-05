@@ -58,7 +58,7 @@
     "vitest": "^3.2.4",
     "@types/node": "^24.1.0",
     "kubernetes-fluent-client": "^3.10.0",
-    "typescript": "5.8.3"
+    "typescript": "5.9.2"
   },
   "scripts": {
     "pepr": "pepr",

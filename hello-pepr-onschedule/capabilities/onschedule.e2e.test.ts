@@ -67,7 +67,7 @@ describe("schedule.ts", () => {
       const { time: startup } = JSON.parse(
         logz.filter(
           f =>
-            f.includes(`"msg":"✅ Scheduling processed"`) &&
+            f.includes(`"msg":"Scheduling processed"`) &&
             f.includes(`"hostname":"${host}"`),
         )[0],
       );

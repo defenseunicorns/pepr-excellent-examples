@@ -90,4 +90,28 @@ describe("watch.ts", () => {
       "pepr-2dde1046-4b91-498f-b58f-6b371932e4b6-watcher",
     );
   });
+
+  it("should create the clusterolebinding in scoped mode", async () => {
+    const clusterRole = await K8s(kind.ClusterRole).Get(
+      "pepr-2dde1046-4b91-498f-b58f-6b371932e4b6",
+    );
+    expect(clusterRole).toBeDefined();
+
+    const secretWatchRule = clusterRole.rules?.find(rule => rule.resources?.[0] === "secrets");
+    expect(secretWatchRule).toBeDefined();
+    expect(secretWatchRule?.apiGroups?.[0]).toBe("");
+    expect(secretWatchRule?.verbs?.includes("watch")).toBe(true);
+
+    const configMapWatchRule = clusterRole.rules?.find(
+      rule => rule.resources?.[0] === "configmaps",
+    );
+    expect(configMapWatchRule).toBeDefined();
+    expect(configMapWatchRule?.apiGroups?.[0]).toBe("");
+    expect(configMapWatchRule?.verbs?.includes("watch")).toBe(true);
+
+    const podWatchRule = clusterRole.rules?.find(rule => rule.resources?.[0] === "pods");
+    expect(podWatchRule).toBeDefined();
+    expect(podWatchRule?.apiGroups?.[0]).toBe("");
+    expect(podWatchRule?.verbs?.includes("watch")).toBe(true);
+  });
 });

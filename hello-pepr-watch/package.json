@@ -15,6 +15,7 @@
   "pepr": {
     "uuid": "2dde1046-4b91-498f-b58f-6b371932e4b6",
     "onError": "reject",
+    "rbacMode": "scoped",
     "webhookTimeout": 10,
     "customLabels": {
       "namespace": {

@@ -38,7 +38,7 @@
     "env": {}
   },
   "dependencies": {
-    "pepr": "file:pepr-0.0.0-development.tgz"
+    "pepr": "0.52.2"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",

@@ -118,4 +118,46 @@ describe("genericKind.ts", () => {
     },
     secs(10),
   );
+
+  describe("additional webhooks", () => {
+    let mutatingWebhook;
+    let validatingWebhook;
+
+    beforeAll(async () => {
+      mutatingWebhook = await K8s(kind.MutatingWebhookConfiguration).Get("pepr-generic-kind");
+      validatingWebhook = await K8s(kind.ValidatingWebhookConfiguration).Get("pepr-generic-kind");
+    });
+    it("adds the additionalWebhook's namespace to the ignore list in the namespace selector", async () => {
+      expect(mutatingWebhook.webhooks[0].namespaceSelector.matchExpressions).toContainEqual({
+        key: "kubernetes.io/metadata.name",
+        operator: "NotIn",
+        values: ["kube-system", "pepr-system", "istio-system", "monitoring"],
+      });
+
+      expect(validatingWebhook.webhooks[0].namespaceSelector.matchExpressions).toContainEqual({
+        key: "kubernetes.io/metadata.name",
+        operator: "NotIn",
+        values: ["kube-system", "pepr-system", "istio-system", "monitoring"],
+      });
+    });
+
+    it("adds the additionalWebhook's failurePolicy to the new webhooks", async () => {
+      expect(mutatingWebhook.webhooks[1].failurePolicy).toBe("Ignore");
+      expect(validatingWebhook.webhooks[2].failurePolicy).toBe("Fail");
+    });
+
+    it("adds the additionalWebhook's namespace to the namespace selector", async () => {
+      expect(mutatingWebhook.webhooks[1].namespaceSelector.matchExpressions).toContainEqual({
+        key: "kubernetes.io/metadata.name",
+        operator: "In",
+        values: ["istio-system"],
+      });
+
+      expect(validatingWebhook.webhooks[2].namespaceSelector.matchExpressions).toContainEqual({
+        key: "kubernetes.io/metadata.name",
+        operator: "In",
+        values: ["monitoring"],
+      });
+    });
+  });
 });

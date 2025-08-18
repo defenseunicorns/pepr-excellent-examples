@@ -16,6 +16,16 @@
     "uuid": "generic-kind",
     "onError": "reject",
     "webhookTimeout": 10,
+    "additionalWebhooks": [
+      {
+        "namespace": "istio-system",
+        "failurePolicy": "Ignore"
+      },
+      {
+        "namespace": "monitoring",
+        "failurePolicy": "Fail"
+      }
+    ],
     "customLabels": {
       "namespace": {
         "pepr.dev": ""
@@ -28,7 +38,7 @@
     "env": {}
   },
   "dependencies": {
-    "pepr": "0.52.2"
+    "pepr": "file:pepr-0.0.0-development.tgz"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",

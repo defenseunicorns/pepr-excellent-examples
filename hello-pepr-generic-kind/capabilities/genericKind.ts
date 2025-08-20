@@ -20,7 +20,7 @@ When(a.GenericKind, {
   .Mutate(() => {
     Log.info("GenericKind created and mutated");
   })
-  .Validate((instance) => {
+  .Validate(instance => {
     Log.info("GenericKind created and validated");
     return instance.Approve();
   })
@@ -38,7 +38,7 @@ When(a.GenericKind, {
   .Mutate(() => {
     Log.info("GenericKind created or updated and mutated");
   })
-  .Validate((instance) => {
+  .Validate(instance => {
     Log.info("GenericKind created or updated and validated");
     return instance.Approve();
   })
@@ -56,7 +56,7 @@ When(a.GenericKind, {
   .Mutate(() => {
     Log.info("GenericKind updated and mutated");
   })
-  .Validate((instance) => {
+  .Validate(instance => {
     Log.info("GenericKind updated and validated");
     return instance.Approve();
   })
@@ -74,7 +74,7 @@ When(a.GenericKind, {
   .Mutate(() => {
     Log.info("GenericKind deleted mutated");
   })
-  .Validate((instance) => {
+  .Validate(instance => {
     Log.info("GenericKind deleted validated");
     return instance.Approve();
   })

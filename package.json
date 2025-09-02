@@ -44,7 +44,7 @@
     "test-specific-version"
   ],
   "dependencies": {
-    "kubernetes-fluent-client": "^3.10.1"
+    "kubernetes-fluent-client": "^3.10.0"
   },
   "devDependencies": {
     "husky": "^9.1.7",

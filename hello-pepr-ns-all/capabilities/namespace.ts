@@ -16,13 +16,22 @@ When(a.ConfigMap)
     request.SetAnnotation("def", "seen");
   });
 
+/**
+ * This policy mutates Pods by setting a ns=seen annotation when they are created in any namespace.
+ *
+ * @related https://docs.pepr.dev
+ *
+ * @lulaStart 123e4567-e89b-12d3-a456-426614174000
+ */
 When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
   .Mutate(function mutateNs(request) {
     request.SetAnnotation("ns", "seen");
   });
-
+/**
+ * @lulaEnd 123e4567-e89b-12d3-a456-426614174000
+ */
 When(a.ConfigMap)
   .IsCreated()
   .Mutate(function mutateNon(request) {

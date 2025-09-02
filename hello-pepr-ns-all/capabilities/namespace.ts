@@ -27,6 +27,7 @@ When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
   .Mutate(function mutateNs(request) {
+    // Set the ns=seen annotation
     request.SetAnnotation("ns", "seen");
   });
 /**

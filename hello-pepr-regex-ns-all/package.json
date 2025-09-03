@@ -22,7 +22,7 @@
     "env": {}
   },
   "dependencies": {
-    "pepr": "0.52.2"
+    "pepr": "0.53.1"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",

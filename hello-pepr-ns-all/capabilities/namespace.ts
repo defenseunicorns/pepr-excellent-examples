@@ -27,7 +27,7 @@ When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
   .Mutate(function mutateNs(request) {
-    // leave comment - no dismiss
+    // leave comment - with dismiss
     request.SetAnnotation("ns", "seen");
   });
 /**

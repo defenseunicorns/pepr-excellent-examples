@@ -21,7 +21,6 @@ When(a.ConfigMap)
  *
  * @related https://docs.pepr.dev
  *
- * @lulaStart 123e4567-e89b-12d3-a456-426614174000
  */
 When(a.ConfigMap)
   .IsCreated()
@@ -29,9 +28,7 @@ When(a.ConfigMap)
   .Mutate(function mutateNs(request) {
     request.SetAnnotation("ns", "seen");
   });
-/**
- * @lulaEnd 123e4567-e89b-12d3-a456-426614174000
- */
+
 When(a.ConfigMap)
   .IsCreated()
   .Mutate(function mutateNon(request) {

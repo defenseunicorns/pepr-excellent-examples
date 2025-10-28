@@ -4,7 +4,7 @@
   "description": "excellent example helpers",
   "type": "module",
   "dependencies": {
-    "dotenv": "^17.2.1",
+    "dotenv": "^17.2.3",
     "dotenv-cli": "^10.0.0"
   },
   "devDependencies": {

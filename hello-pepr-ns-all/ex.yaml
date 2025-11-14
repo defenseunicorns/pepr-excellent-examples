@@ -4,10 +4,12 @@ company:
   location: "Colorado Springs, CO"
 project:
   name: "Lula"
+  mascot: "Owl"
 # @lulaEnd 123f4567-e89b-12d3-a456-426614174001
 
 # @lulaStart abcf4567-e89b-12d3-a456-42661417400
 languages:
   - TypeScript
   - Go
+  - Rust
 # @lulaEnd abcf4567-e89b-12d3-a456-42661417400

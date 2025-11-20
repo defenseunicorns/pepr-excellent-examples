@@ -4,8 +4,9 @@ Watch actions are ideal for asynchronous operations that need to respond to reso
 
 ## Use Watch when you need to:
 
+- Monitor existing resources in a cluster
 - Perform long-running operations without timeout constraints
-- Monitor and react to resource lifecycle events (creation, updates, deletion)
+- React to resource lifecycle events (creation, updates, deletion)
 
 
 ## Code Snippet Examples

@@ -12,7 +12,7 @@ Watch actions are ideal for asynchronous operations that need to respond to reso
 ## Code Snippet Examples
 This example watches Secret resources and logs different lifecycle events: create, update, delete, and create-or-update.
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-docs/pull/117):
+View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-watch/capabilities/watch.ts):
 
 ### Watch Create Events
 

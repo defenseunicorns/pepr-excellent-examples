@@ -1,5 +1,13 @@
-# @lulaStart 123e4567-e89b-12d3-a456-426614174001
+# @lulaStart 123f4567-e89b-12d3-a456-426614174001
 company:
   name: "Defense Unicorns"
   location: "Colorado Springs, CO"
-# @lulaEnd 123e4567-e89b-12d3-a456-426614174001
+project:
+  name: "Lula"
+# @lulaEnd 123f4567-e89b-12d3-a456-426614174001
+
+# @lulaStart abcf4567-e89b-12d3-a456-42661417400
+languages:
+  - TypeScript
+  - Go
+# @lulaEnd abcf4567-e89b-12d3-a456-42661417400

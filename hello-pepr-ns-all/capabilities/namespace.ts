@@ -27,13 +27,17 @@ When(a.ConfigMap)
   .IsCreated()
   .InNamespace(name)
   .Mutate(function mutateNs(request) {
+    // add comment
     request.SetAnnotation("ns", "seen");
   });
 /**
  * @lulaEnd 123e4567-e89b-12d3-a456-426614174000
  */
+
+// @lulaStart abcf4567-e89b-12d3-a456-42661417400
 When(a.ConfigMap)
   .IsCreated()
   .Mutate(function mutateNon(request) {
     request.SetAnnotation("non", "seen");
   });
+// @lulaEnd abcf4567-e89b-12d3-a456-42661417400

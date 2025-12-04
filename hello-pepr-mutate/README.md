@@ -1,39 +1,94 @@
-# Mutate() Module
+# Mutate
 
-This module demonstrates how to use the Pepr **Mutate** action to modify Kubernetes objects during admission. Mutations allow you to enforce defaults, apply standard labels/annotations, or clean up unwanted metadata before the resource is persisted.
+Pepr `Mutate()` action is used to modify Kubernetes objects during admission. Mutations allow you to enforce defaults, apply standard labels/annotations, or clean up unwanted metadata before the resource is persisted.
 
-For full documentation, visit:  
-👉 **https://docs.pepr.dev/actions/mutate**
-
----
 
 ## When should you use Mutate?
 
-Use **Mutate** when you need to:
+Use `Mutate()` when you need to:
 
 - Apply default labels or annotations to resources as they are created.
 - Remove unwanted metadata automatically (labels, annotations, fields).
-- Normalize metadata so all resources follow your conventions.
+- Normalize user input so objects follow your standards.
 - Enforce consistent cluster hygiene by modifying objects before they are stored.
-- Transform user-provided metadata without rejecting the request.
+- Transform objects while still allowing them through.
 
----
+> [!TIP] Consider adding a matching `Validate()` to detect invalid >post-mutation states.
 
-## When *not* to use Mutate
+## Code Snippet Examples
 
-Avoid **Mutate** when:
+This example mutates Secret resources and logs different lifecycle events: create, update, delete, and create-or-update.
 
-- You only want to *validate* correctness — use **Validate()** instead.
-- You need long-running or post-persistence reactions — use **Watch()** or **Reconcile()**.
-- You want to block the object unless changes are made — use **Validate()** with a failure response.
+View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-mutate/capabilities/mutate.ts)
 
----
+### Create Event
 
-## Example: Add a label on creation
-
-```ts
-When(a.ConfigMap)
+```typescript
+When(a.Secret)
   .IsCreated()
-  .Mutate(req => {
-    req.SetLabel("pepr", "was-here");
+  .InNamespace(name)
+  .WithName("create-yay")
+  .Mutate(function createYay() {
+    Log.info("Mutate: create-yay");
   });
+```
+
+##### Successful k9s logging:
+
+```
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: create-yay"}
+```
+
+### Create or Update Event
+
+```typescript
+When(a.Secret)
+  .IsCreatedOrUpdated()
+  .InNamespace(name)
+  .WithName("cou-create-yay")
+  .Mutate(function couCreateYay() {
+    Log.info("Mutate: cou-create-yay");
+  });
+```
+
+#### Successful k9s logging:
+
+```
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: cou-create-yay"}      
+```
+
+### Update Event
+
+```typescript
+When(a.Secret)
+  .IsUpdated()
+  .InNamespace(name)
+  .WithName("update-yay")
+  .Mutate(function updateYay() {
+    Log.info("Mutate: update-yay");
+  });
+```
+
+#### Successful k9s logging:
+
+```
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: update-yay"}
+```
+
+### Delete Event
+
+```typescript
+When(a.Secret)
+  .IsDeleted()
+  .InNamespace(name)
+  .WithName("delete-yay")
+  .Mutate(function deleteYay() {
+    Log.info("Mutate: delete-yay");
+  });
+```
+
+#### Successful k9s logging:
+
+```
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: delete-yay"}
+```

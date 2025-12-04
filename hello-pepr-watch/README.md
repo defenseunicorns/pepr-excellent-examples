@@ -27,7 +27,7 @@ When(a.Secret)
 ```
 #### Successful k9s log:
 ```
-{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-me: create"}            │
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-me: create"}
 ```
 ### Watch Create or Update Events
 

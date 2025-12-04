@@ -1,6 +1,6 @@
 # Watch
 
-Watch actions are ideal for asynchronous operations that need to respond to resource changes without timeout constraints. 
+Pepr `Watch()` actions are ideal for asynchronous operations that need to respond to resource changes without timeout constraints. 
 
 ## Use Watch when you need to:
 

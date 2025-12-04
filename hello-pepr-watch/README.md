@@ -25,7 +25,10 @@ When(a.Secret)
     Log.info(`Watched ${instance.metadata?.name}: create`);
   });
 ```
-
+#### Successful k9s log:
+```
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-me: create"}            │
+```
 ### Watch Create or Update Events
 
 ```typescript
@@ -36,6 +39,10 @@ When(a.Secret)
   .Watch((instance, phase) => {
     Log.info(`Watched ${instance.metadata?.name}: ${phase}`);
   });
+```
+#### Successful k9s log:
+```
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-or-update-me: ADDED"}
 ```
 
 ### Watch Update Events
@@ -50,6 +57,10 @@ When(a.Secret)
   });
 
 ```
+#### Successful k9s log:
+```
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-or-update-me: update"}
+```
 
 ### Watch Delete Events
 
@@ -61,4 +72,8 @@ When(a.Secret)
   .Watch((instance) => {
     Log.info(`Watched ${instance.metadata?.name}: delete`);
   });
+```
+#### Successful k9s log:
+```
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-or-update-me: delete"}
 ```

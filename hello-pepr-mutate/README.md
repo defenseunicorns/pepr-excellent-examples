@@ -33,7 +33,7 @@ When(a.Secret)
   });
 ```
 
-##### Successful k9s logging:
+##### Example pod log output:
 
 ```
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: create-yay"}
@@ -51,7 +51,7 @@ When(a.Secret)
   });
 ```
 
-#### Successful k9s logging:
+#### Example pod log output:
 
 ```
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: cou-create-yay"}      
@@ -69,7 +69,7 @@ When(a.Secret)
   });
 ```
 
-#### Successful k9s logging:
+#### Example pod log output:
 
 ```
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: update-yay"}
@@ -87,7 +87,7 @@ When(a.Secret)
   });
 ```
 
-#### Successful k9s logging:
+#### Example pod log output:
 
 ```
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: delete-yay"}

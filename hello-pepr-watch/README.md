@@ -25,7 +25,7 @@ When(a.Secret)
     Log.info(`Watched ${instance.metadata?.name}: create`);
   });
 ```
-#### Successful k9s log:
+#### Example pod log output:
 ```
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-me: create"}
 ```
@@ -40,7 +40,7 @@ When(a.Secret)
     Log.info(`Watched ${instance.metadata?.name}: ${phase}`);
   });
 ```
-#### Successful k9s log:
+#### Example pod log output:
 ```
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-or-update-me: ADDED"}
 ```
@@ -57,7 +57,7 @@ When(a.Secret)
   });
 
 ```
-#### Successful k9s log:
+#### Example pod log output:
 ```
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-or-update-me: update"}
 ```
@@ -73,7 +73,7 @@ When(a.Secret)
     Log.info(`Watched ${instance.metadata?.name}: delete`);
   });
 ```
-#### Successful k9s log:
+#### Example pod log output:
 ```
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-or-update-me: delete"}
 ```

@@ -36,7 +36,7 @@ When(a.ConfigMap)
     Log.info(cm, "external api call (create): reconcile/finalize");
   });
 ```
-#### Successful k9s logging:
+#### Example pod log output:
 ```
 ```
 ### Create or Update Event
@@ -56,7 +56,7 @@ When(a.ConfigMap)
     Log.info(cm, "external api call (createorupdate): watch/finalize");
   });
 ```
-#### Successful k9s logging:
+#### Example pod log output:
 ```
 ```
 ### Update Event
@@ -77,7 +77,7 @@ When(a.ConfigMap)
     Log.info(cm, "external api call (update): watch/finalize");
   });
 ```
-#### Successful k9s logging:
+#### Example pod log output:
 ```
 ```
 ### Update Opt Out Event
@@ -99,7 +99,7 @@ When(a.ConfigMap)
     return false;
   });
 ```
-#### Successful k9s logging:
+#### Example pod log output:
 ```
 ```
 ### Delete Event
@@ -120,6 +120,6 @@ When(a.ConfigMap)
     Log.info(cm, "external api call (delete): watch/finalize");
   });
 ```
-#### Successful k9s logging:
+#### Example pod log output:
 ```
 ```

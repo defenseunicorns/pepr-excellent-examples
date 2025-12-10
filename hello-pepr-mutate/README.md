@@ -35,7 +35,7 @@ When(a.Secret)
 
 ##### Example pod log output:
 
-```
+```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: create-yay"}
 ```
 
@@ -53,7 +53,7 @@ When(a.Secret)
 
 #### Example pod log output:
 
-```
+```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: cou-create-yay"}      
 ```
 
@@ -71,7 +71,7 @@ When(a.Secret)
 
 #### Example pod log output:
 
-```
+```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: update-yay"}
 ```
 
@@ -89,6 +89,6 @@ When(a.Secret)
 
 #### Example pod log output:
 
-```
+```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: delete-yay"}
 ```

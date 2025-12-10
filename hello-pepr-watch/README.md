@@ -26,7 +26,7 @@ When(a.Secret)
   });
 ```
 #### Example pod log output:
-```
+```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-me: create"}
 ```
 ### Watch Create or Update Events
@@ -41,7 +41,7 @@ When(a.Secret)
   });
 ```
 #### Example pod log output:
-```
+```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-or-update-me: ADDED"}
 ```
 
@@ -58,7 +58,7 @@ When(a.Secret)
 
 ```
 #### Example pod log output:
-```
+```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-or-update-me: update"}
 ```
 
@@ -74,6 +74,6 @@ When(a.Secret)
   });
 ```
 #### Example pod log output:
-```
+```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-or-update-me: delete"}
 ```

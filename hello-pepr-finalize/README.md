@@ -1,4 +1,5 @@
 # Finalize
+
 Pepr `Finalize()` action runs after a Kubernetes resource is deleted but before it is fully removed. 
 Use it to perform any required pre-deletion logic—cleanup external resources, update systems, or gracefully teardown dependent processes.
 Finalizers run *after* a delete request but before the object is removed. 
@@ -37,8 +38,13 @@ When(a.ConfigMap)
   });
 ```
 #### Example pod log output:
+```json
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>-watcher-<hostname>","metadata":<ConfigMap object>,"msg":"external api call (create): reconcile/callback"}
+
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>-watcher-<hostname>","metadata":<ConfigMap object>,"msg":"external api call (create): reconcile/finalize"}
 ```
-```
+**Note:** The log includes the full ConfigMap object that triggered the action, making it useful for debugging which specific resource was reconciled or finalized.
+
 ### Create or Update Event
 ```typescript
 When(a.ConfigMap)
@@ -57,8 +63,13 @@ When(a.ConfigMap)
   });
 ```
 #### Example pod log output:
+```json
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>-watcher-<hostname>","kind":"ConfigMap","apiVersion":"v1","metadata":<ConfigMap object>,"msg":"external api call (createorupdate): watch/callback"}
+
+ {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>-watcher-<hostname>","kind":"ConfigMap","apiVersion":"v1","metadata":<ConfigMap object>,"msg":"external api call (createorupdate): watch/finalize"}
 ```
-```
+**Note:** The log includes the full ConfigMap object that triggered the action, making it useful for debugging which specific resource was reconciled or finalized.
+
 ### Update Event
 ```typescript
 When(a.ConfigMap)
@@ -78,7 +89,10 @@ When(a.ConfigMap)
   });
 ```
 #### Example pod log output:
-```
+```json
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr--watcher-","kind":"ConfigMap","apiVersion":"v1","metadata":<ConfigMap object>,"msg":"external api call (update): watch/callback"}
+
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>-watcher-<hostname>","kind":"ConfigMap","apiVersion":"v1","metadata":<ConfigMap object>,"msg":"external api call (update): watch/finalize"}
 ```
 ### Update Opt Out Event
 ```typescript
@@ -100,7 +114,10 @@ When(a.ConfigMap)
   });
 ```
 #### Example pod log output:
-```
+```json
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>-watcher-<hostname>","kind":"ConfigMap","apiVersion":"v1","metadata":<ConfigMap object>,"msg":"external api call (update-opt-out): watch/callback"}
+
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>-watcher-<hostname>","kind":"ConfigMap","apiVersion":"v1","metadata":<ConfigMap object>,"msg":"external api call (update-opt-out): watch/pre-finalize"}
 ```
 ### Delete Event
 ```typescript
@@ -121,5 +138,9 @@ When(a.ConfigMap)
   });
 ```
 #### Example pod log output:
-```
+```json
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>-watcher-<hostname>","kind":"ConfigMap","apiVersion":"v1","metadata":<ConfigMap object>,"msg":"external api call (delete): watch/finalize"}
+
+{"level":30,"time":<timestamp>:,"pid":<pid>,"hostname":"pepr-<hostname>-watcher-<hostname>","kind":"ConfigMap","apiVersion":"v1","metadata":<ConfigMap object>,"msg":"external api call (delete): watch/callback"}
+
 ```

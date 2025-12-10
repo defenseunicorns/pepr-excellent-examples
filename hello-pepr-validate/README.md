@@ -34,7 +34,7 @@ When(a.Secret)
 
 ##### Example pod log output:
 
-```
+```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Valid: create-yay"}
 ```
 
@@ -56,7 +56,7 @@ When(a.Secret)
 
 #### Example pod log output:
 
-```
+```json
 Error from server: error when creating "capabilities/scenario.create-or-update.yaml": admission webhook "pepr-<hostname>.pepr.dev" denied the request: cou-create-oof
 ```
 
@@ -75,7 +75,7 @@ When(a.Secret)
 
 #### Example pod log output:
 
-```
+```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Valid: update-yay"}
 ```
 
@@ -94,6 +94,6 @@ When(a.Secret)
 
 #### Example pod log output:
 
-```
+```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Valid: delete-yay"}
 ```

@@ -1,8 +1,9 @@
-# Custom RBAC Configuration
+# Custom RBAC
 
 Pepr modules can be configured with scoped RBAC permissions that follow the principle of least privilege instead of using cluster-admin access.
 
-By default, Pepr modules use admin RBAC mode which grants full cluster access. This example shows how to configure custom, scoped RBAC permissions that follow the principle of least privilege.
+By default, Pepr modules use admin RBAC mode which grants full cluster access. 
+This example shows how to configure custom, scoped RBAC permissions that follow the principle of least privilege.
 
 ## RBAC Modes
 

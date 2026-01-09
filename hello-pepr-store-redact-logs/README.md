@@ -22,3 +22,11 @@ Store.onReady(async () => {
   Log.info("DONE");
 });
 ```
+#### Example pod log output:
+
+```json
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","password":"***DECLASSIFIED***","msg":"getItem"}
+{"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"DONE"}
+```
+
+>[!TIP] Learn more about [Pepr Store](https://docs.pepr.dev/user-guide/store/)

@@ -1,4 +1,4 @@
-# Namespace Selection: All Namespaces
+# ns all
 
 When a Capability defines `namespaces: []`, the module can process resources in any namespace cluster-wide. You can use `.InNamespace()` to filter for specific namespaces, or omit namespace filters entirely to process all namespaces.
 

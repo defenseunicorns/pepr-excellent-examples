@@ -1,6 +1,7 @@
-# Reconcile Kind
+# Reconcile: Kind Strategy
 
-The Reconcile action provides ordered, asynchronous processing of Kubernetes resource changes. The `kind` strategy creates one queue per resource kind (e.g., all ConfigMaps share one queue, all Secrets share another), allowing different kinds to be processed in parallel while maintaining order within each kind.
+The Reconcile action provides ordered, asynchronous processing of Kubernetes resource changes. 
+The `kind` strategy creates one queue per resource kind (e.g., all ConfigMaps share one queue, all Secrets share another), allowing different kinds to be processed in parallel while maintaining order within each kind.
 
 ## When to Use
 
@@ -14,8 +15,7 @@ Use the `kind` strategy when you need:
 
 ## Code Examples
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-reconcile-kind/capabilities/reconcile.ts)
-
+> **View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-reconcile-kind/capabilities/reconcile.ts)**
 **Module Configuration in package.json:**
 ```json
 {

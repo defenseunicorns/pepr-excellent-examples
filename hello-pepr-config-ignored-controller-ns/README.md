@@ -1,6 +1,7 @@
-# Config Ignored Controller ns
+# Configuration: Controller-Specific Namespace Exclusions
 
-Controller-specific namespace ignoring provides fine-grained control over which controllers process resources in specific namespaces. While `alwaysIgnore.namespaces` excludes namespaces from ALL Pepr processing, you can configure controller-specific ignores to exclude namespaces from only admission webhooks or only watch controllers.
+Controller-specific namespace ignoring provides fine-grained control over which controllers process resources in specific namespaces. 
+While `alwaysIgnore.namespaces` excludes namespaces from ALL Pepr processing, you can configure controller-specific ignores to exclude namespaces from only admission webhooks or only watch controllers.
 
 ## When to Use
 
@@ -17,7 +18,7 @@ Use controller-specific namespace ignoring for:
 
 ## Code Examples
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-config-ignored-controller-ns)
+> **View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-config-ignored-controller-ns)**
 
 **Module Configuration in package.json:**
 ```json

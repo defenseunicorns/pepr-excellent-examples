@@ -1,4 +1,4 @@
-# Reconcile Kind ns name
+# Reconcile: kindNsName Strategy
 
 The Reconcile action provides ordered, asynchronous processing of Kubernetes resource changes. The `kindNsName` strategy provides the finest granularity—each individual resource gets its own dedicated processing queue, keyed by kind + namespace + name. This is the **recommended strategy** for most real-world scenarios.
 
@@ -15,7 +15,7 @@ Use the `kindNsName` strategy when you need:
 
 ## Code Examples
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-reconcile-kindnsname/capabilities/reconcile.ts)
+> **View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-reconcile-kindnsname/capabilities/reconcile.ts)**
 
 **Module Configuration in package.json:**
 ```json

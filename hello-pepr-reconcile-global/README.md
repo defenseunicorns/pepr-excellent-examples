@@ -1,4 +1,4 @@
-# Reconcile Global
+# Reconcile: Global Strategy
 
 The Reconcile action provides ordered, asynchronous processing of Kubernetes resource changes. The `global` strategy consolidates all events into one queue, offering maximum ordering guarantees at the cost of throughput.
 
@@ -14,7 +14,7 @@ Use the `global` strategy when you need:
 
 ## Code Examples
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-reconcile-global/capabilities/reconcile.ts)
+> **View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-reconcile-global/capabilities/reconcile.ts)**
 
 **Module Configuration in package.json:**
 ```json

@@ -1,6 +1,7 @@
-# Config
+# Configuration
 
-Pepr modules can be customized through configuration options in `package.json` under the `pepr` section. These module-level settings apply globally across all capabilities, allowing you to customize labels, environment variables, namespace exclusions, and webhook behavior.
+Pepr modules can be customized through configuration options in `package.json` under the `pepr` section. 
+These module-level settings apply globally across all capabilities, allowing you to customize labels, environment variables, namespace exclusions, and webhook behavior.
 
 ## Use module configuration for:
 - Setting global behavior that applies to all capabilities in your module
@@ -11,7 +12,7 @@ Pepr modules can be customized through configuration options in `package.json` u
 
 ## Code Examples
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-config)
+> **View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-config)**
 
 **Module Configuration in package.json:**
 ```json

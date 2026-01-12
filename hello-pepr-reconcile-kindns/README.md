@@ -1,4 +1,4 @@
-# Reconcile Kind ns
+# Reconcile: kindNs Strategy
 
 The Reconcile action provides ordered, asynchronous processing of Kubernetes resource changes. The `kindNs` strategy creates one queue per kind within each namespace, allowing resources in different namespaces to be processed in parallel while maintaining order within each kind-namespace combination.
 
@@ -14,7 +14,7 @@ Use the `kindNs` strategy when you need:
 
 ## Code Examples
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-reconcile-kindns/capabilities/reconcile.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-reconcile-kindns/capabilities/reconcile.ts)**
 
 **Module Configuration in package.json:**
 ```json

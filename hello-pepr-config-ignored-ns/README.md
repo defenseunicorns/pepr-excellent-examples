@@ -1,6 +1,7 @@
-# Ignored ns
+# Configuration: Namespace Exclusions
 
-When you configure namespaces in `alwaysIgnore.namespaces`, Pepr will not process any resources in those namespaces for both admission webhooks (mutate/validate) and watch controllers. This completely excludes specific namespaces from all Pepr processing.
+When you configure namespaces in `alwaysIgnore.namespaces`, Pepr will not process any resources in those namespaces for both admission webhooks (mutate/validate) and watch controllers. 
+This completely excludes specific namespaces from all Pepr processing.
 
 ## When to Use
 
@@ -10,11 +11,12 @@ Use `alwaysIgnore.namespaces` for:
 - Namespaces that should bypass all admission control and watch operations
 - Reducing processing overhead by ignoring irrelevant namespaces
 
->[!IMPORTANT] This applies to ALL actions in the module, regardless of capability or filters. Both admission webhooks and watch controllers will ignore these namespaces.
+>[!IMPORTANT] This applies to ALL actions in the module, regardless of capability or filters. 
+Both admission webhooks and watch controllers will ignore these namespaces.
 
 ## Code Examples
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-config-ignored-ns)
+> **View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-config-ignored-ns)**
 
 **Module Configuration in package.json:**
 ```json

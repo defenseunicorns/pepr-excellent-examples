@@ -1,4 +1,4 @@
-# Store Resources
+# Store: Resources
 
 Pepr Store is backed by Kubernetes Custom Resources that can be accessed directly as `PeprStore` objects. 
 Behind the scenes, the Pepr Store API (`Store.setItem()`, `Store.getItem()`, etc.) uses a Custom Resource Definition called `PeprStore` to persist data in the cluster. 
@@ -24,7 +24,7 @@ Use this pattern when you need to:
 
 ## Code Example
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-store-resources/capabilities/store.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-store-resources/capabilities/store.ts)**
 
 ```typescript
 When(a.ConfigMap)
@@ -70,3 +70,4 @@ data:
   c: "3"
   https://observed: "yay"
 ```
+>[!TIP] Learn more about the [Pepr Store](https://docs.pepr.dev/user-guide/store/)

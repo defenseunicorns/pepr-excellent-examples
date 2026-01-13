@@ -1,4 +1,4 @@
-# Finalize
+# Action: Finalize
 
 Pepr `Finalize()` action runs after a Kubernetes resource is deleted but before it is fully removed. 
 Use it to perform any required pre-deletion logic—cleanup external resources, update systems, or gracefully teardown dependent processes.
@@ -22,7 +22,7 @@ Finalizers run *after* a delete request but before the object is removed.
 
 This example registers a finalizer on a Deployment and performs cleanup when the resource is deleted.
 
-View full example on [GitHub](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-finalize/capabilities/finalize.ts)
+>**View full example on [GitHub](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-finalize/capabilities/finalize.ts)**
 
 ### Create Event
 ```typescript
@@ -144,3 +144,5 @@ When(a.ConfigMap)
 {"level":30,"time":<timestamp>:,"pid":<pid>,"hostname":"pepr-<hostname>-watcher-<hostname>","kind":"ConfigMap","apiVersion":"v1","metadata":<ConfigMap object>,"msg":"external api call (delete): watch/callback"}
 
 ```
+
+>[!TIP] Learn more about the [Finalize action](https://docs.pepr.dev/actions/finalize/)

@@ -1,4 +1,4 @@
-# Regex Name
+# Filter: Resource Name Patterns 
 
 `.WithNameRegex()` filters resources by their name using regular expressions instead of namespace names. 
 This is useful for matching resources based on naming conventions without explicitly listing each name. 
@@ -12,7 +12,7 @@ Do **not** use to match resource namespace names. To match with namespace names,
 
 ## Code Examples
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-regex-name/capabilities/regex-name.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-regex-name/capabilities/regex-name.ts)**
 
 ### Match Resource Names Starting with "default"
 

@@ -1,4 +1,4 @@
-# ns wrong
+# Namespace: Filter Mismatch
 
 When a Capability defines specific namespaces, actions cannot use `.InNamespace()` with namespaces outside that list. The action will never trigger because the namespace filter references a namespace the Capability is not bound to.
 
@@ -12,7 +12,7 @@ Always ensure `.InNamespace()` filters reference namespaces that are either in t
 
 ## Code Example
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-ns-wrong/capabilities/namespace.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-ns-wrong/capabilities/namespace.ts)**
 
 ### Capability Bound to Specific Namespace
 

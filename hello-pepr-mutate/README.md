@@ -1,6 +1,7 @@
-# Mutate
+# Action: Mutate
 
-Pepr `Mutate()` action is used to modify Kubernetes objects during admission. Mutations allow you to enforce defaults, apply standard labels/annotations, or clean up unwanted metadata before the resource is persisted.
+Pepr `Mutate()` action is used to modify Kubernetes objects during admission. 
+Mutations allow you to enforce defaults, apply standard labels/annotations, or clean up unwanted metadata before the resource is persisted.
 
 
 ## When should you use Mutate?
@@ -19,7 +20,7 @@ Use `Mutate()` when you need to:
 
 This example mutates Secret resources and logs different lifecycle events: create, update, delete, and create-or-update.
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-mutate/capabilities/mutate.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-mutate/capabilities/mutate.ts)**
 
 ### Create Event
 
@@ -92,3 +93,4 @@ When(a.Secret)
 ```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Mutate: delete-yay"}
 ```
+>[!TIP] Learn more about the [Mutate action](http://localhost:4321/actions/mutate/)

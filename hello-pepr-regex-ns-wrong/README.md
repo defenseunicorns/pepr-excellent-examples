@@ -1,6 +1,8 @@
-# Regex ns wrong
+# Filter: Namespace Pattern Mismatch
 
-Demonstrates incorrect usage where `.InNamespaceRegex()` is used but the regex pattern does not match any of the namespaces defined in the Capability's namespace list. When a Capability defines specific namespaces, `.InNamespaceRegex()` patterns must match at least one namespace in the Capability's list. If the regex pattern does not match any bounded namespaces, the action will never trigger.
+Demonstrates incorrect usage where `.InNamespaceRegex()` is used but the regex pattern does not match any of the namespaces defined in the Capability's namespace list. 
+When a Capability defines specific namespaces, `.InNamespaceRegex()` patterns must match at least one namespace in the Capability's list. 
+If the regex pattern does not match any bounded namespaces, the action will never trigger.
 
 This example demonstrates what **not** to do. When using `.InNamespaceRegex()` with bounded namespaces:
 - Always verify your regex pattern matches at least one namespace in the Capability's list
@@ -11,7 +13,7 @@ This example demonstrates what **not** to do. When using `.InNamespaceRegex()` w
 
 ## Code Example
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-regex-ns-wrong/capabilities/namespace.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-regex-ns-wrong/capabilities/namespace.ts)**
 
 ### Capability Bound to Specific Namespace
 

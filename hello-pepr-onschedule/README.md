@@ -1,4 +1,4 @@
-# OnSchedule
+# OnSchedule Automated Task Execution
 
 This example demonstrates the Pepr `OnSchedule` API for executing code at predefined intervals, providing a simple alternative to Kubernetes CronJobs.
 `OnSchedule` enables automated code execution at regular intervals without complex CronJob configuration. 
@@ -15,7 +15,7 @@ Use `OnSchedule` for:
 **Important**: Intervals should be 30 seconds or longer due to the storage mechanism. Jobs should be idempotent.
 
 ## Code Examples
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-onschedule/capabilities/onschedule.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-onschedule/capabilities/onschedule.ts)**
 
 **Run Forever:**
 ```typescript

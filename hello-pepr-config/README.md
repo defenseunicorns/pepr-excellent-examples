@@ -1,4 +1,5 @@
-# Configuration
+# Configuration: Module Settings
+
 
 Pepr modules can be customized through configuration options in `package.json` under the `pepr` section. 
 These module-level settings apply globally across all capabilities, allowing you to customize labels, environment variables, namespace exclusions, and webhook behavior.

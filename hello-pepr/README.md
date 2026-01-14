@@ -1,4 +1,4 @@
-# Pepr Module
+# Module
 
 This is a Pepr Module. [Pepr](https://github.com/defenseunicorns/pepr) is a type-safe Kubernetes middleware system.
 

@@ -1,4 +1,4 @@
-# Reconcile: kindNsName Strategy
+# Action: Reconcile- kindNsName Strategy
 
 The Reconcile action provides ordered, asynchronous processing of Kubernetes resource changes. The `kindNsName` strategy provides the finest granularity—each individual resource gets its own dedicated processing queue, keyed by kind + namespace + name. This is the **recommended strategy** for most real-world scenarios.
 

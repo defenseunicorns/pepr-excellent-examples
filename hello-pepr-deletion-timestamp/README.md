@@ -1,4 +1,4 @@
-# Deletion Timestamp
+# Filter: Deletion Timestamp
 
 The `WithDeletionTimestamp()` filter targets Kubernetes resources that are in the process of being deleted.
 When a Kubernetes resource is deleted, it may not be removed immediately if it has [finalizers](https://docs.pepr.dev/actions/finalize). 
@@ -25,7 +25,7 @@ Use `WithDeletionTimestamp()` when you need to:
 
 ## Code Examples
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-deletion-timestamp/capabilities/deletion.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-deletion-timestamp/capabilities/deletion.ts)**
 
 ### Admission Controller (Mutate)
 

@@ -1,4 +1,4 @@
-# Regex ns all
+# Filter: Namespace Name Patterns
 
 When a Capability defines `namespaces: []`, you can use `.InNamespaceRegex()` to match namespace names using regular expressions. This is useful for filtering namespaces by naming patterns without explicitly listing them.
 
@@ -14,7 +14,7 @@ When a Capability defines `namespaces: []`, you can use `.InNamespaceRegex()` to
 
 ## Code Example
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-regex-ns-all/capabilities/namespace.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-regex-ns-all/capabilities/namespace.ts)**
 
 ### Match Namespaces Starting with "default"
 

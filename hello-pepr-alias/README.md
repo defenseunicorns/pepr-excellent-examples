@@ -1,6 +1,7 @@
 # Alias
 
-The `Alias()` function allows you to label actions with meaningful identifiers that appear in logs. This is particularly useful in modules with multiple actions of the same type, making it easier to trace which specific action executed. 
+The `Alias()` function allows you to label actions with meaningful identifiers that appear in logs. 
+This is particularly useful in modules with multiple actions of the same type, making it easier to trace which specific action executed. 
 
 ## When to Use
 
@@ -11,7 +12,7 @@ Use `Alias()` when you need to:
 - Track action execution in production
 
 ## Code Examples
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-alias/capabilities/alias.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-alias/capabilities/alias.ts)**
 
 **Reconcile with Alias:**
 ```typescript
@@ -84,4 +85,4 @@ When(a.ConfigMap)
 ```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","alias":"alias:create:validate","msg":"external api call (validate-create-alias): validate/callback"}
 ```
-
+>[!TIP] Learn more about the [Alias function](https://docs.pepr.dev/actions/using-alias-child-logger)

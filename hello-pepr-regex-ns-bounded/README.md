@@ -1,4 +1,4 @@
-# Regex ns bounded
+# Filter: Namespace Patterns (Bounded)
 
 When a Capability defines specific namespaces, `.InNamespaceRegex()` only matches within those bounded namespaces. The regex pattern is applied to the namespace list defined in the Capability, not to all cluster namespaces. This provides both the security of namespace boundaries and the flexibility of pattern matching.
 
@@ -14,7 +14,7 @@ Use `.InNamespaceRegex()` with bounded namespaces for:
 
 ## Code Example
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-regex-ns-bounded/capabilities/namespace.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-regex-ns-bounded/capabilities/namespace.ts)**
 
 ### Match Namespaces Ending with "-alpha"
 

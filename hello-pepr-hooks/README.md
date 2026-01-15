@@ -16,7 +16,7 @@ Use this pattern when you need to:
 - Troubleshoot webhook ordering and execution
 
 ## Code Examples
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-hooks/capabilities/hooks.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-hooks/capabilities/hooks.ts)**
 
 **Mutate and Validate:**
 Creates both **MutatingWebhook** and **ValidatingWebhook** entries for the same resource.

@@ -1,4 +1,4 @@
-# Watch
+# Action: Watch
 
 Pepr `Watch()` actions are ideal for asynchronous operations that need to respond to resource changes without timeout constraints. 
 
@@ -12,7 +12,7 @@ Pepr `Watch()` actions are ideal for asynchronous operations that need to respon
 ## Code Snippet Examples
 This example watches Secret resources and logs different lifecycle events: create, update, delete, and create-or-update.
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-watch/capabilities/watch.ts):
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-watch/capabilities/watch.ts)**
 
 ### Watch Create Events
 
@@ -77,3 +77,4 @@ When(a.Secret)
 ```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Watched create-or-update-me: delete"}
 ```
+>[!TIP] Learn more about the [Watch Action](https://docs.pepr.dev/actions/watch/)

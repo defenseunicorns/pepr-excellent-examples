@@ -1,4 +1,4 @@
-# Generic Kind
+# GenericKind
 
 `GenericKind` is the base class for working with any Kubernetes resource without requiring generated types. 
 When working with Custom Resources (CRDs) that don't have pre-generated TypeScript types, you can use `a.GenericKind` with the resource's GVK (Group, Version, Kind) to create Pepr actions. 
@@ -15,7 +15,7 @@ For production use with well-defined CRDs, consider generating TypeScript types 
 
 ## Code Example
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-generic-kind/capabilities/genericKind.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-generic-kind/capabilities/genericKind.ts)**
 
 ```typescript
 When(a.GenericKind, {

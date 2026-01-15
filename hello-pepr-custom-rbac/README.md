@@ -1,4 +1,4 @@
-# Custom RBAC
+# Configuration: RBAC Permissions
 
 Pepr modules can be configured with scoped RBAC permissions that follow the principle of least privilege instead of using cluster-admin access.
 
@@ -19,7 +19,8 @@ Grants full cluster-admin permissions. Use only for development or when necessar
 ```bash
 npx pepr build --rbac-mode scoped
 ```
-Grants only the permissions needed for specific actions. This example uses scoped mode with custom ClusterRole definitions.
+Grants only the permissions needed for specific actions. 
+This example uses scoped mode with custom ClusterRole definitions.
 
 ## When to Use
 
@@ -32,7 +33,7 @@ Use scoped RBAC mode when you need to:
 
 ## Code Examples
 
-View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-custom-rbac/capabilities/rbac.ts)
+>**View full example on [Github](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-custom-rbac/capabilities/rbac.ts)**
 
 This module demonstrates various Pepr features requiring different RBAC permissions:
 

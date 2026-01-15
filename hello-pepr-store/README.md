@@ -1,4 +1,4 @@
-# Store
+# Store: Persistent Key-Value Storage
 Pepr `Store` is a built-in key-value storage mechanism that persists and shares data within the cluster. 
 It solves the challenge of sharing data between different actions (Mutate, Validate, and Watch) without manually creating and managing Kubernetes resources.
 

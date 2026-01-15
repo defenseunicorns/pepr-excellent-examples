@@ -1,4 +1,4 @@
-# Action: Reconcile- Global Strategy
+# Action: Reconcile - Global Strategy
 
 The Reconcile action provides ordered, asynchronous processing of Kubernetes resource changes. The `global` strategy consolidates all events into one queue, offering maximum ordering guarantees at the cost of throughput.
 

@@ -1,4 +1,4 @@
-# Action: Reconcile- Kind Strategy
+# Action: Reconcile - Kind Strategy
 
 The Reconcile action provides ordered, asynchronous processing of Kubernetes resource changes. 
 The `kind` strategy creates one queue per resource kind (e.g., all ConfigMaps share one queue, all Secrets share another), allowing different kinds to be processed in parallel while maintaining order within each kind.

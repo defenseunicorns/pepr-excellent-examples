@@ -2,7 +2,7 @@ import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { TestRunCfg } from "./TestRunCfg";
 import * as sut from "./pepr";
 
-const trc = new TestRunCfg(__filename);
+const _trc = new TestRunCfg(__filename);
 
 describe("sift()", () => {
   let mockLog, mockErr;
@@ -22,8 +22,8 @@ describe("sift()", () => {
       const all = [
         "[",
         '  {"level":30,"time":1727729495753,"pid":1,"hostname":"pepr-6b7cfad2-722b-47f8-99ed-f3cbf65ab5b1-8554cd4879-4ddgz","msg":"Pepr Controller (v0.0.0-development)"}',
-        "  (node:1) [DEP0040] DeprecationWarning: The \`punycode\` module is deprecated. Please use a userland alternative instead.",
-        "  (Use \`node --trace-deprecation ...\` to show where the warning was created)",
+        "  (node:1) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.",
+        "  (Use `node --trace-deprecation ...` to show where the warning was created)",
         '  {"level":30,"time":1727729495753,"pid":1,"hostname":"pepr-6b7cfad2-722b-47f8-99ed-f3cbf65ab5b1-8554cd4879-4ddgz","msg":"Applying the Pepr Store CRD if it doesn\'t exist"}',
         '  {"level":20,"time":1727729497520,"pid":17,"hostname":"pepr-6b7cfad2-722b-47f8-99ed-f3cbf65ab5b1-8554cd4879-4ddgz","msg":"Add ',
         "]",

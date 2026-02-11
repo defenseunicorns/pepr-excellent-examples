@@ -10,11 +10,11 @@ import path from "path";
 import yaml from "js-yaml";
 import { execSync } from "child_process";
 
-const apply = async res => {
+const _apply = async res => {
   return await fullCreate(res, kind);
 };
 
-const trc = new TestRunCfg(__filename);
+const _trc = new TestRunCfg(__filename);
 
 async function usePackageJson(type: "default" | "custom") {
   const srcPath = path.resolve(__dirname, `../package.${type}.json`);

@@ -1,10 +1,9 @@
-import { beforeAll, afterAll, describe, it, expect } from "vitest";
+import { beforeAll, describe, it, expect } from "vitest";
 import { kind, K8s } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";
-import { secs, mins, timed, sleep } from "helpers/src/time";
-import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
-import { clean } from "helpers/src/cluster";
+import { secs, mins, timed } from "helpers/src/time";
+import { moduleUp, untilLogged, logs } from "helpers/src/pepr";
 import { execSync } from "child_process";
 import { PeprStore } from "./peprstore-v1";
 const apply = async res => {
@@ -29,12 +28,13 @@ describe("store.ts", () => {
       `kubectl apply -f ${trc.root()}/capabilities/nonmigrated-peprstore.yaml`,
       { stdio: "inherit" },
     );
-    await moduleUp(1), mins(4);
+    await moduleUp(1);
+    void mins(4);
   }, secs(90));
 
   describe("Store Resource", () => {
     let store: PeprStore;
-    let logz;
+    let _logz;
     beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.observe.yaml`;
       await timed(`load: ${file}`, async () => {
@@ -42,7 +42,7 @@ describe("store.ts", () => {
         await apply(resources);
 
         await untilLogged('"msg":"observed"');
-        logz = await logs();
+        _logz = await logs();
       });
     }, mins(1));
     it("should migrate the store resource to v2", async () => {

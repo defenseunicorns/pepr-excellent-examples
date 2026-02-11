@@ -6,11 +6,11 @@ import { ms, secs, mins, sleep, timed } from "./time";
 
 import * as KFC from "kubernetes-fluent-client";
 vi.mock("kubernetes-fluent-client");
-const { K8s, kind } = vi.mocked(KFC);
+const { K8s: _K8s, kind: _kind } = vi.mocked(KFC);
 
 import * as resource from "./resource";
 vi.mock("./resource");
-const { live } = vi.mocked(resource);
+const { live: _live } = vi.mocked(resource);
 
 describe("sleep", () => {
   it("resolves after (roughly) given number of seconds", async () => {

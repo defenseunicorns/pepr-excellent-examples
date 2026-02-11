@@ -2,7 +2,7 @@ import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";
 import { gone } from "helpers/src/resource";
-import { secs, mins, sleep } from "helpers/src/time";
+import { secs, mins } from "helpers/src/time";
 import { moduleUp, moduleDown, untilLogged } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";
 import { K8s, kind } from "pepr";
@@ -59,10 +59,10 @@ describe("mutate.ts", () => {
   });
 
   describe("mutate create-or-updates", () => {
-    let ns, cyay, cmeh, coof, uyay, umeh, uoof;
+    let ns, cyay, cmeh, coof, _uyay, umeh, uoof;
 
     beforeAll(async () => {
-      [ns, cyay, cmeh, coof, uyay, umeh, uoof] = await trc.load(
+      [ns, cyay, cmeh, coof, _uyay, umeh, uoof] = await trc.load(
         `${trc.root()}/capabilities/scenario.create-or-update.yaml`,
       );
       ns = await fullCreate(ns);
@@ -188,10 +188,10 @@ describe("mutate.ts", () => {
   });
 
   describe("mutate deletes", () => {
-    let ns, yay, oof;
+    let ns, yay, _oof;
 
     beforeAll(async () => {
-      [ns, yay, oof] = await trc.load(
+      [ns, yay, _oof] = await trc.load(
         `${trc.root()}/capabilities/scenario.delete.yaml`,
       );
       ns = await fullCreate(ns);

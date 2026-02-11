@@ -2,7 +2,7 @@ import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";
-import { secs, mins, timed, sleep } from "helpers/src/time";
+import { secs, mins, timed } from "helpers/src/time";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";
 
@@ -69,7 +69,7 @@ describe("store.ts", () => {
         const file = `${trc.root()}/capabilities/scenario.async.yaml`;
         await timed(`load: ${file}`, async () => {
           const resources = await trc.load(file);
-          const applied = await apply(resources);
+          await apply(resources);
           await untilLogged('"msg":"removeItem"');
           logz = await logs();
         });
@@ -100,7 +100,7 @@ describe("store.ts", () => {
         const file = `${trc.root()}/capabilities/scenario.sync.yaml`;
         await timed(`load: ${file}`, async () => {
           const resources = await trc.load(file);
-          const applied = await apply(resources);
+          await apply(resources);
 
           await untilLogged('"msg":"removeItemAndWait"');
           logz = await logs();
@@ -132,7 +132,7 @@ describe("store.ts", () => {
         const file = `${trc.root()}/capabilities/scenario.observe.yaml`;
         await timed(`load: ${file}`, async () => {
           const resources = await trc.load(file);
-          const applied = await apply(resources);
+          await apply(resources);
 
           await untilLogged('"msg":"observed"');
           logz = await logs();
@@ -146,7 +146,7 @@ describe("store.ts", () => {
             .filter(l => l.includes('"msg":"observed"'))
             .map(l => JSON.parse(l))
             .flatMap(o => o.updates)
-            .filter(o => o.hasOwnProperty("v2-https://observed"));
+            .filter(o => Object.hasOwn(o, "v2-https://observed"));
 
           expect(update).toHaveLength(1);
 

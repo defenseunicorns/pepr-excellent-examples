@@ -2,8 +2,8 @@ import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { fullCreate } from "helpers/src/general";
-import { secs, mins, sleep, timed } from "helpers/src/time";
-import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
+import { secs, mins, timed } from "helpers/src/time";
+import { moduleUp, moduleDown, logs } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";
 import { live } from "helpers/src/resource";
 

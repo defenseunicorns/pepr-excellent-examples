@@ -11,6 +11,8 @@ updates:
 
     schedule:
       interval: daily
+    cooldown:
+      default-days: 7
 
     # https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#groups--
     groups:

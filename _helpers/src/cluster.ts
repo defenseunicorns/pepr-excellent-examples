@@ -24,7 +24,7 @@ async function retry<T, U>(
   try {
     return await action();
   } catch (err) {
-    const status = err.hasOwnProperty("status") ? `${err.status}` : undefined;
+    const status = Object.hasOwn(err, "status") ? `${err.status}` : undefined;
 
     if (["400", "429"].includes(status)) {
       await reactions[status](err);

@@ -75,7 +75,7 @@ export async function logs(): Promise<string[]> {
   return sift(logs);
 }
 
-export async function untilLogged(needle: string | Function, count = 1) {
+export async function untilLogged(needle: string | ((log: string) => boolean), count = 1) {
   while (true) {
     const logz = await logs();
 

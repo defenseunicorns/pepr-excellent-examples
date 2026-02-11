@@ -1,9 +1,9 @@
-import { beforeAll, afterAll, afterEach, describe, it, expect } from "vitest";
+import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { spawn } from "child_process";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { halfCreate, fullCreate } from "helpers/src/general";
-import { secs, mins, sleep } from "helpers/src/time";
-import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
+import { secs, mins } from "helpers/src/time";
+import { moduleUp, moduleDown, untilLogged } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";
 import { K8s, kind } from "pepr";
 
@@ -218,7 +218,7 @@ const until = (predicate: () => boolean): Promise<void> => {
     if (predicate()) {
       resolve();
     } else {
-      setTimeout(_ => poll(resolve), 250);
+      setTimeout(() => poll(resolve), 250);
     }
   };
   return new Promise(poll);

@@ -8,7 +8,7 @@ const { nearestAncestor } = vi.mocked(general);
 
 import * as fs from "fs";
 vi.mock("fs");
-const { readdirSync } = vi.mocked(fs);
+const { readdirSync: _readdirSync } = vi.mocked(fs);
 
 import * as fsP from "node:fs/promises";
 vi.mock("node:fs/promises");
@@ -96,7 +96,7 @@ describe("TestRunCfg", () => {
   });
 
   it("derives cluster lock file text", () => {
-    const lock = `${root}/cluster.lock`;
+    const _lock = `${root}/cluster.lock`;
     const testRunConfig = new TestRunCfg(me);
     expect(testRunConfig.locktext()).toBe(`${testRunConfig.me}:${testRunConfig.unique}`);
   });

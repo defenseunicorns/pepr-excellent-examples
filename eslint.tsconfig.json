@@ -20,7 +20,6 @@
     "_helpers/**/*",
     "pepr-cli/**/*",
     "pepr-operator/**/*",
-    "test-specific-version/**/*",
     "dash-policyreport/**/*"
   ],
   "exclude": ["node_modules", "dist"]

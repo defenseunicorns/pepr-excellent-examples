@@ -40,8 +40,7 @@
     "hello-pepr-validate",
     "hello-pepr-warnings",
     "hello-pepr-watch",
-    "pepr-operator",
-    "test-specific-version"
+    "pepr-operator"
   ],
   "dependencies": {
     "kubernetes-fluent-client": "^3.10.0"

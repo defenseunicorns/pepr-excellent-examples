@@ -1,6 +1,7 @@
-# Validate
+# Action: Validate
 
-Pepr `Validate()` action runs **during admission phase** to allow or deny Kubernetes objects before they are persisted. Use it to enforce rules, block invalid configurations, and ensure resources meet required standards.
+Pepr `Validate()` action runs **during admission phase** to allow or deny Kubernetes objects before they are persisted. 
+Use it to enforce rules, block invalid configurations, and ensure resources meet required standards.
 
 ## When should you use Validate?
 
@@ -16,8 +17,7 @@ Pepr `Validate()` action runs **during admission phase** to allow or deny Kubern
 
 This example validates that Pods include required labels and rejects ones that do not comply.
 
-View additional examples on [GitHub](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-validate/capabilities/validate.ts)
-
+>**View additional examples on [GitHub](https://github.com/defenseunicorns/pepr-excellent-examples/blob/main/hello-pepr-validate/capabilities/validate.ts)**
 
 ### Create Event
 
@@ -97,3 +97,4 @@ When(a.Secret)
 ```json
 {"level":30,"time":<timestamp>,"pid":<pid>,"hostname":"pepr-<hostname>","msg":"Valid: delete-yay"}
 ```
+>[!TIP] Learn more about the [Validate action](https://docs.pepr.dev/actions/validate/)

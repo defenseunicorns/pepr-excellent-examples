@@ -1,7 +1,4 @@
 import { beforeEach, afterEach, describe, it, expect } from "vitest";
-import { kind } from "kubernetes-fluent-client";
-import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { fullCreate } from "helpers/src/general";
 import { mins } from "helpers/src/time";
 import { moduleUp, moduleDown } from "helpers/src/pepr";
 import fs from "fs/promises";
@@ -9,12 +6,6 @@ import { copyFile } from "fs/promises";
 import path from "path";
 import yaml from "js-yaml";
 import { execSync } from "child_process";
-
-const apply = async res => {
-  return await fullCreate(res, kind);
-};
-
-const trc = new TestRunCfg(__filename);
 
 async function usePackageJson(type: "default" | "custom") {
   const srcPath = path.resolve(__dirname, `../package.${type}.json`);

@@ -10,8 +10,8 @@ const { K8s, kind } = vi.mocked(KFC);
 
 describe("live()", () => {
   it("returns true when resource is Get-able", async () => {
-    const Get = vi.fn(name => Promise.resolve());
-    const InNamespace = vi.fn(ns => ({ Get }));
+    const Get = vi.fn(() => Promise.resolve());
+    const InNamespace = vi.fn(() => ({ Get }));
     K8s.mockImplementationOnce(
       () => ({ InNamespace }) as unknown as ReturnType<typeof K8s<any, any>>,
     );
@@ -24,10 +24,10 @@ describe("live()", () => {
   });
 
   it("returns false when resource isn't Get-able", async () => {
-    const Get = vi.fn(name => {
+    const Get = vi.fn(() => {
       throw { status: 404 };
     });
-    const InNamespace = vi.fn(ns => ({ Get }));
+    const InNamespace = vi.fn(() => ({ Get }));
     K8s.mockImplementationOnce(
       () => ({ InNamespace }) as unknown as ReturnType<typeof K8s<any, any>>,
     );
@@ -42,8 +42,8 @@ describe("live()", () => {
 
 describe("gone()", () => {
   it("returns false when resource is Get-able", async () => {
-    const Get = vi.fn(name => Promise.resolve());
-    const InNamespace = vi.fn(ns => ({ Get }));
+    const Get = vi.fn(() => Promise.resolve());
+    const InNamespace = vi.fn(() => ({ Get }));
     K8s.mockImplementationOnce(
       () => ({ InNamespace }) as unknown as ReturnType<typeof K8s<any, any>>,
     );
@@ -56,10 +56,10 @@ describe("gone()", () => {
   });
 
   it("returns true when resource isn't Get-able", async () => {
-    const Get = vi.fn(name => {
+    const Get = vi.fn(() => {
       throw { status: 404 };
     });
-    const InNamespace = vi.fn(ns => ({ Get }));
+    const InNamespace = vi.fn(() => ({ Get }));
     K8s.mockImplementationOnce(
       () => ({ InNamespace }) as unknown as ReturnType<typeof K8s<any, any>>,
     );

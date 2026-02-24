@@ -1,6 +1,6 @@
 import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { mins, secs, timed, sleep } from "helpers/src/time";
+import { mins, secs, timed } from "helpers/src/time";
 import { fullCreate } from "helpers/src/general";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";

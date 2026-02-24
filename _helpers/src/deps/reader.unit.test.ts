@@ -35,7 +35,7 @@ const { nearestAncestor } = vi.mocked(general);
 
 const pkg = obj => ({ devDependencies: obj });
 const buffered = obj => Buffer.from(JSON.stringify(obj), "utf-8");
-const resolved = obj => (path => Promise.resolve(buffered(obj))) as typeof fs.readFile;
+const resolved = obj => (() => Promise.resolve(buffered(obj))) as typeof fs.readFile;
 
 describe("reader()", () => {
   afterEach(() => {
@@ -69,8 +69,8 @@ describe("reader()", () => {
 
     isAbsolute.mockImplementation(() => true);
     resolve.mockImplementation(p => p);
-    access.mockImplementation(p => Promise.resolve());
-    nearestAncestor.mockImplementation((f, d) => me);
+    access.mockImplementation(() => Promise.resolve());
+    nearestAncestor.mockImplementation(() => me);
     readFile.mockImplementationOnce(resolved(theirPkg)).mockImplementationOnce(resolved(myPkg));
 
     const result = await sut.reader(them);

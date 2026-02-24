@@ -43,7 +43,7 @@ describe("genericKind.ts", () => {
     "watches resource create-or-updates",
     async () => {
       const file = `${trc.root()}/capabilities/scenario.create-or-update.yaml`;
-      const resources = await trc.load(file);
+      await trc.load(file);
       execSync(`kubectl apply -f ${file}`);
 
       // no direct assertion -- test succeeds when message is logged

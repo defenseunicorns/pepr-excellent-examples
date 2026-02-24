@@ -1,8 +1,8 @@
 import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { K8s, kind } from "kubernetes-fluent-client";
 import { TestRunCfg } from "helpers/src/TestRunCfg";
-import { halfCreate, fullCreate } from "helpers/src/general";
-import { secs, mins, sleep, timed } from "helpers/src/time";
+import { fullCreate } from "helpers/src/general";
+import { secs, mins, timed } from "helpers/src/time";
 import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";
 import cfg from "../package.json";
@@ -26,7 +26,7 @@ describe("config.ts", () => {
       const file = `${trc.root()}/capabilities/scenario.config.yaml`;
       await timed(`load: ${file}`, async () => {
         const resources = await trc.load(file);
-        const resources_applied = await apply(resources);
+        await apply(resources);
 
         await untilLogged('"msg":"noop"');
       });
@@ -63,9 +63,9 @@ describe("config.ts", () => {
         );
 
         const failurePolicy =
-          cfg.pepr.onError == "reject"
+          cfg.pepr.onError === "reject"
             ? "Fail"
-            : cfg.pepr.onError == "ignore"
+            : cfg.pepr.onError === "ignore"
               ? "Ignore"
               : null;
 

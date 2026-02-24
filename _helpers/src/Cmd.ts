@@ -1,31 +1,31 @@
-import { spawn } from 'child_process';
+import { spawn } from "child_process";
 
 export interface Spec {
-  cmd: string
-  stdin?: string[]
-  cwd?: string
-  env?: object  // object containing key-value pairs
+  cmd: string;
+  stdin?: string[];
+  cwd?: string;
+  env?: object; // object containing key-value pairs
 }
 
 export interface Result {
-  stdout: string[]
-  stderr: string[]
-  exitcode: number
+  stdout: string[];
+  stderr: string[];
+  exitcode: number;
 }
 
 export class Cmd {
-  result: Result
-  cmd: string
-  stdin: string[]
-  cwd: string
-  env: object
+  result: Result;
+  cmd: string;
+  stdin: string[];
+  cwd: string;
+  env: object;
 
   constructor(spec: Spec) {
-    this.result = null
-    this.cmd = spec.cmd
-    this.stdin = spec.stdin || []
-    this.cwd = spec.cwd || process.cwd()
-    this.env = spec.env ? { ...process.env, ...spec.env } : process.env
+    this.result = null;
+    this.cmd = spec.cmd;
+    this.stdin = spec.stdin || [];
+    this.cwd = spec.cwd || process.cwd();
+    this.env = spec.env ? { ...process.env, ...spec.env } : process.env;
   }
 
   runRaw(): Promise<Result> {
@@ -34,44 +34,44 @@ export class Cmd {
         shell: true,
         cwd: this.cwd,
         env: this.env as NodeJS.ProcessEnv,
-      })
+      });
 
-      this.stdin.forEach(line => proc.stdin.write(`${line}\n`))
-      proc.stdin.end()
-      
-      let bufout: Buffer = Buffer.from("")
-      proc.stdout.on("data", (buf) => {
-        bufout = Buffer.concat([bufout, buf])
-      })
+      this.stdin.forEach(line => proc.stdin.write(`${line}\n`));
+      proc.stdin.end();
 
-      let buferr: Buffer = Buffer.from("")
-      proc.stderr.on("data", (buf) => {
-        buferr = Buffer.concat([buferr, buf])
-      })
+      let bufout: Buffer = Buffer.from("");
+      proc.stdout.on("data", buf => {
+        bufout = Buffer.concat([bufout, buf]);
+      });
+
+      let buferr: Buffer = Buffer.from("");
+      proc.stderr.on("data", buf => {
+        buferr = Buffer.concat([buferr, buf]);
+      });
 
       proc.on("close", exitcode => {
-        let stdout = bufout.toString('utf8') === ""
-          ? []
-          : bufout.toString('utf8').split(/[\r\n]+/)
+        const stdout =
+          bufout.toString("utf8") === "" ? [] : bufout.toString("utf8").split(/[\r\n]+/);
 
-        let stderr = buferr.toString('utf8') === ""
-          ? []
-          : buferr.toString('utf8').split(/[\r\n]+/)
+        const stderr =
+          buferr.toString("utf8") === "" ? [] : buferr.toString("utf8").split(/[\r\n]+/);
 
-        this.result = { stdout, stderr, exitcode }
-        resolve(this.result)
-      })
+        this.result = { stdout, stderr, exitcode };
+        resolve(this.result);
+      });
 
       proc.on("error", err => {
-        reject(err)
-      })
-    })
+        reject(err);
+      });
+    });
   }
 
   run(): Promise<Result> {
     return this.runRaw().then(result => {
-      if (result.exitcode > 0) { throw result }
-      return result
-    })
+      if (result.exitcode > 0) {
+        throw result;
+      }
+      return result;
+    });
   }
 }

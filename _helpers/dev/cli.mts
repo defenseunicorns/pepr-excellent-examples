@@ -31,11 +31,11 @@ program.name('cli')
     }
   })
 
-const env = program.command('env')
+program.command('env')
   .description('dump env')
   .action(async () => { console.log(process.env) })
 
-const deps = program.command('deps')
+program.command('deps')
   .description('sync module devDependencies with external package.json')
   .argument('<path>', 'path to package.json to sync deps against')
   .addOption(
@@ -43,12 +43,14 @@ const deps = program.command('deps')
   )
   .action(async (path, opts) => {
     const updates = await differ(path)
-    opts.write ?
-      await writer(updates) :
+    if (opts.write) {
+      await writer(updates)
+    } else {
       console.log(updates)
+    }
   })
 
-const test = program.command('test')
+program.command('test')
   .description('run tests')
   .addOption(
     new Option('-s, --suite <suite>', 'suite type')
@@ -108,7 +110,7 @@ const test = program.command('test')
 
     printTestInfo() 
   })
-  .action(async ({suite, passthru, image}) => {
+  .action(async ({suite, passthru}) => {
     try{
       passthru = passthru || []
       switch (suite) {
@@ -126,7 +128,6 @@ const test = program.command('test')
 
 
 await program.parseAsync(process.argv);
-const opts = program.opts();
 
 function printTestInfo() {
     if (process.env.PEPR_PACKAGE) {
@@ -178,10 +179,10 @@ function validateCustomPackage(parentDir: string) {
     mkdirSync(`${parentDir}/custom-package`, { recursive: true });
     execSync(`tar -xzf ${process.env.PEPR_PACKAGE} -C custom-package`, { cwd: parentDir }).toString();
     const npmInfo = execSync(`npm view --json custom-package/package/`, { cwd: parentDir }).toString();
-    assert(npmInfo.includes('\"name\": \"pepr\"'));
-    assert(npmInfo.includes('\"pepr\": \"dist/cli.js\"'));
+    assert(npmInfo.includes('"name": "pepr"'));
+    assert(npmInfo.includes('"pepr": "dist/cli.js"'));
   }
-  catch (error) {
+  catch {
     throw new Error(`Custom-Package (${process.env.PEPR_PACKAGE}) does not appear to be a pepr package, exiting.`);
   }
   finally {
@@ -191,13 +192,13 @@ function validateCustomPackage(parentDir: string) {
 
 function testUnit(passthru) {
   spawnSync(
-    // eslint-disable-next-line no-useless-escape
+     
     "vitest", [
       "run",
       "--passWithNoTests",
       "--reporter", "verbose",
       ...passthru,
-      ".*\.unit\.test\.ts",
+      ".*\\.unit\\.test\\.ts",
     ],
     { stdio: 'inherit' }
   )
@@ -219,13 +220,13 @@ async function testE2e(passthru) {
   */
   if (process.env.INIT_CWD === process.env.PWD) {
     // run tests that create & destroy their own clusters
-    let result = spawnSync(
+    const result = spawnSync(
       "vitest", [
         "run",
         "--passWithNoTests",
         "--reporter", "verbose",
         ...passthru,
-         "src/cluster\.e2e\.test\.ts",
+         "src/cluster\\.e2e\\.test\\.ts",
       ],
       { stdio: 'inherit' }
     )
@@ -235,15 +236,15 @@ async function testE2e(passthru) {
     try {
       await down(cluster)
       const kubeConfig = await up(cluster)
-  
+
       // run tests that require a pre-existing cluster (and/or don't care)
-      let result = spawnSync(
+      const result = spawnSync(
         "vitest", [
           "run",
           "--passWithNoTests",
           "--reporter", "verbose",
           ...passthru,
-          "src/cluster\.e2e\.test\.ts",
+          "src/cluster\\.e2e\\.test\\.ts",
         ],
         {
           stdio: 'inherit',

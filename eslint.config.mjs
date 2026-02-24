@@ -78,13 +78,6 @@ export default defineConfig([globalIgnores(["**/node_modules", "**/dist", "**/es
 
     // Additional specific rule configurations - all set to warn
     rules: {
-        "@typescript-eslint/no-unused-vars": ["warn", {
-            args: "all",
-            argsIgnorePattern: "^_",
-            caughtErrorsIgnorePattern: "^_",
-            destructuredArrayIgnorePattern: "^_",
-            varsIgnorePattern: "^_",
-        }],
         "@typescript-eslint/no-floating-promises": "warn",
         "class-methods-use-this": "warn",
 

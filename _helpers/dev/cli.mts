@@ -31,11 +31,11 @@ program.name('cli')
     }
   })
 
-const _env = program.command('env')
+program.command('env')
   .description('dump env')
   .action(async () => { console.log(process.env) })
 
-const _deps = program.command('deps')
+program.command('deps')
   .description('sync module devDependencies with external package.json')
   .argument('<path>', 'path to package.json to sync deps against')
   .addOption(
@@ -50,7 +50,7 @@ const _deps = program.command('deps')
     }
   })
 
-const _test = program.command('test')
+program.command('test')
   .description('run tests')
   .addOption(
     new Option('-s, --suite <suite>', 'suite type')
@@ -110,7 +110,7 @@ const _test = program.command('test')
 
     printTestInfo() 
   })
-  .action(async ({suite, passthru, image: _image}) => {
+  .action(async ({suite, passthru}) => {
     try{
       passthru = passthru || []
       switch (suite) {
@@ -128,7 +128,6 @@ const _test = program.command('test')
 
 
 await program.parseAsync(process.argv);
-const _opts = program.opts();
 
 function printTestInfo() {
     if (process.env.PEPR_PACKAGE) {
@@ -183,7 +182,7 @@ function validateCustomPackage(parentDir: string) {
     assert(npmInfo.includes('"name": "pepr"'));
     assert(npmInfo.includes('"pepr": "dist/cli.js"'));
   }
-  catch (_error) {
+  catch {
     throw new Error(`Custom-Package (${process.env.PEPR_PACKAGE}) does not appear to be a pepr package, exiting.`);
   }
   finally {

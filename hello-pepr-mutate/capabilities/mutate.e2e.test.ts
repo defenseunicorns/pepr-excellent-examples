@@ -59,10 +59,10 @@ describe("mutate.ts", () => {
   });
 
   describe("mutate create-or-updates", () => {
-    let ns, cyay, cmeh, coof, _uyay, umeh, uoof;
+    let ns, cyay, cmeh, coof, umeh, uoof;
 
     beforeAll(async () => {
-      [ns, cyay, cmeh, coof, _uyay, umeh, uoof] = await trc.load(
+      [ns, cyay, cmeh, coof, , umeh, uoof] = await trc.load(
         `${trc.root()}/capabilities/scenario.create-or-update.yaml`,
       );
       ns = await fullCreate(ns);
@@ -188,10 +188,10 @@ describe("mutate.ts", () => {
   });
 
   describe("mutate deletes", () => {
-    let ns, yay, _oof;
+    let ns, yay;
 
     beforeAll(async () => {
-      [ns, yay, _oof] = await trc.load(
+      [ns, yay] = await trc.load(
         `${trc.root()}/capabilities/scenario.delete.yaml`,
       );
       ns = await fullCreate(ns);

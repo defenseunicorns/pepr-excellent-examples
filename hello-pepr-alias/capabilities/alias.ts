@@ -13,7 +13,7 @@ When(a.ConfigMap)
   .InNamespace("hello-pepr-alias-create")
   .WithName("cm-reconcile-create")
   .Alias("alias:create:reconcile")
-  .Reconcile(function reconcileCreate(cm, _phase, logger) {
+  .Reconcile(function reconcileCreate(cm, phase, logger) {
     logger.info(
       cm,
       "external api call (reconcile-create-alias): reconcile/callback",
@@ -30,7 +30,7 @@ When(a.ConfigMap)
   .IsCreated()
   .InNamespace("hello-pepr-alias-create")
   .WithName("cm-reconcile-create")
-  .Reconcile(function reconcileCreate(cm, _phase, logger) {
+  .Reconcile(function reconcileCreate(cm, phase, logger) {
     logger.info(
       cm,
       "external api call (reconcile-create-no-alias): reconcile/callback",
@@ -42,7 +42,7 @@ When(a.ConfigMap)
   .InNamespace("hello-pepr-alias-create")
   .WithName("cm-watch-create")
   .Alias("alias:create:watch")
-  .Watch(function watchCreate(cm, _phase, logger) {
+  .Watch(function watchCreate(cm, phase, logger) {
     logger.info(cm, "external api call (watch-create-alias): watch/callback");
   })
   .Finalize(function finalizeCreate(cm, logger) {

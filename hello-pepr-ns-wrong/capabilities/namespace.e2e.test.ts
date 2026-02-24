@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { TestRunCfg } from "helpers/src/TestRunCfg";
 import { mins } from "helpers/src/time";
 import { moduleBuild } from "helpers/src/pepr";
-
-const _trc = new TestRunCfg(__filename);
 
 describe("namespace.ts", () => {
   it(

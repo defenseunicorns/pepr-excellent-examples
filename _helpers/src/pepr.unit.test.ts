@@ -1,8 +1,5 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
-import { TestRunCfg } from "./TestRunCfg";
 import * as sut from "./pepr";
-
-const _trc = new TestRunCfg(__filename);
 
 describe("sift()", () => {
   let mockLog, mockErr;

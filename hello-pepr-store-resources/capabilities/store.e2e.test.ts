@@ -34,7 +34,6 @@ describe("store.ts", () => {
 
   describe("Store Resource", () => {
     let store: PeprStore;
-    let _logz;
     beforeAll(async () => {
       const file = `${trc.root()}/capabilities/scenario.observe.yaml`;
       await timed(`load: ${file}`, async () => {
@@ -42,7 +41,7 @@ describe("store.ts", () => {
         await apply(resources);
 
         await untilLogged('"msg":"observed"');
-        _logz = await logs();
+        await logs();
       });
     }, mins(1));
     it("should migrate the store resource to v2", async () => {

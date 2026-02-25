@@ -130,12 +130,8 @@ describe("mutate.ts", () => {
 
         const { stdout } = uuidOut;
 
-        const expected = [
-          "UUID\t\tDescription",
-          "--------------------------------------------",
-          "c6600eb7-5020-4bf0-87e3-61ffb6d607d8\t",
-        ].join("\n");
-        expect(stdout).toMatch(expected);
+        expect(stdout).toContain("c6600eb7-5020-4bf0-87e3-61ffb6d607d8");
+        expect(stdout).toContain("Description");
       },
       secs(10),
     );

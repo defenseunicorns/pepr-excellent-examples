@@ -40,7 +40,7 @@ When(a.ConfigMap)
     }
 
     if (warnings.length > 0) {
-      Log.info("Approving request with warnings:", warnings);
+      Log.info({ warnings }, "Approving request with warnings:");
     } else {
       Log.info("Approving request without warnings");
     }
@@ -61,7 +61,7 @@ When(a.ConfigMap)
         "Consider using a safer configuration option",
       ];
 
-      Log.info("Denying request with warnings:", warnings);
+      Log.info({ warnings }, "Denying request with warnings");
 
       return request.Deny(
         "ConfigMap contains dangerous settings that are not allowed",
@@ -104,7 +104,7 @@ When(a.ConfigMap)
     }
 
     if (warnings.length > 0) {
-      Log.info("Approving request with multiple warnings:", warnings);
+      Log.info({ warnings }, "Approving request with multiple warnings");
     } else {
       Log.info("Approving request without warnings");
     }

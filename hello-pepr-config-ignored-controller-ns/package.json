@@ -41,9 +41,9 @@
     "pepr": "1.1.0"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
-    "typescript": "5.8.3",
-    "vitest": "^3.2.4"
+    "@types/node": "^25.3.0",
+    "typescript": "5.9.3",
+    "vitest": "^4.0.18"
   },
   "scripts": {
     "pepr": "pepr",

@@ -33,7 +33,7 @@
     "pepr": "1.1.0"
   },
   "devDependencies": {
-    "typescript": "5.8.3"
+    "typescript": "5.9.3"
   },
   "scripts": {
     "cli": "npm run --workspace helpers cli -- --module=$(pwd)",

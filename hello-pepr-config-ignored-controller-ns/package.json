@@ -38,7 +38,7 @@
     }
   },
   "dependencies": {
-    "pepr": "1.1.0"
+    "pepr": "1.1.1"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",

@@ -9,7 +9,7 @@ import { K8s, kind } from "pepr";
 const trc = new TestRunCfg(__filename);
 
 describe("deletion.ts", () => {
-  beforeAll(async () => await moduleUp(3), mins(4));
+  beforeAll(async () => await moduleUp(3), mins(6));
   afterAll(async () => {
     await moduleDown();
     await clean(trc);

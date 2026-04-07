@@ -1,6 +1,5 @@
 import { Capability, K8s, Log, a } from "pepr";
-import { GenericKind } from "kubernetes-fluent-client";
-import { Operation } from "fast-json-patch";
+import { GenericKind, Operation } from "kubernetes-fluent-client";
 /**
  * Test two different filters for deletion timestamp.
  * Validate that shouldSkipRequest works for admission requests.

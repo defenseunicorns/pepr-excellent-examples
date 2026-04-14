@@ -1,0 +1,34 @@
+{
+  "name": "hello-pepr-eslint-v10-migration",
+  "version": "0.0.1",
+  "description": "Tests that pepr format works before and after the eslint v9 -> v10 migration",
+  "keywords": [
+    "pepr",
+    "k8s",
+    "policy-engine",
+    "pepr-module",
+    "security"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pepr": {
+    "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "onError": "reject",
+    "alwaysIgnore": {
+      "namespaces": [],
+      "labels": []
+    },
+    "includedFiles": []
+  },
+  "dependencies": {
+    "pepr": "1.1.5"
+  },
+  "devDependencies": {
+    "typescript": "6.0.2"
+  },
+  "scripts": {
+    "cli": "npm run --workspace helpers cli -- --module=$(pwd)",
+    "test:e2e": "node test-format-migration.mjs"
+  }
+}

@@ -1,6 +1,6 @@
 // This is intentionally the OLD (v9-era) eslint config format that pepr init generated
 // before the eslint v10 migration. It uses FlatCompat + __dirname. The migration test
-// verifies that pepr format passes with both eslint v9 (old pepr) and eslint v10 (new pepr).
+// verifies that pepr format passes with eslint v10 (new pepr) against this unchanged config.
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import path from "node:path";

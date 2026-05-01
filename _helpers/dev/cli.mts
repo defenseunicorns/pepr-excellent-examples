@@ -8,6 +8,7 @@ import { writer } from '../src/deps/writer';
 import { up, down } from '../src/cluster';
 import { findUpSync } from 'find-up'
 import { getPeprAlias } from '../src/pepr'
+import { rewriteWorkspacePeprPins, restoreWorkspacePeprPins } from '../src/peprPins'
 import { copyFileSync, mkdirSync, renameSync, rmSync } from 'fs';
 import { rmdirSync } from 'node:fs';
 import assert from 'node:assert';
@@ -88,8 +89,6 @@ program.command('test')
     if (thisCommand.opts().suite === "unit" ){ return }
 
     if (thisCommand.opts().customPackage){
-      // install the custom package at the root
-      execSync(`npm install ${thisCommand.opts().customPackage}`, { cwd: peprExcellentExamplesRepo });
       process.env.PEPR_PACKAGE = `${resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
       validateCustomPackage(peprExcellentExamplesRepo);
     }
@@ -98,6 +97,15 @@ program.command('test')
     }
     if (thisCommand.opts().image){
       process.env.PEPR_IMAGE = thisCommand.opts().image
+    }
+
+    // When PEPR_PACKAGE points at a tarball, rewrite every workspace's
+    // pepr pin to the same `file:` spec so npm resolves a single pepr
+    // version across the whole workspace tree. Without this, workspaces'
+    // hard-pinned pepr@X.Y.Z conflicts with the dev tarball at install.
+    if (process.env.PEPR_PACKAGE) {
+      rewriteWorkspacePeprPins(peprExcellentExamplesRepo, getPeprAlias().replace(/^pepr@/, ""));
+      execSync(`npm install ${process.env.PEPR_PACKAGE}`, { cwd: peprExcellentExamplesRepo });
     }
 
     try {
@@ -122,6 +130,7 @@ program.command('test')
     finally{
       if(process.env.CI !== 'true') {
         restorePackageJSON();
+        restoreWorkspacePeprPins(peprExcellentExamplesRepo);
       }
     }
   })

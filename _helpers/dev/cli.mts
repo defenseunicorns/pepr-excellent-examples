@@ -103,16 +103,18 @@ program.command('test')
     // pepr pin to the same `file:` spec so npm resolves a single pepr
     // version across the whole workspace tree. Without this, workspaces'
     // hard-pinned pepr@X.Y.Z conflicts with the dev tarball at install.
-    if (process.env.PEPR_PACKAGE) {
-      rewriteWorkspacePeprPins(peprExcellentExamplesRepo, getPeprAlias().replace(/^pepr@/, ""));
-      execSync(`npm install ${process.env.PEPR_PACKAGE}`, { cwd: peprExcellentExamplesRepo });
-    }
-
     try {
+      if (process.env.PEPR_PACKAGE) {
+        rewriteWorkspacePeprPins(peprExcellentExamplesRepo, `file:${process.env.PEPR_PACKAGE}`);
+        execSync(`npm install ${process.env.PEPR_PACKAGE}`, { cwd: peprExcellentExamplesRepo });
+      }
       process.env.KFC_PACKAGE = thisCommand.opts().kfc
       backupPackageJSON();
       execSync('npm install', { cwd: peprExcellentExamplesRepo });
     } catch (err) {
+      if (process.env.CI !== 'true') {
+        restoreWorkspacePeprPins(peprExcellentExamplesRepo);
+      }
       throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}. Check package.json and package-lock.json. Error: ${err.message}`);
     }
 

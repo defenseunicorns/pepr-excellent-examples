@@ -8,6 +8,7 @@ import { writer } from '../src/deps/writer';
 import { up, down } from '../src/cluster';
 import { findUpSync } from 'find-up'
 import { getPeprAlias } from '../src/pepr'
+import { rewriteWorkspacePeprPins, restoreWorkspacePeprPins } from '../src/peprPins'
 import { copyFileSync, mkdirSync, renameSync, rmSync } from 'fs';
 import { rmdirSync } from 'node:fs';
 import assert from 'node:assert';
@@ -88,8 +89,6 @@ program.command('test')
     if (thisCommand.opts().suite === "unit" ){ return }
 
     if (thisCommand.opts().customPackage){
-      // install the custom package at the root
-      execSync(`npm install ${thisCommand.opts().customPackage}`, { cwd: peprExcellentExamplesRepo });
       process.env.PEPR_PACKAGE = `${resolve(peprExcellentExamplesRepo, thisCommand.opts().customPackage)}`
       validateCustomPackage(peprExcellentExamplesRepo);
     }
@@ -100,11 +99,22 @@ program.command('test')
       process.env.PEPR_IMAGE = thisCommand.opts().image
     }
 
+    // When PEPR_PACKAGE points at a tarball, rewrite every workspace's
+    // pepr pin to the same `file:` spec so npm resolves a single pepr
+    // version across the whole workspace tree. Without this, workspaces'
+    // hard-pinned pepr@X.Y.Z conflicts with the dev tarball at install.
     try {
+      if (process.env.PEPR_PACKAGE) {
+        rewriteWorkspacePeprPins(peprExcellentExamplesRepo, `file:${process.env.PEPR_PACKAGE}`);
+        execSync(`npm install ${process.env.PEPR_PACKAGE}`, { cwd: peprExcellentExamplesRepo });
+      }
       process.env.KFC_PACKAGE = thisCommand.opts().kfc
       backupPackageJSON();
       execSync('npm install', { cwd: peprExcellentExamplesRepo });
     } catch (err) {
+      if (process.env.CI !== 'true') {
+        restoreWorkspacePeprPins(peprExcellentExamplesRepo);
+      }
       throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}. Check package.json and package-lock.json. Error: ${err.message}`);
     }
 
@@ -122,6 +132,7 @@ program.command('test')
     finally{
       if(process.env.CI !== 'true') {
         restorePackageJSON();
+        restoreWorkspacePeprPins(peprExcellentExamplesRepo);
       }
     }
   })

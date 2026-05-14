@@ -18,8 +18,14 @@ updates:
     groups:
       prod:
         dependency-type: "production"
+        update-types: 
+          - "minor"
+          - "patch"
       dev:
         dependency-type: "development"
+        update-types: 
+          - "minor"
+          - "patch"
 
     allow:
       - dependency-type: "production"

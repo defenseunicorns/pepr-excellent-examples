@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "vitest": "^3.2.4",
-    "@types/node": "^24.1.0",
+    "@types/node": "^25.6.2",
     "kubernetes-fluent-client": "^3.10.0",
     "typescript": "5.8.3"
   },

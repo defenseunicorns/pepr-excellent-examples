@@ -26,6 +26,14 @@ updates:
         update-types: 
           - "minor"
           - "patch"
+      prod-major:
+        dependency-type: "production"
+        update-types: 
+          - "major"
+      dev-major:
+        dependency-type: "development"
+        update-types: 
+          - "major"
 
     allow:
       - dependency-type: "production"

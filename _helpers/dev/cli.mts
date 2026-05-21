@@ -206,7 +206,6 @@ function testUnit(passthru) {
      
     "vitest", [
       "run",
-      "--passWithNoTests",
       "--reporter", "verbose",
       ...passthru,
       "unit.test.ts",
@@ -273,7 +272,6 @@ async function testE2e(passthru) {
       const result = spawnSync(
         "vitest", [
           "run",
-          "--passWithNoTests",
           "--reporter", "verbose",
           ...passthru
 

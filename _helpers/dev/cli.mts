@@ -209,7 +209,7 @@ function testUnit(passthru) {
       "--passWithNoTests",
       "--reporter", "verbose",
       ...passthru,
-      ".*\\.unit\\.test\\.ts",
+      "unit.test.ts",
     ],
     { stdio: 'inherit' }
   )
@@ -234,10 +234,9 @@ async function testE2e(passthru) {
     const result = spawnSync(
       "vitest", [
         "run",
-        "--passWithNoTests",
         "--reporter", "verbose",
         ...passthru,
-         "src/cluster\\.e2e\\.test\\.ts",
+         "src/cluster.e2e.test.ts",
       ],
       { stdio: 'inherit' }
     )
@@ -252,10 +251,9 @@ async function testE2e(passthru) {
       const result = spawnSync(
         "vitest", [
           "run",
-          "--passWithNoTests",
           "--reporter", "verbose",
           ...passthru,
-          "src/cluster\\.e2e\\.test\\.ts",
+          "src/cluster.e2e.test.ts",
         ],
         {
           stdio: 'inherit',

@@ -133,8 +133,11 @@ describe("finalize.ts", () => {
     await stripFinalizers();
     await clean(trc);
     await stripPeprSystemFinalizers();
-    await dumpPeprSystem();
     await moduleDownBounded(45);
+    // Dump AFTER moduleDown timed out — pepr-system should now be in
+    // Terminating phase with status.conditions naming the actual blocker
+    // (NamespaceContentRemaining, NamespaceFinalizersRemaining, etc.).
+    await dumpPeprSystem();
   }, mins(2));
 
   describe("create", () => {

@@ -9,9 +9,42 @@ import { KubernetesObject } from "kubernetes-fluent-client";
 
 const trc = new TestRunCfg(__filename);
 
+const FINALIZER = "pepr.dev/finalizer";
+const TEST_NAMESPACES = [
+  "hello-pepr-finalize-create",
+  "hello-pepr-finalize-createorupdate",
+  "hello-pepr-finalize-update",
+  "hello-pepr-finalize-update-opt-out",
+  "hello-pepr-finalize-delete",
+];
+
+// Clears pepr.dev/finalizer from any leftover ConfigMap in the test
+// namespaces so namespace termination can't block cleanup. Without this,
+// any CM whose Finalize callback didn't fire (or returned false) keeps
+// its namespace stuck Terminating and afterAll hangs to its timeout.
+async function stripFinalizers(): Promise<void> {
+  for (const ns of TEST_NAMESPACES) {
+    let cms;
+    try {
+      cms = await K8s(kind.ConfigMap).InNamespace(ns).Get();
+    } catch (e) {
+      if (e.status === 404) continue;
+      throw e;
+    }
+    for (const cm of cms.items) {
+      if (!cm.metadata?.finalizers?.includes(FINALIZER)) continue;
+      await K8s(kind.ConfigMap, {
+        namespace: ns,
+        name: cm.metadata!.name!,
+      }).Patch([{ op: "replace", path: "/metadata/finalizers", value: [] }]);
+    }
+  }
+}
+
 describe("finalize.ts", () => {
   beforeAll(async () => await moduleUp(3), mins(4));
   afterAll(async () => {
+    await stripFinalizers();
     await clean(trc);
     await moduleDown();
   }, mins(2));

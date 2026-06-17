@@ -66,53 +66,12 @@ async function stripPeprSystemFinalizers(): Promise<void> {
   }
 }
 
-// Diagnostic dump: log everything in pepr-system at teardown time so we
-// can identify what's actually holding the namespace in Terminating.
-// Runs right before moduleDown(). Best-effort — never throws.
-async function dumpPeprSystem(): Promise<void> {
-  const ns = "pepr-system";
-  console.log(`[diag] === pepr-system teardown snapshot ===`);
-  try {
-    const got = await K8s(kind.Namespace).Get(ns);
-    console.log(
-      `[diag] namespace phase=${got.status?.phase} conditions=${JSON.stringify(
-        got.status?.conditions ?? [],
-      )} finalizers=${JSON.stringify(got.spec?.finalizers ?? [])}`,
-    );
-  } catch (e) {
-    console.log(`[diag] namespace Get failed: status=${e.status}`);
-  }
-
-  const kinds: Array<[string, any]> = [
-    ["ConfigMap", kind.ConfigMap],
-    ["Secret", kind.Secret],
-    ["Pod", kind.Pod],
-    ["Service", kind.Service],
-    ["Deployment", kind.Deployment],
-    ["ServiceAccount", kind.ServiceAccount],
-  ];
-  for (const [label, k] of kinds) {
-    try {
-      const list = await K8s(k).InNamespace(ns).Get();
-      for (const obj of list.items) {
-        const fins = obj.metadata?.finalizers ?? [];
-        const dt = obj.metadata?.deletionTimestamp;
-        console.log(
-          `[diag] ${label}/${obj.metadata?.name} finalizers=${JSON.stringify(fins)} deletionTimestamp=${dt ?? "none"}`,
-        );
-      }
-    } catch (e) {
-      console.log(`[diag] ${label} list failed: status=${e.status}`);
-    }
-  }
-  console.log(`[diag] === end snapshot ===`);
-}
-
-// Bound moduleDown() so afterAll can complete even if pepr-system stays
-// stuck Terminating. The CI job's k3d cluster is destroyed when the job
-// ends, so leaving residual Pepr artifacts is harmless. NOT the same as
-// raising vitest's hookTimeout — that would just wait longer for the
-// same hang; this gives up on the wait and lets the hook exit cleanly.
+// Bound moduleDown() so afterAll can complete even when pepr-system
+// takes longer than vitest's hookTimeout to fully terminate on a
+// constrained k3d cluster. The CI job's cluster is destroyed at job
+// end, so a not-fully-completed moduleDown is harmless. NOT the same
+// as raising the hookTimeout — that just waits longer for the same
+// hang; this gives up on the wait so the hook exits cleanly.
 async function moduleDownBounded(budgetSecs: number): Promise<void> {
   const result = await Promise.race([
     moduleDown().then(() => "done" as const),
@@ -122,7 +81,7 @@ async function moduleDownBounded(budgetSecs: number): Promise<void> {
   ]);
   if (result === "timeout") {
     console.warn(
-      `[diag] moduleDown() exceeded ${budgetSecs}s; proceeding so afterAll can complete`,
+      `moduleDown() exceeded ${budgetSecs}s; proceeding so afterAll can complete`,
     );
   }
 }
@@ -133,21 +92,6 @@ describe("finalize.ts", () => {
     await stripFinalizers();
     await clean(trc);
     await stripPeprSystemFinalizers();
-
-    // Delete pepr-system ourselves so we can dump it mid-Terminating —
-    // status.conditions populate within a few seconds and name the
-    // actual blocker (NamespaceContentRemaining etc.). Doing this
-    // before moduleDown also avoids the cascading CRD/webhook deletes
-    // that destabilize apiserver discovery (status=400 on subsequent
-    // KFC calls, observed in the prior CI run).
-    try {
-      await K8s(kind.Namespace).Delete("pepr-system");
-    } catch (e) {
-      if (e.status !== 404) throw e;
-    }
-    await new Promise(r => setTimeout(r, 5000));
-    await dumpPeprSystem();
-
     await moduleDownBounded(45);
   }, mins(2));
 

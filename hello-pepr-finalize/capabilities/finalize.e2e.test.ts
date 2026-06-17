@@ -6,12 +6,10 @@ import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";
 import { K8s, kind } from "pepr";
 import { KubernetesObject } from "kubernetes-fluent-client";
-import cfg from "../package.json";
 
 const trc = new TestRunCfg(__filename);
 
 const FINALIZER = "pepr.dev/finalizer";
-const PEPR_WEBHOOK_NAME = `pepr-${cfg.pepr.uuid}`;
 const TEST_NAMESPACES = [
   "hello-pepr-finalize-create",
   "hello-pepr-finalize-createorupdate",
@@ -43,22 +41,27 @@ async function stripFinalizers(): Promise<void> {
   }
 }
 
-// Pepr's MutatingWebhookConfiguration matches Namespace operations. The
-// shared moduleDown() helper deletes the pepr-system namespace before
-// removing the webhook configs, so kube-apiserver tries to call a webhook
-// whose backing service is being torn down with the namespace; with
-// failurePolicy: Fail the deletion deadlocks until the hook times out.
-// Removing the webhook configs first lets pepr-system terminate cleanly;
-// moduleDown's later 404-tolerant deletes are no-ops.
-async function removePeprWebhooks(): Promise<void> {
-  for (const k of [
-    kind.ValidatingWebhookConfiguration,
-    kind.MutatingWebhookConfiguration,
-  ]) {
+// Pepr persists its own state in pepr-system (ConfigMaps/Secrets named
+// pepr-<uuid>-*) with finalizers it removes during graceful shutdown.
+// In test teardown the controller is killed before it can drain those
+// finalizers, so pepr-system stays in Terminating and moduleDown's
+// `untilTrue(() => gone(...))` waits forever. Clearing finalizers here
+// lets the namespace terminate immediately.
+async function stripPeprSystemFinalizers(): Promise<void> {
+  const ns = "pepr-system";
+  for (const k of [kind.ConfigMap, kind.Secret]) {
+    let items;
     try {
-      await K8s(k).Delete(PEPR_WEBHOOK_NAME);
+      items = (await K8s(k).InNamespace(ns).Get()).items;
     } catch (e) {
-      if (e.status !== 404) throw e;
+      if (e.status === 404) continue;
+      throw e;
+    }
+    for (const obj of items) {
+      if (!obj.metadata?.finalizers?.length) continue;
+      await K8s(k, { namespace: ns, name: obj.metadata!.name! }).Patch([
+        { op: "replace", path: "/metadata/finalizers", value: [] },
+      ]);
     }
   }
 }
@@ -68,7 +71,7 @@ describe("finalize.ts", () => {
   afterAll(async () => {
     await stripFinalizers();
     await clean(trc);
-    await removePeprWebhooks();
+    await stripPeprSystemFinalizers();
     await moduleDown();
   }, mins(2));
 

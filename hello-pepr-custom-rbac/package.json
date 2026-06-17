@@ -21,35 +21,7 @@
     "includedFiles": [],
     "env": {
       "LOG_LEVEL": "debug"
-    },
-    "rbac": [
-      {
-        "apiGroups": [
-          ""
-        ],
-        "resources": [
-          "pods"
-        ],
-        "verbs": [
-          "get",
-          "list",
-          "watch"
-        ]
-      },
-      {
-        "apiGroups": [
-          "apps"
-        ],
-        "resources": [
-          "deployments"
-        ],
-        "verbs": [
-          "create",
-          "update",
-          "patch"
-        ]
-      }
-    ]
+    }
   },
   "dependencies": {
     "pepr": "1.2.0"

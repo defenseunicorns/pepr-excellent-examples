@@ -2,17 +2,22 @@ import { beforeEach, afterEach, describe, it, expect } from "vitest";
 import { mins } from "helpers/src/time";
 import { moduleUp, moduleDown } from "helpers/src/pepr";
 import fs from "fs/promises";
-import { copyFile } from "fs/promises";
 import path from "path";
 import yaml from "js-yaml";
 import { execSync } from "child_process";
 
 async function usePackageJson(type: "default" | "custom") {
-  const srcPath = path.resolve(__dirname, `../package.${type}.json`);
-  const destPath = path.resolve(__dirname, "../package.json");
+  const pkgPath = path.resolve(__dirname, "../package.json");
+  const pkg = JSON.parse(await fs.readFile(pkgPath, "utf8"));
 
-  // Asynchronously copy the specified package.json to the main package.json
-  await copyFile(srcPath, destPath);
+  if (type === "custom") {
+    const overlayPath = path.resolve(__dirname, "../fixtures/rbac.custom.json");
+    pkg.pepr.rbac = JSON.parse(await fs.readFile(overlayPath, "utf8"));
+  } else {
+    delete pkg.pepr.rbac;
+  }
+
+  await fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 }
 
 describe("rbac generation with rbacMode=admin", () => {

@@ -6,10 +6,12 @@ import { moduleUp, moduleDown, untilLogged, logs } from "helpers/src/pepr";
 import { clean } from "helpers/src/cluster";
 import { K8s, kind } from "pepr";
 import { KubernetesObject } from "kubernetes-fluent-client";
+import cfg from "../package.json";
 
 const trc = new TestRunCfg(__filename);
 
 const FINALIZER = "pepr.dev/finalizer";
+const PEPR_WEBHOOK_NAME = `pepr-${cfg.pepr.uuid}`;
 const TEST_NAMESPACES = [
   "hello-pepr-finalize-create",
   "hello-pepr-finalize-createorupdate",
@@ -41,11 +43,32 @@ async function stripFinalizers(): Promise<void> {
   }
 }
 
+// Pepr's MutatingWebhookConfiguration matches Namespace operations. The
+// shared moduleDown() helper deletes the pepr-system namespace before
+// removing the webhook configs, so kube-apiserver tries to call a webhook
+// whose backing service is being torn down with the namespace; with
+// failurePolicy: Fail the deletion deadlocks until the hook times out.
+// Removing the webhook configs first lets pepr-system terminate cleanly;
+// moduleDown's later 404-tolerant deletes are no-ops.
+async function removePeprWebhooks(): Promise<void> {
+  for (const k of [
+    kind.ValidatingWebhookConfiguration,
+    kind.MutatingWebhookConfiguration,
+  ]) {
+    try {
+      await K8s(k).Delete(PEPR_WEBHOOK_NAME);
+    } catch (e) {
+      if (e.status !== 404) throw e;
+    }
+  }
+}
+
 describe("finalize.ts", () => {
   beforeAll(async () => await moduleUp(3), mins(4));
   afterAll(async () => {
     await stripFinalizers();
     await clean(trc);
+    await removePeprWebhooks();
     await moduleDown();
   }, mins(2));
 

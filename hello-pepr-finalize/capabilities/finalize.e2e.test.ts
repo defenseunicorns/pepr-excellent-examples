@@ -133,11 +133,22 @@ describe("finalize.ts", () => {
     await stripFinalizers();
     await clean(trc);
     await stripPeprSystemFinalizers();
-    await moduleDownBounded(45);
-    // Dump AFTER moduleDown timed out — pepr-system should now be in
-    // Terminating phase with status.conditions naming the actual blocker
-    // (NamespaceContentRemaining, NamespaceFinalizersRemaining, etc.).
+
+    // Delete pepr-system ourselves so we can dump it mid-Terminating —
+    // status.conditions populate within a few seconds and name the
+    // actual blocker (NamespaceContentRemaining etc.). Doing this
+    // before moduleDown also avoids the cascading CRD/webhook deletes
+    // that destabilize apiserver discovery (status=400 on subsequent
+    // KFC calls, observed in the prior CI run).
+    try {
+      await K8s(kind.Namespace).Delete("pepr-system");
+    } catch (e) {
+      if (e.status !== 404) throw e;
+    }
+    await new Promise(r => setTimeout(r, 5000));
     await dumpPeprSystem();
+
+    await moduleDownBounded(45);
   }, mins(2));
 
   describe("create", () => {

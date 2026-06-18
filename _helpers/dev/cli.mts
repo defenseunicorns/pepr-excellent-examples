@@ -10,7 +10,6 @@ import { findUpSync } from 'find-up'
 import { getPeprAlias } from '../src/pepr'
 import { rewriteWorkspacePeprPins, restoreWorkspacePeprPins } from '../src/peprPins'
 import { copyFileSync, mkdirSync, renameSync, rmSync } from 'fs';
-import { rmdirSync } from 'node:fs';
 import assert from 'node:assert';
 
 
@@ -197,7 +196,7 @@ function validateCustomPackage(parentDir: string) {
     throw new Error(`Custom-Package (${process.env.PEPR_PACKAGE}) does not appear to be a pepr package, exiting.`);
   }
   finally {
-    rmdirSync(`${parentDir}/custom-package`, { recursive: true });
+    rmSync(`${parentDir}/custom-package`, { recursive: true, force: true });
   }
 }
 

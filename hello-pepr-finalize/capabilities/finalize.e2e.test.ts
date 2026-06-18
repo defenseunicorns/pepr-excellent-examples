@@ -9,11 +9,90 @@ import { KubernetesObject } from "kubernetes-fluent-client";
 
 const trc = new TestRunCfg(__filename);
 
+const FINALIZER = "pepr.dev/finalizer";
+const TEST_NAMESPACES = [
+  "hello-pepr-finalize-create",
+  "hello-pepr-finalize-createorupdate",
+  "hello-pepr-finalize-update",
+  "hello-pepr-finalize-update-opt-out",
+  "hello-pepr-finalize-delete",
+];
+
+// Clears pepr.dev/finalizer from any leftover ConfigMap in the test
+// namespaces so namespace termination can't block cleanup. Without this,
+// any CM whose Finalize callback didn't fire (or returned false) keeps
+// its namespace stuck Terminating and afterAll hangs to its timeout.
+async function stripFinalizers(): Promise<void> {
+  for (const ns of TEST_NAMESPACES) {
+    let cms;
+    try {
+      cms = await K8s(kind.ConfigMap).InNamespace(ns).Get();
+    } catch (e) {
+      if (e.status === 404) continue;
+      throw e;
+    }
+    for (const cm of cms.items) {
+      if (!cm.metadata?.finalizers?.includes(FINALIZER)) continue;
+      await K8s(kind.ConfigMap, {
+        namespace: ns,
+        name: cm.metadata!.name!,
+      }).Patch([{ op: "replace", path: "/metadata/finalizers", value: [] }]);
+    }
+  }
+}
+
+// Pepr persists its own state in pepr-system (ConfigMaps/Secrets named
+// pepr-<uuid>-*) with finalizers it removes during graceful shutdown.
+// In test teardown the controller is killed before it can drain those
+// finalizers, so pepr-system stays in Terminating and moduleDown's
+// `untilTrue(() => gone(...))` waits forever. Clearing finalizers here
+// lets the namespace terminate immediately.
+async function stripPeprSystemFinalizers(): Promise<void> {
+  const ns = "pepr-system";
+  for (const k of [kind.ConfigMap, kind.Secret]) {
+    let items;
+    try {
+      items = (await K8s(k).InNamespace(ns).Get()).items;
+    } catch (e) {
+      if (e.status === 404) continue;
+      throw e;
+    }
+    for (const obj of items) {
+      if (!obj.metadata?.finalizers?.length) continue;
+      await K8s(k, { namespace: ns, name: obj.metadata!.name! }).Patch([
+        { op: "replace", path: "/metadata/finalizers", value: [] },
+      ]);
+    }
+  }
+}
+
+// Bound moduleDown() so afterAll can complete even when pepr-system
+// takes longer than vitest's hookTimeout to fully terminate on a
+// constrained k3d cluster. The CI job's cluster is destroyed at job
+// end, so a not-fully-completed moduleDown is harmless. NOT the same
+// as raising the hookTimeout — that just waits longer for the same
+// hang; this gives up on the wait so the hook exits cleanly.
+async function moduleDownBounded(budgetSecs: number): Promise<void> {
+  const result = await Promise.race([
+    moduleDown().then(() => "done" as const),
+    new Promise<"timeout">(resolve =>
+      setTimeout(() => resolve("timeout"), budgetSecs * 1000),
+    ),
+  ]);
+  if (result === "timeout") {
+    console.warn(
+      `moduleDown() exceeded ${budgetSecs}s; proceeding so afterAll can complete`,
+    );
+  }
+}
+
 describe("finalize.ts", () => {
   beforeAll(async () => await moduleUp(3), mins(4));
   afterAll(async () => {
+    await stripFinalizers();
     await clean(trc);
-    await moduleDown();
+    await stripPeprSystemFinalizers();
+    await moduleDownBounded(45);
   }, mins(2));
 
   describe("create", () => {

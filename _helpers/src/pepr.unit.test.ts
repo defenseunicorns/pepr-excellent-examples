@@ -1,6 +1,56 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import * as sut from "./pepr";
 
+describe("getPeprAlias()", () => {
+  let saved: { PEPR_SPEC?: string; PEPR_PACKAGE?: string };
+
+  beforeEach(() => {
+    saved = { PEPR_SPEC: process.env.PEPR_SPEC, PEPR_PACKAGE: process.env.PEPR_PACKAGE };
+    delete process.env.PEPR_SPEC;
+    delete process.env.PEPR_PACKAGE;
+  });
+
+  afterEach(() => {
+    process.env.PEPR_SPEC = saved.PEPR_SPEC;
+    process.env.PEPR_PACKAGE = saved.PEPR_PACKAGE;
+    if (saved.PEPR_SPEC === undefined) delete process.env.PEPR_SPEC;
+    if (saved.PEPR_PACKAGE === undefined) delete process.env.PEPR_PACKAGE;
+  });
+
+  it("prefers PEPR_SPEC when set (resolved-once spec)", () => {
+    process.env.PEPR_SPEC = "pepr@1.2.3";
+    process.env.PEPR_PACKAGE = "/tmp/pepr.tgz";
+    expect(sut.getPeprAlias()).toBe("pepr@1.2.3");
+  });
+
+  it("falls back to file:PEPR_PACKAGE when PEPR_SPEC is unset", () => {
+    process.env.PEPR_PACKAGE = "/tmp/pepr.tgz";
+    expect(sut.getPeprAlias()).toBe("file:/tmp/pepr.tgz");
+  });
+
+  it("defaults to pepr@latest when nothing is set", () => {
+    expect(sut.getPeprAlias()).toBe("pepr@latest");
+  });
+});
+
+describe("peprVersion()", () => {
+  let saved: string | undefined;
+
+  beforeEach(() => {
+    saved = process.env.PEPR_SPEC;
+  });
+
+  afterEach(() => {
+    process.env.PEPR_SPEC = saved;
+    if (saved === undefined) delete process.env.PEPR_SPEC;
+  });
+
+  it("returns the version from a resolved PEPR_SPEC without shelling out", async () => {
+    process.env.PEPR_SPEC = "pepr@1.2.3";
+    await expect(sut.peprVersion()).resolves.toBe("1.2.3");
+  });
+});
+
 describe("sift()", () => {
   let mockLog, mockErr;
 

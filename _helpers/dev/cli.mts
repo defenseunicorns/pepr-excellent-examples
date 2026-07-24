@@ -117,7 +117,18 @@ program.command('test')
       throw new Error(`Failed to run npm install in ${peprExcellentExamplesRepo}. Check package.json and package-lock.json. Error: ${err.message}`);
     }
 
-    printTestInfo() 
+    // Resolve the pepr spec exactly once per run. The concrete spec is exported
+    // as PEPR_SPEC and inherited by the spawned vitest child, so every downstream
+    // `npx` call (build/deploy/version/init) reuses the cached package instead of
+    // re-resolving the `pepr@latest` dist-tag and re-downloading each time.
+    if (process.env.PEPR_PACKAGE) {
+      process.env.PEPR_SPEC = `file:${process.env.PEPR_PACKAGE}`;
+    } else {
+      const version = execSync(`npm view pepr@latest version`).toString().trim();
+      process.env.PEPR_SPEC = `pepr@${version}`;
+    }
+
+    printTestInfo()
   })
   .action(async ({suite, passthru}) => {
     try{
@@ -143,8 +154,9 @@ function printTestInfo() {
     if (process.env.PEPR_PACKAGE) {
       console.log(`Pepr Build under test: ${execSync(`shasum ${process.env.PEPR_PACKAGE}`).toString()}`);
     } else {
-      const peprVersion = execSync(`npx --yes ${getPeprAlias()} --version`).toString();
-      console.log(`Pepr Version under test: ${peprVersion}`);
+      // PEPR_SPEC was resolved once in preAction ("pepr@<version>"); reuse it
+      // rather than shelling out to `npx` again just to read the version.
+      console.log(`Pepr Version under test: ${process.env.PEPR_SPEC}`);
     }
     if (process.env.PEPR_IMAGE) {
       console.log(`Pepr Image under test: ${execSync(`docker inspect --format="{{.Id}} {{.RepoTags}}" ${process.env.PEPR_IMAGE}`).toString()}`);

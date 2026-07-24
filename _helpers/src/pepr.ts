@@ -94,10 +94,22 @@ export async function untilLogged(needle: string | ((log: string) => boolean), c
 }
 
 export function getPeprAlias(): string {
+  // PEPR_SPEC is the spec resolved once per run (e.g. "pepr@1.2.3" or "file:...").
+  // Preferring it lets every downstream `npx` call reuse the cached package
+  // instead of re-resolving the `pepr@latest` dist-tag (and re-downloading).
+  if (process.env.PEPR_SPEC) {
+    return process.env.PEPR_SPEC;
+  }
   return process.env.PEPR_PACKAGE ? `file:${process.env.PEPR_PACKAGE}` : "pepr@latest";
 }
 
 export async function peprVersion(): Promise<string> {
+  // A resolved spec (set once per run) already carries the exact version, so
+  // skip the extra `npx pepr --version` round-trip.
+  if (process.env.PEPR_SPEC?.startsWith("pepr@")) {
+    return process.env.PEPR_SPEC.slice("pepr@".length);
+  }
+
   let version: string = "";
   if (getPeprAlias().startsWith("pepr")) {
     // determine npx pepr@version from workspace root

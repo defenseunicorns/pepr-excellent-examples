@@ -4,16 +4,55 @@ permissions: read-all
 on:
   workflow_dispatch:
   merge_group:
-    paths-ignore:
-    - "LICENSE"
-    - "CODEOWNERS"
-    - "**.md"
   push:
     branches: ["main"]
   pull_request:
     branches: ["main"]
 
 jobs:
+
+  harness:
+    name: harness validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint harness sources
+        run: npx --no-install eslint _helpers/src --config eslint.config.mjs
+
+      - name: Typecheck harness sources
+        # Match Vitest's resolution of the existing extensionless imports.
+        run: npx --no-install tsc --noEmit --project _helpers/tsconfig.json --moduleResolution bundler --module ESNext
+
+      - name: Run harness unit tests
+        # Invoke Vitest directly so its exit code reaches CI.
+        run: npx --no-install vitest run --root _helpers unit.test.ts
+
+  validation:
+    name: dependency validation
+    needs: [harness, excellent-examples]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require harness and E2E success
+        env:
+          HARNESS_RESULT: ${{ needs.harness.result }}
+          E2E_RESULT: ${{ needs.excellent-examples.result }}
+        run: test "$HARNESS_RESULT" = success && test "$E2E_RESULT" = success
 
   examples-matrix:
     name: job matrix

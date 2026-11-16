@@ -1,3 +1,4 @@
+import { realpathSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { Cmd } from "./Cmd";
 
@@ -27,7 +28,7 @@ describe("runRaw()", () => {
   });
 
   it("accepts working directory", async () => {
-    const expected = "/tmp";
+    const expected = realpathSync("/tmp");
     const { stdout } = await new Cmd({ cwd: expected, cmd: `pwd` }).runRaw();
     expect(stdout.join("")).toBe(expected);
   });

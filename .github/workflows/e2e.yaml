@@ -200,3 +200,60 @@ jobs:
           timeout_minutes: 6
           command: |
             npm run --workspace=${{ matrix.name }} test:e2e 
+
+  maintenance-automerge:
+    name: enable maintenance auto-merge
+    needs: [validation]
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.head_ref, 'dependabot/npm_and_yarn/maintenance-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # No checkout: this job does not execute pull-request code with write access.
+      - name: Require validation in branch rules
+        id: rules
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          required=$(gh api "repos/$REPOSITORY/rules/branches/main" --jq 'any(.[]; .type == "required_status_checks" and any(.parameters.required_status_checks[]?; .context == "dependency validation"))')
+          echo "required=$required" >> "$GITHUB_OUTPUT"
+          if [ "$required" != true ]; then
+            echo "::notice::Auto-merge stays disabled until dependency validation is required by the main branch rules."
+          fi
+
+      - name: Read Dependabot metadata
+        if: steps.rules.outputs.required == 'true'
+        id: metadata
+        uses: dependabot/fetch-metadata@d7267f607e9d3fb96fc2fbe83e0af444713e90b7 # v2.3.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check routine maintenance scope
+        if: steps.rules.outputs.required == 'true'
+        id: scope
+        env:
+          DEPENDENCY_NAMES: ${{ steps.metadata.outputs.dependency-names }}
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const names = process.env.DEPENDENCY_NAMES.split(',').map(name => name.trim()).filter(Boolean);
+          const routineTypes = ['version-update:semver-minor', 'version-update:semver-patch'];
+          const eligible = names.length > 0 && !names.includes('pepr') && routineTypes.includes(process.env.UPDATE_TYPE);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `eligible=${eligible}\n`);
+          NODE
+
+      - name: Enable auto-merge after validation
+        if: steps.scope.outputs.eligible == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        # Organization review and code-owner requirements still apply.
+        run: gh pr merge --auto --squash --match-head-commit "$HEAD_SHA" "$PR_URL"

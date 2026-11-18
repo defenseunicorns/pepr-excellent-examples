@@ -26,7 +26,7 @@
     }
   },
   "dependencies": {
-    "pepr": "1.2.0"
+    "pepr": "2.0.7"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",

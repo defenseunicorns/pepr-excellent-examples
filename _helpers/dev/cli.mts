@@ -54,7 +54,7 @@ program.command('test')
   .description('run tests')
   .addOption(
     new Option('-s, --suite <suite>', 'suite type')
-      .choices(['unit', 'e2e', 'all'])
+      .choices(['unit', 'build', 'e2e', 'all'])
       .default('all')
   )
   .addOption(
@@ -135,6 +135,7 @@ program.command('test')
       passthru = passthru || []
       switch (suite) {
         case 'unit':  testUnit(passthru)      ; break
+        case 'build': testBuild(passthru)    ; break
         case 'e2e':   await testE2e(passthru) ; break
         case 'all':   await testAll(passthru) ; break
       }
@@ -223,6 +224,19 @@ function testUnit(passthru) {
     ],
     { stdio: 'inherit' }
   )
+}
+
+function testBuild(passthru) {
+  const result = spawnSync(
+    "vitest", [
+      "run",
+      "--reporter", "verbose",
+      ...passthru,
+      "build.test.ts",
+    ],
+    { stdio: 'inherit', cwd: process.env.PWD }
+  )
+  if (result.status !== 0) { throw result }
 }
 
 async function testE2e(passthru) {

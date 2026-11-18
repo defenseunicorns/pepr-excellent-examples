@@ -26,7 +26,7 @@ async function retry<T, U>(
   } catch (err) {
     const status = Object.hasOwn(err, "status") ? `${err.status}` : undefined;
 
-    if (["400", "429"].includes(status)) {
+    if (["400", "429", "503"].includes(status) && reactions[status]) {
       await reactions[status](err);
 
       retries -= 1;
@@ -74,29 +74,54 @@ export async function up(name: string = "pexex-helpers-cluster"): Promise<string
 
   const kubeConfig = config.stdout[0];
 
-  // config KFC to use test-specific kube config
-  process.env.KUBECONFIG = kubeConfig;
+  const originalKubeconfig = process.env.KUBECONFIG;
+  try {
+    // A created k3d cluster may still return 503 while its API server starts.
+    // Each request is bounded, and the loop allows at most 20 attempts.
+    for (let attempt = 0; attempt < 20; attempt++) {
+      try {
+        await new Cmd({
+          cmd: "kubectl get --raw=/readyz --request-timeout=2s",
+          env: { KUBECONFIG: kubeConfig },
+        }).run();
+        break;
+      } catch (err) {
+        if (attempt === 19) throw err;
+        await sleep(1);
+      }
+    }
 
-  // delay return until installed kinds are servable from cluster (i.e. no 429s)
-  const kinds = Object.keys(kind)
-    .filter(k => k !== "GenericKind")
-    .map(k => kind[k]);
-  await Promise.all(
-    kinds.map(
-      async k =>
-        await retry(async () => await K8s(k).Get(), {
-          "400": async () => {
-            await sleep(5);
-          },
-          "404": noop,
-          "405": noop,
-          "429": async (err: KfcErr) => {
-            await sleep(err.data.details ? err.data.details.retryAfterSeconds : 1);
-          },
-        }),
-    ),
-  );
-  delete process.env.KUBECONFIG;
+    // Config KFC to use the test-specific kubeconfig for kind discovery.
+    process.env.KUBECONFIG = kubeConfig;
+    const kinds = Object.keys(kind)
+      .filter(k => k !== "GenericKind")
+      .map(k => kind[k]);
+    const discovery = await Promise.allSettled(
+      kinds.map(
+        async k =>
+          await retry(async () => await K8s(k).Get(), {
+            "400": async () => {
+              await sleep(5);
+            },
+            "404": noop,
+            "405": noop,
+            "429": async (err: KfcErr) => {
+              await sleep(err.data.details ? err.data.details.retryAfterSeconds : 1);
+            },
+            "503": async () => {
+              await sleep(1);
+            },
+          }),
+      ),
+    );
+    // Keep the test kubeconfig active until every request and retry has finished.
+    for (const result of discovery) {
+      if (result.status === "rejected") throw result.reason;
+    }
+  } finally {
+    if (originalKubeconfig === undefined) delete process.env.KUBECONFIG;
+    else process.env.KUBECONFIG = originalKubeconfig;
+  }
 
   return kubeConfig;
 }

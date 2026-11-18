@@ -52,6 +52,6 @@ describe("run()", () => {
   it("on failure, throws result", async () => {
     const expected = { exitcode: 1, stderr: [], stdout: [] };
     const promise = new Cmd({ cmd: `exit ${expected.exitcode}` }).run();
-    expect(promise).rejects.toEqual(expected);
+    await expect(promise).rejects.toEqual(expected);
   });
 });

@@ -18,7 +18,7 @@ vi.mock("./Cmd.js", () => ({
 vi.mock("./time.js", () => ({ sleep }));
 vi.mock("kubernetes-fluent-client", () => ({
   K8s: () => ({ Get: get }),
-  kind: { ConfigMap: class {} },
+  kind: { ConfigMap: class {}, Secret: class {} },
   RegisterKind: vi.fn(),
 }));
 
@@ -82,8 +82,45 @@ describe("up() readiness", () => {
   it("retries a transient 503 during kind discovery", async () => {
     get.mockRejectedValueOnce({ status: 503 }).mockResolvedValue({ items: [] });
     await up("test-cluster");
-    expect(get).toHaveBeenCalledTimes(2);
+    expect(get).toHaveBeenCalledTimes(3);
   });
+
+  it.each([undefined, "/original/kubeconfig"])(
+    "waits for other discovery retries before restoring kubeconfig %s after a failure",
+    async kubeconfig => {
+      if (kubeconfig === undefined) delete process.env.KUBECONFIG;
+      else process.env.KUBECONFIG = kubeconfig;
+      const error = { status: 401 };
+      const retryKubeconfigs: (string | undefined)[] = [];
+      let resumeRetry!: () => void;
+      sleep.mockImplementation(() => new Promise<void>(resolve => (resumeRetry = resolve)));
+      get
+        .mockRejectedValueOnce(error)
+        .mockRejectedValueOnce({ status: 503 })
+        .mockImplementation(async () => {
+          retryKubeconfigs.push(process.env.KUBECONFIG);
+          return { items: [] };
+        });
+      let settled = false;
+      const result = up("test-cluster")
+        .catch(err => err)
+        .finally(() => (settled = true));
+
+      try {
+        await vi.waitFor(() => expect(sleep).toHaveBeenCalledWith(1));
+        expect(settled).toBe(false);
+        expect(process.env.KUBECONFIG).toBe("/test/kubeconfig");
+      } finally {
+        resumeRetry();
+        await result;
+      }
+
+      await expect(result).resolves.toEqual(error);
+      expect(get).toHaveBeenCalledTimes(3);
+      expect(retryKubeconfigs).toEqual(["/test/kubeconfig"]);
+      expect(process.env.KUBECONFIG).toBe(kubeconfig);
+    },
+  );
 
   it("bounds readiness attempts and restores kubeconfig on failure", async () => {
     process.env.KUBECONFIG = "/original/kubeconfig";

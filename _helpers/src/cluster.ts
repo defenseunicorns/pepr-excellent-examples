@@ -96,7 +96,7 @@ export async function up(name: string = "pexex-helpers-cluster"): Promise<string
     const kinds = Object.keys(kind)
       .filter(k => k !== "GenericKind")
       .map(k => kind[k]);
-    await Promise.all(
+    const discovery = await Promise.allSettled(
       kinds.map(
         async k =>
           await retry(async () => await K8s(k).Get(), {
@@ -114,6 +114,10 @@ export async function up(name: string = "pexex-helpers-cluster"): Promise<string
           }),
       ),
     );
+    // Keep the test kubeconfig active until every request and retry has finished.
+    for (const result of discovery) {
+      if (result.status === "rejected") throw result.reason;
+    }
   } finally {
     if (originalKubeconfig === undefined) delete process.env.KUBECONFIG;
     else process.env.KUBECONFIG = originalKubeconfig;

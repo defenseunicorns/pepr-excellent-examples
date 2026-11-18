@@ -12,12 +12,12 @@
     "pepr": "1.2.0"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
-    "commander": "^14.0.0",
-    "find-up": "^7.0.0",
+    "@types/node": "^26.6.6",
+    "commander": "^15.1.0",
+    "find-up": "^8.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "5.8.3",
-    "vitest": "^3.2.4",
+    "typescript": "7.0.2",
+    "vitest": "^5.1.0",
     "yaml": "^2.8.0"
   },
   "scripts": {

@@ -13,17 +13,18 @@ describe("up()", () => {
     async () => {
       const cluster = "pexex-helpers-cluster-e2e-up";
 
-      const kubeconfig = await up(cluster);
-
-      expect(existsSync(kubeconfig)).toBe(true);
-      const info = await new Cmd({
-        env: { KUBECONFIG: kubeconfig },
-        cmd: `kubectl cluster-info`,
-      }).run();
-      expect(info.stdout.join("\n")).toMatch(/is running/);
-
-      const remove = await new Cmd({ cmd: `k3d cluster delete ${cluster}` }).run();
-      expect(remove.exitcode).toBe(0);
+      let kubeconfig: string;
+      try {
+        kubeconfig = await up(cluster);
+        expect(existsSync(kubeconfig)).toBe(true);
+        const info = await new Cmd({
+          env: { KUBECONFIG: kubeconfig },
+          cmd: `kubectl cluster-info`,
+        }).run();
+        expect(info.stdout.join("\n")).toMatch(/is running/);
+      } finally {
+        await down(cluster);
+      }
       expect(existsSync(kubeconfig)).toBe(false);
     },
     mins(2),
@@ -35,13 +36,16 @@ describe("down()", () => {
     "deletes a test k3d cluster",
     async () => {
       const cluster = "pexex-helpers-cluster-e2e-down";
-      const kubeconfig = await up(cluster);
-
-      await down(cluster);
-
-      const list = await new Cmd({ cmd: `k3d cluster list` }).run();
-      expect(list.stdout.join("\n")).not.toMatch(new RegExp(cluster));
-      expect(existsSync(kubeconfig)).toBe(false);
+      let kubeconfig: string;
+      try {
+        kubeconfig = await up(cluster);
+        await down(cluster);
+        const list = await new Cmd({ cmd: `k3d cluster list` }).run();
+        expect(list.stdout.join("\n")).not.toMatch(new RegExp(cluster));
+        expect(existsSync(kubeconfig)).toBe(false);
+      } finally {
+        await down(cluster);
+      }
     },
     mins(2),
   );

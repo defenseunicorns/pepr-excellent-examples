@@ -1,13 +1,24 @@
 import { beforeEach, afterEach, describe, it, expect } from "vitest";
-import { mins } from "helpers/src/time";
-import { moduleUp, moduleDown } from "helpers/src/pepr";
+import { getPeprAlias } from "helpers/src/pepr";
 import fs from "fs/promises";
 import path from "path";
 import yaml from "js-yaml";
 import { execSync } from "child_process";
 
+const pkgPath = path.resolve(__dirname, "../package.json");
+let originalPackageJson: string;
+beforeEach(async () => {
+  originalPackageJson = await fs.readFile(pkgPath, "utf8");
+  await fs.rm(path.resolve(__dirname, "../dist"), {
+    recursive: true,
+    force: true,
+  });
+});
+afterEach(async () => {
+  await fs.writeFile(pkgPath, originalPackageJson);
+});
+
 async function usePackageJson(type: "default" | "custom") {
-  const pkgPath = path.resolve(__dirname, "../package.json");
   const pkg = JSON.parse(await fs.readFile(pkgPath, "utf8"));
 
   if (type === "custom") {
@@ -21,19 +32,9 @@ async function usePackageJson(type: "default" | "custom") {
 }
 
 describe("rbac generation with rbacMode=admin", () => {
-  const version = "";
-  const verbose = false;
-  const rbacMode = "admin";
-  beforeEach(
-    async () => await moduleUp(3, { version, verbose, rbacMode }),
-    mins(2),
-  );
-
-  afterEach(async () => await moduleDown(), mins(2));
-
   it("should create the yaml files with admin rbacMode and no custom rules", async () => {
     await usePackageJson("default");
-    execSync(`npx pepr build`);
+    execSync(`npx ${getPeprAlias()} build`);
 
     const valuesPath = path.resolve(
       __dirname,
@@ -101,7 +102,7 @@ describe("rbac generation with rbacMode=admin", () => {
 
   it("should create the yaml files with admin rbacMode and custom rules", async () => {
     await usePackageJson("custom");
-    execSync(`npx pepr build`);
+    execSync(`npx ${getPeprAlias()} build`);
 
     const valuesPath = path.resolve(
       __dirname,
@@ -169,20 +170,9 @@ describe("rbac generation with rbacMode=admin", () => {
 });
 
 describe("rbac generation with rbacMode=scoped", () => {
-  const version = "";
-  const verbose = false;
-  const rbacMode = "scoped";
-
-  beforeEach(
-    async () => await moduleUp(3, { version, verbose, rbacMode }),
-    mins(2),
-  );
-
-  afterEach(async () => await moduleDown(), mins(2));
-
   it("should create the yaml files with scoped rbacMode and no custom rules", async () => {
     await usePackageJson("default");
-    execSync(`npx pepr build --rbac-mode=scoped`);
+    execSync(`npx ${getPeprAlias()} build --rbac-mode=scoped`);
 
     const valuesPath = path.resolve(
       __dirname,
@@ -272,7 +262,7 @@ describe("rbac generation with rbacMode=scoped", () => {
 
   it("should create the yaml files with scoped rbacMode and custom rules", async () => {
     await usePackageJson("custom");
-    execSync(`npx pepr build --rbac-mode=scoped`);
+    execSync(`npx ${getPeprAlias()} build --rbac-mode=scoped`);
 
     const valuesPath = path.resolve(
       __dirname,

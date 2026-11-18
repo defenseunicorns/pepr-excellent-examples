@@ -43,7 +43,7 @@
     "pepr-operator"
   ],
   "dependencies": {
-    "@kubernetes/client-node": "1.4.0",
+    "@kubernetes/client-node": "2.0.2",
     "kubernetes-fluent-client": "^3.11.7"
   },
   "devDependencies": {

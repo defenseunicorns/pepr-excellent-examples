@@ -200,3 +200,81 @@ jobs:
           timeout_minutes: 6
           command: |
             npm run --workspace=${{ matrix.name }} test:e2e 
+
+  # Only routine Dependabot updates can use this job. Security and Pepr updates
+  # keep their normal review/merge process. The validation job must pass first.
+  maintenance-automerge:
+    name: enable maintenance auto-merge
+    needs: [validation]
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.head_ref, 'dependabot/npm_and_yarn/maintenance-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # No checkout: this job does not execute pull-request code with write access.
+      # Future commits must also pass CI while a PR waits for approval.
+      - name: Check that main requires dependency validation
+        id: rules
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          # List the required check names, then look for our validation check.
+          required=$(gh api "repos/$REPOSITORY/rules/branches/main" --jq '
+            [ .[]
+              | select(.type == "required_status_checks")
+              | .parameters.required_status_checks[]?.context
+            ]
+            | index("dependency validation") != null
+          ')
+          echo "required=$required" >> "$GITHUB_OUTPUT"
+          if [ "$required" != true ]; then
+            echo "::notice::Auto-merge stays disabled until dependency validation is required by the main branch rules."
+          fi
+
+      # Verify the PR came from Dependabot and find out what it updates.
+      - name: Verify Dependabot and read the changed dependencies
+        if: steps.rules.outputs.required == 'true'
+        id: metadata
+        uses: dependabot/fetch-metadata@d7267f607e9d3fb96fc2fbe83e0af444713e90b7 # v2.3.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Allow only minor or patch updates without Pepr
+        if: steps.rules.outputs.required == 'true'
+        id: scope
+        env:
+          DEPENDENCY_NAMES: ${{ steps.metadata.outputs.dependency-names }}
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const dependencyNames = process.env.DEPENDENCY_NAMES
+            .split(',')
+            .map(name => name.trim())
+            .filter(Boolean);
+
+          const hasDependencies = dependencyNames.length > 0;
+          const includesPepr = dependencyNames.includes('pepr');
+          const isMinorOrPatch =
+            process.env.UPDATE_TYPE === 'version-update:semver-minor' ||
+            process.env.UPDATE_TYPE === 'version-update:semver-patch';
+
+          const eligible = hasDependencies && isMinorOrPatch && !includesPepr;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `eligible=${eligible}\n`);
+          NODE
+
+      # Queue the merge; GitHub still waits for required human approvals.
+      - name: Enable auto-merge for this tested commit
+        if: steps.scope.outputs.eligible == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        # Refuse if the PR moved to a different commit while this job ran.
+        run: gh pr merge --auto --squash --match-head-commit "$HEAD_SHA" "$PR_URL"

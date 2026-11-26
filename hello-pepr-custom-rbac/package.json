@@ -27,7 +27,7 @@
     "pepr": "1.2.0"
   },
   "devDependencies": {
-    "vitest": "^3.2.4",
+    "vitest": "^5.1.2",
     "@types/node": "^24.1.0",
     "kubernetes-fluent-client": "^3.10.0",
     "typescript": "5.8.3"
